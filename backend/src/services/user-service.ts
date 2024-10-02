@@ -1,5 +1,5 @@
 import { AppDataSource } from "../config/data-source";
-import { User } from "../models/user";
+import { User } from "../entities/user";
 import bcrypt from "bcryptjs";
 
 // create user

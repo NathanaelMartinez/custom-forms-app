@@ -2,7 +2,7 @@ import "reflect-metadata";
 import express from "express";
 import { authenticateJWT, authorizeRoles } from "./middlewares/auth-middleware";
 import authRoutes from "./routes/auth-router";
-import { User } from "./models/user";
+import { User } from "./entities/user";
 import { initializeAuth } from "./services/auth-service";
 import dashboardRouter from "./routes/dashboard-router";
 import templateRouter from "./routes/template-router";

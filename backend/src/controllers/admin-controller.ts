@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { AppDataSource } from "../config/data-source";
-import { User } from "../models/user";
+import { User } from "../entities/user";
 import { In } from "typeorm";
 
 export const getUsers = async (req: Request, res: Response) => {

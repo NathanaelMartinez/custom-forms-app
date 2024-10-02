@@ -2,7 +2,7 @@ import passport from "passport";
 import { Strategy as JwtStrategy, ExtractJwt } from "passport-jwt";
 import { authConfig } from "../config/auth-config";
 import { AppDataSource } from "../config/data-source";
-import { User } from "../models/user";
+import { User } from "../entities/user";
 
 // jwt options
 const options = {

@@ -1,4 +1,5 @@
-import { Entity, PrimaryGeneratedColumn, Column } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from "typeorm";
+import { Template } from "./template";
 
 @Entity()
 export class User {
@@ -19,4 +20,10 @@ export class User {
 
   @Column({ default: "active" })
   status!: string; // status can be 'active' or 'blocked'
+
+  @OneToMany(() => Template, (template) => template.author)
+  templates!: Template[];
+
+  @Column({ default: () => "CURRENT_TIMESTAMP" })
+  createdAt!: Date;
 }

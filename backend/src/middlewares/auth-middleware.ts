@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import passport from "passport";
-import { User } from "../models/user";
+import { User } from "../entities/user";
 
 export const authenticateJWT = passport.authenticate("jwt", { session: false });
 

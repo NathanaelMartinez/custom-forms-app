@@ -1,6 +1,6 @@
 import jwt from "jsonwebtoken";
 import { authConfig } from "../config/auth-config";
-import { User } from "../models/user";
+import { User } from "../entities/user";
 
 // generate jwt token
 export const generateToken = (user: User) => {
