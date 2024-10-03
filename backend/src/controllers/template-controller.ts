@@ -8,7 +8,6 @@ import { User } from "../entities/user";
 export const createTemplate = async (req: Request, res: Response) => {
   const { name, description, questions } = req.body;
 
-  // assert that req.user is of type User for typescript
   const user = req.user as User;
 
   if (!user) {
@@ -54,7 +53,7 @@ export const viewTemplates = async (req: Request, res: Response) => {
   try {
     const templateRepository = AppDataSource.getRepository(Template);
     const templates = await templateRepository.find({
-      relations: ["author", "questions"],
+      relations: ["author", "questions"], // fetch associated questions and authors
     });
     res.status(200).json(templates);
   } catch (error) {

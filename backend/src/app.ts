@@ -1,12 +1,10 @@
 import "reflect-metadata";
 import express from "express";
-import { authenticateJWT, authorizeRoles } from "./middlewares/auth-middleware";
-import authRoutes from "./routes/auth-router";
-import { User } from "./entities/user";
+import authRoutes from "./routes/auth-routes";
 import { initializeAuth } from "./services/auth-service";
-import dashboardRouter from "./routes/dashboard-router";
-import templateRouter from "./routes/template-router";
-import adminRouter from "./routes/admin-router";
+import templateRouter from "./routes/template-routes";
+import adminRouter from "./routes/admin-routes";
+import questionRouter from "./routes/question-routes";
 
 const app = express();
 
@@ -16,8 +14,8 @@ initializeAuth(); // init passport
 
 // routes
 app.use("/auth", authRoutes); // authentication routes
-app.use("/", dashboardRouter); // public dashboard routes
 app.use("/templates", templateRouter); // template routes (may require authentication)
+app.use("/questions", questionRouter); // question routes (requires authentication)
 app.use("/admin", adminRouter); // admin user management routes
 
 // error handling
