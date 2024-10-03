@@ -7,44 +7,52 @@ import { User } from "../entities/user";
 // create new template (authenticated users only)
 export const createTemplate = async (req: Request, res: Response) => {
   const { name, description, questions } = req.body;
-
   const user = req.user as User;
 
   if (!user) {
-    res.status(401).json({ message: "Unauthorized" });
+    res.status(401).json({ message: "unauthorized" });
     return;
   }
 
   try {
     const templateRepository = AppDataSource.getRepository(Template);
-    const questionRepository = AppDataSource.getRepository(Question);
 
+    // create template object
     const template = templateRepository.create({
       name,
       description,
       author: user,
     });
 
+    // map questions only if provided
     if (questions && Array.isArray(questions)) {
-      const createdQuestions = questions.map((q: Question) =>
-        questionRepository.create({
-          title: q.title,
-          description: q.description,
-          type: q.type,
-          displayInTable: q.displayInTable || false,
-          template,
-        })
-      );
-      template.questions = createdQuestions;
+      const createdQuestions = questions.map((q: Question) => ({
+        title: q.title,
+        description: q.description,
+        type: q.type,
+        displayInTable: q.displayInTable || false,
+      }));
+      // assign questions to template
+      template.questions = createdQuestions as Question[];
     }
 
+    // save the template (also saves questions due to cascading)
     await templateRepository.save(template);
     res
       .status(201)
-      .json({ message: "Template created successfully", template });
+      .json({ message: "template created successfully", template });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Internal server error." });
+    if (error instanceof Error) {
+      console.error("error creating template:", error.message);
+      res
+        .status(500)
+        .json({ message: "internal server error", error: error.message });
+      return;
+    } else {
+      console.error("unexpected error:", error);
+      res.status(500).json({ message: "internal server error" });
+      return;
+    }
   }
 };
 

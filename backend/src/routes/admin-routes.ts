@@ -12,11 +12,11 @@ import {
 const router = express.Router();
 
 // view all users (admin only)
-router.get("/admin/users", authenticateJWT, authorizeRoles("admin"), getUsers);
+router.get("/users", authenticateJWT, authorizeRoles("admin"), getUsers);
 
 // modify user (block/unblock, promote/demote) (admin only)
 router.patch(
-  "/admin/users/:id",
+  "/users/:id",
   authenticateJWT,
   authorizeRoles("admin"),
   modifyUser
@@ -24,7 +24,7 @@ router.patch(
 
 // delete a user (admin only)
 router.delete(
-  "/admin/users/:id",
+  "/users/:id",
   authenticateJWT,
   authorizeRoles("admin"),
   deleteUser
