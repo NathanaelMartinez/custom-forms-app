@@ -1,0 +1,131 @@
+/* define color palette */
+:root {
+  --primary-color: #124e66; /* dark blue */
+  --secondary-color: #2e3944; /* slate gray */
+  --bg-dark: #212a31; /* dark gray */
+  --bg-muted: #748d92; /* muted blue */
+  --bg-light: #d3d9d4; /* light gray */
+  --text-light: #ffffff; /* white */
+  --text-dark: #000000; /* black */
+}
+
+/* navbar */
+.navbar-dark {
+  background-color: var(--bg-dark);
+}
+
+.navbar-brand {
+  color: var(--text-light);
+}
+
+.custom-primary-btn {
+  background-color: var(--primary-color);
+  border-color: var(--primary-color);
+}
+
+.custom-primary-btn:hover, .custom-primary-btn:focus {
+  background-color: darken(var(--primary-color), 10%);
+  border-color: darken(var(--primary-color), 10%);
+  color: var(--text-light);
+}
+
+.custom-primary-btn:disabled {
+  background-color: var(--primary-color); 
+  color: var(--text-light);               
+  border-color: var(--primary-color);     
+  opacity: 0.65;                          
+  cursor: not-allowed;                    
+}
+
+.custom-secondary-btn {
+  background-color: var(--secondary-color);
+  border-color: var(--secondary-color);
+}
+
+.custom-secondary-btn:hover, .custom-secondary-btn:focus {
+  background-color: darken(var(--secondary-color), 10%);
+  border-color: darken(var(--secondary-color), 10%);
+  color: var(--text-light);
+}
+
+.btn-success {
+  background-color: var(--primary-color);
+  border-color: var(--primary-color);
+}
+
+.custom-icon-btn {
+  color: var(--bg-light);
+  border: none;
+  background: none;
+}
+
+.custom-icon-btn:hover, .custom-icon-btn:focus {
+  color: var(--bg-muted);
+}
+
+.custom-icon-btn:disabled {
+  color: var(--secondary-color);
+  opacity: 0.5;
+}
+
+/* Form control styles */
+.form-control {
+  border-color: var(--bg-muted);
+}
+
+/* cards */
+.card {
+    background-color: var(--bg-light);
+    color: var(--text-light);
+    border: none;
+    box-shadow: rgba(0, 0, 0, 0.15) 0px 3px 3px 0px;
+  }
+  
+  .card-title {
+    color: var(--text-light);
+  }
+  
+  .card-text {
+    color: var(--text-light);
+  }
+
+/* template card styling */
+.template-card {
+  width: 100%;
+  aspect-ratio: 8 / 11;
+  background-color: var(--bg-muted);
+  position: relative;
+  color: white;
+  border-radius: 8px;
+  overflow: hidden;
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+  box-shadow: rgba(0, 0, 0, 0.25) 0px 8px 16px;
+  cursor: pointer; /* changes cursor to a clicker */
+}
+
+/* to make cards appear like buttons being pressed */
+.template-card:hover {
+  transform: translateY(2px);
+  box-shadow: rgba(0, 0, 0, 0.2) 0px 4px 8px;
+}
+
+.template-card:focus {
+  outline: none;
+  transform: translateY(2px);
+  box-shadow: rgba(0, 0, 0, 0.2) 0px 4px 8px;
+}
+
+/* for thumbnails */
+.template-card .card-img-overlay {
+  background: rgba(0, 0, 0, 0.5);
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  justify-content: end;
+  height: 100%;
+}
+
+/* featured card for first card */
+.featured-card {
+  
+}
