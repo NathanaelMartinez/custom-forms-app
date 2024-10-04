@@ -15,8 +15,10 @@ import {
   PersonCircle,
   BookmarkFill,
 } from "react-bootstrap-icons";
+import { useNavigate } from "react-router-dom";
 
 const HomePage: React.FC = () => {
+  const navigate = useNavigate(); 
   const isLoggedIn = false; // placeholder for user login state
 
   // placeholder data for top 5 all-time templates
@@ -34,6 +36,10 @@ const HomePage: React.FC = () => {
     { id: 2, name: "Recent Form Template 2", dateCreated: "2024-01-05" },
     { id: 3, name: "Recent Form Template 3", dateCreated: "2024-01-10" },
   ];
+
+  const handleSignUpClick = () => {
+    navigate("/sign-up"); // Redirect to sign-up page
+  };
 
   return (
     <>
@@ -71,7 +77,7 @@ const HomePage: React.FC = () => {
                   >
                     Login
                   </Button>
-                  <Button variant="primary" className="custom-primary-btn">
+                  <Button variant="primary" onClick={handleSignUpClick} className="custom-primary-btn">
                     Sign Up
                   </Button>
                 </>
@@ -144,6 +150,7 @@ const HomePage: React.FC = () => {
                 <Button
                   variant="primary"
                   className="custom-primary-btn"
+                  onClick={handleSignUpClick}
                   size="lg"
                 >
                   {isLoggedIn ? "Create Template" : "Sign Up"}

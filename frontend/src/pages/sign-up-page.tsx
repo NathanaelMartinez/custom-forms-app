@@ -1,0 +1,168 @@
+import React, { useState } from "react";
+import {
+  Container,
+  Row,
+  Col,
+  Form,
+  Button,
+  FloatingLabel,
+} from "react-bootstrap";
+import { FileText } from "react-bootstrap-icons";
+import { Link } from "react-router-dom";
+import gatheringDataImage from "../assets/gathering_data.jpg";
+
+const SignUpPage: React.FC = () => {
+  const [formData, setFormData] = useState({
+    username: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+  });
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (formData.password === formData.confirmPassword) {
+      console.log("Passwords match, form submitted");
+    } else {
+      console.error("Passwords do not match");
+    }
+  };
+
+  return (
+    <div className="signup-page bg-dark text-light min-vh-100 d-flex align-items-center">
+      <Container>
+        {/* Logo */}
+        <Row className="justify-content-center mb-5">
+          <h1 className="display-3 fw-bold text-center">
+            <Link to="/home" className="text-decoration-none text-light">
+              QuickFormr <FileText />
+            </Link>
+          </h1>
+        </Row>
+
+        {/* two sides layout */}
+        <Row className="g-0">
+          {/* product pitch */}
+          <Col
+            md={7}
+            className="d-flex justify-content-center align-items-center"
+          >
+            <div className="product-info position-relative bg-secondary p-4 rounded text-center">
+              <img
+                src={gatheringDataImage}
+                alt="Gathering Data"
+                className="img-fluid rounded"
+              />
+              <div className="overlay-text position-absolute bottom-0 start-0 p-4">
+                <h2 className="fw-bold">Simplify Form Creation</h2>
+                <p>
+                  Create custom forms tailored to your goals. Collect the
+                  information you need to make better decisions, streamline
+                  processes, and get results faster.
+                </p>
+              </div>
+              <a
+                href="http://www.freepik.com"
+                className="attribution-link position-absolute"
+              >
+                Designed by studiogstock / Freepik
+              </a>
+            </div>
+          </Col>
+
+          {/* sign-up form */}
+          <Col md={4}>
+            <div className="form-container p-5 rounded shadow-lg bg-light">
+              <h2 className="mb-4 fw-bold text-dark">Sign Up</h2>
+              <Form onSubmit={handleSubmit}>
+                <Form.Group controlId="formUsername" className="mb-3">
+                  <FloatingLabel controlId="floatingUsername" label="Username">
+                    <Form.Control
+                      type="text"
+                      name="username"
+                      placeholder="Enter username"
+                      value={formData.username}
+                      onChange={handleChange}
+                      className="input-focus-muted"
+                      required
+                    />
+                  </FloatingLabel>
+                </Form.Group>
+
+                <Form.Group controlId="formEmail" className="mb-3">
+                  <FloatingLabel controlId="floatingEmail" label="Email">
+                    <Form.Control
+                      type="email"
+                      name="email"
+                      placeholder="Enter your email"
+                      value={formData.email}
+                      onChange={handleChange}
+                      className="input-focus-muted"
+                      required
+                    />
+                  </FloatingLabel>
+                </Form.Group>
+
+                <Form.Group controlId="formPassword" className="mb-3">
+                  <FloatingLabel controlId="floatingPassword" label="Password">
+                    <Form.Control
+                      type="password"
+                      name="password"
+                      placeholder="Enter password"
+                      value={formData.password}
+                      onChange={handleChange}
+                      className="input-focus-muted"
+                      required
+                    />
+                  </FloatingLabel>
+                </Form.Group>
+
+                <Form.Group controlId="formConfirmPassword" className="mb-4">
+                  <FloatingLabel
+                    controlId="floatingConfirmPassword"
+                    label="Confirm Password"
+                  >
+                    <Form.Control
+                      type="password"
+                      name="confirmPassword"
+                      placeholder="Repeat your password"
+                      value={formData.confirmPassword}
+                      onChange={handleChange}
+                      className="input-focus-muted"
+                      required
+                    />
+                  </FloatingLabel>
+                </Form.Group>
+
+                <Button
+                  variant="success"
+                  type="submit"
+                  size="lg"
+                  className="custom-success-btn w-100"
+                >
+                  Sign Up
+                </Button>
+              </Form>
+
+              {/* already have an account link */}
+              <div className="text-center mt-3">
+                <p className="text-dark">
+                  Already have an account?{" "}
+                  <Link to="/login" className="text-primary">
+                    Log In Here
+                  </Link>
+                </p>
+              </div>
+            </div>
+          </Col>
+        </Row>
+      </Container>
+    </div>
+  );
+};
+
+export default SignUpPage;

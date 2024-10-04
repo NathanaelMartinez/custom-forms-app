@@ -23,18 +23,19 @@
   border-color: var(--primary-color);
 }
 
-.custom-primary-btn:hover, .custom-primary-btn:focus {
+.custom-primary-btn:hover,
+.custom-primary-btn:focus {
   background-color: darken(var(--primary-color), 10%);
   border-color: darken(var(--primary-color), 10%);
   color: var(--text-light);
 }
 
 .custom-primary-btn:disabled {
-  background-color: var(--primary-color); 
-  color: var(--text-light);               
-  border-color: var(--primary-color);     
-  opacity: 0.65;                          
-  cursor: not-allowed;                    
+  background-color: var(--primary-color);
+  color: var(--text-light);
+  border-color: var(--primary-color);
+  opacity: 0.65;
+  cursor: not-allowed;
 }
 
 .custom-secondary-btn {
@@ -42,15 +43,29 @@
   border-color: var(--secondary-color);
 }
 
-.custom-secondary-btn:hover, .custom-secondary-btn:focus {
+.custom-secondary-btn:hover,
+.custom-secondary-btn:focus {
   background-color: darken(var(--secondary-color), 10%);
   border-color: darken(var(--secondary-color), 10%);
   color: var(--text-light);
 }
 
-.btn-success {
+.custom-success-btn {
   background-color: var(--primary-color);
   border-color: var(--primary-color);
+  color: var(--text-light);
+}
+
+.custom-success-btn:hover,
+.custom-success-btn:focus {
+  background-color: #1b647a; /* slightly lighten on hover */
+  border-color: #1b647a;
+  color: var(--text-light);
+}
+
+.custom-success-btn:active {
+  background-color: #144b5e; /* slightly darken on active press */
+  border-color: #144b5e;
 }
 
 .custom-icon-btn {
@@ -59,7 +74,8 @@
   background: none;
 }
 
-.custom-icon-btn:hover, .custom-icon-btn:focus {
+.custom-icon-btn:hover,
+.custom-icon-btn:focus {
   color: var(--bg-muted);
 }
 
@@ -69,25 +85,41 @@
 }
 
 /* Form control styles */
-.form-control {
+form-control {
+  background-color: var(--bg-light);
+  border: 1px solid var(--bg-muted);
+}
+
+.form-label {
+  color: var(--text-dark);
+}
+
+/* this is because labels were invisible when not in focus */
+.form-floating label {
+  color: grey;
+}
+
+.input-focus-muted:focus {
   border-color: var(--bg-muted);
+  box-shadow: 0 0 0 0.2rem rgba(116, 141, 146, 0.25); /* try to mimic default */
+  outline: none;
 }
 
 /* cards */
 .card {
-    background-color: var(--bg-light);
-    color: var(--text-light);
-    border: none;
-    box-shadow: rgba(0, 0, 0, 0.15) 0px 3px 3px 0px;
-  }
-  
-  .card-title {
-    color: var(--text-light);
-  }
-  
-  .card-text {
-    color: var(--text-light);
-  }
+  background-color: var(--bg-light);
+  color: var(--text-light);
+  border: none;
+  box-shadow: rgba(0, 0, 0, 0.15) 0px 3px 3px 0px;
+}
+
+.card-title {
+  color: var(--text-light);
+}
+
+.card-text {
+  color: var(--text-light);
+}
 
 /* template card styling */
 .template-card {
@@ -127,5 +159,47 @@
 
 /* featured card for first card */
 .featured-card {
-  
+}
+
+.product-info {
+  position: relative; /* allow child elements to be positioned */
+  width: 68%;
+  height: auto;
+}
+
+.product-info::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(
+    to top,
+    rgba(0, 0, 0, 0.5),
+    rgba(0, 0, 0, 0)
+  ); /* gradient effect for better text readability */
+  z-index: 1;
+}
+
+.overlay-text {
+  z-index: 2; /* overlayed on top of gradient */
+  color: var(--text-light);
+}
+
+.attribution-link {
+  bottom: 5px;
+  right: 10px;
+  font-size: 0.6rem;
+  color: var(--bg-light);
+  text-decoration: none;
+  z-index: 3;
+}
+
+.attribution-link:hover {
+  color: var(--text-light);
+}
+
+h1.display-3 {
+  font-size: 4rem;
 }
