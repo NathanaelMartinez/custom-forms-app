@@ -6,10 +6,12 @@ import {
   Form,
   Button,
   FloatingLabel,
+  Alert,
 } from "react-bootstrap";
 import { FileText } from "react-bootstrap-icons";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import gatheringDataImage from "../assets/gathering_data.jpg";
+import axios, { AxiosError } from "axios";
 
 const SignUpPage: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -19,25 +21,53 @@ const SignUpPage: React.FC = () => {
     confirmPassword: "",
   });
 
+  const [errors, setErrors] = useState<string | null>(null); // store error messages
+
+  const navigate = useNavigate();
+  
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+    setErrors(null); // reset errors on input change
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (formData.password === formData.confirmPassword) {
-      console.log("Passwords match, form submitted");
-    } else {
-      console.error("Passwords do not match");
+    if (formData.password !== formData.confirmPassword) {
+      setErrors("Passwords do not match");
+      return;
+    }
+
+    try {
+      // make the request to the backend
+      const response = await axios.post("/api/auth/register", {
+        username: formData.username,
+        email: formData.email,
+        password: formData.password,
+      });
+
+      // handle successful registration (e.g., redirect to login or home)
+      console.log("User registered successfully", response.data);
+      navigate("/home"); // redirect to home after successful registration
+
+    } catch (error) {
+      // handle error response
+      if (axios.isAxiosError(error)) {
+        const err = error as AxiosError<{ error: string }>; 
+        const message = err.response?.data?.error || "Registration failed";
+        setErrors(message);
+      } else {
+        setErrors("Registration failed. Please try again.");
+      }
     }
   };
+
 
   return (
     <div className="signup-page bg-dark text-light min-vh-100 d-flex align-items-center">
       <Container>
         {/* Logo */}
-        <Row className="justify-content-center mb-5">
-          <h1 className="display-3 fw-bold text-center">
+        <Row className="mb-5">
+          <h1 className="display-3 fw-bold mx-5 text-start">
             <Link to="/home" className="text-decoration-none text-light">
               QuickFormr <FileText />
             </Link>
@@ -78,6 +108,10 @@ const SignUpPage: React.FC = () => {
           <Col md={4}>
             <div className="form-container p-5 rounded shadow-lg bg-light">
               <h2 className="mb-4 fw-bold text-dark">Sign Up</h2>
+
+              {/* display errors */}
+              {errors && <Alert variant="danger">{errors}</Alert>}
+
               <Form onSubmit={handleSubmit}>
                 <Form.Group controlId="formUsername" className="mb-3">
                   <FloatingLabel controlId="floatingUsername" label="Username">
