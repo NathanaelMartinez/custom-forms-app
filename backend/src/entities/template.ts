@@ -8,7 +8,7 @@ import {
 import { User } from "./user";
 import { Question } from "./question";
 
-@Entity()
+@Entity("templates")
 export class Template {
   @PrimaryGeneratedColumn("uuid")
   id!: string;

@@ -83,6 +83,21 @@
   color: var(--secondary-color);
   opacity: 0.5;
 }
+.admin-icon-btn {
+  color: rgb(200, 0, 0); /* Subtle red for normal state */
+  border: none;
+  background: none;
+}
+
+.admin-icon-btn:hover,
+.admin-icon-btn:focus {
+  color: rgb(255, 69, 58); /* Brighter red for hover/focus to emphasize the warning */
+}
+
+.admin-icon-btn:disabled {
+  color: rgb(150, 150, 150); /* Neutral gray for disabled state */
+  opacity: 0.6; /* Slightly muted opacity for disabled button */
+}
 
 /* Form control styles */
 form-control {

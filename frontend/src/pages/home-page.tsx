@@ -71,7 +71,6 @@ const HomePage: React.FC = () => {
   const handleLogout = () => {
     localStorage.removeItem("authToken"); // clear token from localStorage
     setIsLoggedIn(false); // set login state to false
-    navigate("/login"); // redirect to login page
   };
 
   return (
@@ -99,7 +98,7 @@ const HomePage: React.FC = () => {
                   {role === "admin" && (
                     <Button
                       variant="link"
-                      className="p-0 me-2 custom-icon-btn"
+                      className="p-0 me-2 admin-icon-btn"
                       onClick={() => navigate("/admin-panel")}
                     >
                       <ShieldFill size={36} />

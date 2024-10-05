@@ -11,9 +11,7 @@ import {
 import { FileText } from "react-bootstrap-icons";
 import { Link, useNavigate } from "react-router-dom";
 import gatheringDataImage from "../assets/gathering_data.jpg";
-import axios, { AxiosError } from "axios";
-
-const SERVER_URL = import.meta.env.VITE_SERVER_URL;
+import { registerUser } from "../services/auth-service";
 
 const SignUpPage: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -38,30 +36,14 @@ const SignUpPage: React.FC = () => {
       setErrors("Passwords do not match");
       return;
     }
-  
+
     try {
-      // make request to backend
-      const response = await axios.post(`${SERVER_URL}/auth/register`, {
-        username: formData.username,
-        email: formData.email,
-        password: formData.password,
-      });
-  
-      // handle successful registration
-      const authToken = response.data.token;
-      localStorage.setItem("authToken", authToken); // save token to localStorage
-      console.log("User registered successfully", response.data);
-      navigate("/"); // redirect to home after successful registration
-  
+      const data = await registerUser(formData.username, formData.email, formData.password);
+      localStorage.setItem("authToken", data.token); // save token to localStorage
+      console.log("User registered successfully", data);
+      navigate("/"); // redirect after successful registration
     } catch (error) {
-      // handle error messages
-      if (axios.isAxiosError(error)) {
-        const err = error as AxiosError<{ error: string }>;
-        const message = err.response?.data?.error || "Registration failed";
-        setErrors(message);  // display error message to user
-      } else {
-        setErrors("Registration failed. Please try again.");
-      }
+      setErrors(error as string); // display error to the user
     }
   };
   

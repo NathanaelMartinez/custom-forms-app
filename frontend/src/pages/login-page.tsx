@@ -11,9 +11,7 @@ import {
 import { FileText } from "react-bootstrap-icons";
 import { Link, useNavigate } from "react-router-dom";
 import gatheringDataImage from "../assets/gathering_data.jpg";
-import axios, { AxiosError } from "axios";
-
-const SERVER_URL = import.meta.env.VITE_SERVER_URL;
+import { loginUser } from "../services/auth-service";
 
 const LoginPage: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -34,27 +32,12 @@ const LoginPage: React.FC = () => {
     e.preventDefault();
 
     try {
-      // make request to backend
-      const response = await axios.post(`${SERVER_URL}/auth/login`, {
-        email: formData.email,
-        password: formData.password,
-      });
-
-      // handle successful login
-      const authToken = response.data.token;
-      localStorage.setItem("authToken", authToken); // save token to localStorage
-      console.log("User logged in successfully", response.data);
+      const data = await loginUser(formData.email, formData.password);
+      localStorage.setItem("authToken", data.token); // save token to localStorage
+      console.log("User logged in successfully", data);
       navigate("/"); // redirect to home after successful login
-
     } catch (error) {
-      // handle error messages
-      if (axios.isAxiosError(error)) {
-        const err = error as AxiosError<{ error: string }>;
-        const message = err.response?.data?.error || "Login failed";
-        setErrors(message);  // display error message to user
-      } else {
-        setErrors("Login failed. Please try again.");
-      }
+      setErrors(error as string);  // display error message to user
     }
   };
 

@@ -1,7 +1,7 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from "typeorm";
 import { Template } from "./template";
 
-@Entity()
+@Entity("questions")
 export class Question {
   @PrimaryGeneratedColumn("uuid")
   id!: string;
