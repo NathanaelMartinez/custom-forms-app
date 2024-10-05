@@ -1,11 +1,21 @@
 import "reflect-metadata";
 import express from "express";
+import cors from "cors";
 import authRoutes from "./routes/auth-routes";
 import { initializeAuth } from "./services/auth-service";
 import templateRouter from "./routes/template-routes";
 import adminRouter from "./routes/admin-routes";
 
 const app = express();
+
+// cors config
+app.use(
+  cors({
+    origin: "https://custom-forms-app-1.onrender.com",
+    methods: ["GET", "POST", "PATCH", "DELETE"],
+    allowedHeaders: ["Authorization", "Content-Type"],
+  })
+);
 
 // middleware
 app.use(express.json());
