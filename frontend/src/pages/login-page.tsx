@@ -15,18 +15,16 @@ import axios, { AxiosError } from "axios";
 
 const SERVER_URL = import.meta.env.VITE_SERVER_URL;
 
-const SignUpPage: React.FC = () => {
+const LoginPage: React.FC = () => {
   const [formData, setFormData] = useState({
-    username: "",
     email: "",
     password: "",
-    confirmPassword: "",
   });
 
   const [errors, setErrors] = useState<string | null>(null); // store error messages
 
   const navigate = useNavigate();
-  
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
     setErrors(null); // reset errors on input change
@@ -34,40 +32,34 @@ const SignUpPage: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (formData.password !== formData.confirmPassword) {
-      setErrors("Passwords do not match");
-      return;
-    }
-  
+
     try {
       // make request to backend
-      const response = await axios.post(`${SERVER_URL}/auth/register`, {
-        username: formData.username,
+      const response = await axios.post(`${SERVER_URL}/auth/login`, {
         email: formData.email,
         password: formData.password,
       });
-  
-      // handle successful registration
+
+      // handle successful login
       const authToken = response.data.token;
       localStorage.setItem("authToken", authToken); // save token to localStorage
-      console.log("User registered successfully", response.data);
-      navigate("/"); // redirect to home after successful registration
-  
+      console.log("User logged in successfully", response.data);
+      navigate("/"); // redirect to home after successful login
+
     } catch (error) {
       // handle error messages
       if (axios.isAxiosError(error)) {
         const err = error as AxiosError<{ error: string }>;
-        const message = err.response?.data?.error || "Registration failed";
+        const message = err.response?.data?.error || "Login failed";
         setErrors(message);  // display error message to user
       } else {
-        setErrors("Registration failed. Please try again.");
+        setErrors("Login failed. Please try again.");
       }
     }
   };
-  
 
   return (
-    <div className="signup-page bg-dark text-light min-vh-100 d-flex align-items-center">
+    <div className="login-page bg-dark text-light min-vh-100 d-flex align-items-center">
       <Container>
         {/* Logo */}
         <Row className="mb-5">
@@ -92,11 +84,11 @@ const SignUpPage: React.FC = () => {
                 className="img-fluid rounded"
               />
               <div className="overlay-text position-absolute bottom-0 start-0 p-4">
-                <h2 className="fw-bold">Simplify Form Creation</h2>
+                <h2 className="fw-bold">Manage Your Custom Forms</h2>
                 <p>
-                  Create custom forms tailored to your goals. Collect the
-                  information you need to make better decisions, streamline
-                  processes, and get results faster.
+                  Log in to access, manage, and customize your forms. Make
+                  smarter decisions with real-time insights and control over
+                  your data collection process.
                 </p>
               </div>
               <a
@@ -108,29 +100,15 @@ const SignUpPage: React.FC = () => {
             </div>
           </Col>
 
-          {/* sign-up form */}
+          {/* login form */}
           <Col md={4}>
             <div className="form-container p-5 rounded shadow-lg bg-light">
-              <h2 className="mb-4 fw-bold text-dark">Sign Up</h2>
+              <h2 className="mb-4 fw-bold text-dark">Log In</h2>
 
               {/* display errors */}
               {errors && <Alert variant="danger">{errors}</Alert>}
 
               <Form onSubmit={handleSubmit}>
-                <Form.Group controlId="formUsername" className="mb-3">
-                  <FloatingLabel controlId="floatingUsername" label="Username">
-                    <Form.Control
-                      type="text"
-                      name="username"
-                      placeholder="Enter username"
-                      value={formData.username}
-                      onChange={handleChange}
-                      className="input-focus-muted"
-                      required
-                    />
-                  </FloatingLabel>
-                </Form.Group>
-
                 <Form.Group controlId="formEmail" className="mb-3">
                   <FloatingLabel controlId="floatingEmail" label="Email">
                     <Form.Control
@@ -145,7 +123,7 @@ const SignUpPage: React.FC = () => {
                   </FloatingLabel>
                 </Form.Group>
 
-                <Form.Group controlId="formPassword" className="mb-3">
+                <Form.Group controlId="formPassword" className="mb-4">
                   <FloatingLabel controlId="floatingPassword" label="Password">
                     <Form.Control
                       type="password"
@@ -159,39 +137,22 @@ const SignUpPage: React.FC = () => {
                   </FloatingLabel>
                 </Form.Group>
 
-                <Form.Group controlId="formConfirmPassword" className="mb-4">
-                  <FloatingLabel
-                    controlId="floatingConfirmPassword"
-                    label="Confirm Password"
-                  >
-                    <Form.Control
-                      type="password"
-                      name="confirmPassword"
-                      placeholder="Repeat your password"
-                      value={formData.confirmPassword}
-                      onChange={handleChange}
-                      className="input-focus-muted"
-                      required
-                    />
-                  </FloatingLabel>
-                </Form.Group>
-
                 <Button
                   variant="success"
                   type="submit"
                   size="lg"
                   className="custom-success-btn w-100"
                 >
-                  Sign Up
+                  Log In
                 </Button>
               </Form>
 
-              {/* already have an account link */}
+              {/* don't have an account link */}
               <div className="text-center mt-3">
                 <p className="text-dark">
-                  Already have an account?{" "}
-                  <Link to="/login" className="text-primary">
-                    Log In Here
+                  Don't have an account?{" "}
+                  <Link to="/sign-up" className="text-primary">
+                    Sign Up Here
                   </Link>
                 </p>
               </div>
@@ -203,4 +164,4 @@ const SignUpPage: React.FC = () => {
   );
 };
 
-export default SignUpPage;
+export default LoginPage;

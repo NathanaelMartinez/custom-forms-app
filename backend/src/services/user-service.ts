@@ -23,7 +23,7 @@ export const createUser = async (
     return savedUser;
   } catch (error) {
     console.error("Error creating user:", error);
-    return null;
+    throw error;
   }
 };
 
