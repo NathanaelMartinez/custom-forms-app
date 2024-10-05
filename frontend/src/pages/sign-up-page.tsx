@@ -48,6 +48,8 @@ const SignUpPage: React.FC = () => {
       });
   
       // handle successful registration
+      const authToken = response.data.token;
+      localStorage.setItem("authToken", authToken); // save token to localStorage (users don't need to immediately login after acct creation)
       console.log("User registered successfully", response.data);
       navigate("/"); // redirect to home after successful registration
   

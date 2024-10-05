@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   Button,
   Card,
@@ -19,7 +19,7 @@ import { useNavigate } from "react-router-dom";
 
 const HomePage: React.FC = () => {
   const navigate = useNavigate(); 
-  const isLoggedIn = false; // placeholder for user login state
+  const [isLoggedIn, setIsLoggedIn] = useState(false); // login state
 
   // placeholder data for top 5 all-time templates
   const popularTemplates = [
@@ -37,8 +37,19 @@ const HomePage: React.FC = () => {
     { id: 3, name: "Recent Form Template 3", dateCreated: "2024-01-10" },
   ];
 
+  // check login status on component mount
+  useEffect(() => {
+    const token = localStorage.getItem("authToken"); // check for token in localStorage
+    if (token) {
+      setIsLoggedIn(true); // if token exists, set login state to true
+    } else {
+      setIsLoggedIn(false);
+    }
+  }, []); // only run this once when the component mounts
+
+
   const handleSignUpClick = () => {
-    navigate("/sign-up"); // Redirect to sign-up page
+    navigate("/sign-up"); // redirect to sign-up page
   };
 
   return (
