@@ -13,7 +13,7 @@ import { Link, useNavigate } from "react-router-dom";
 import gatheringDataImage from "../assets/gathering_data.jpg";
 import axios, { AxiosError } from "axios";
 
-const SERVER_URL = import.meta.env.SERVER_URL;
+const SERVER_URL = import.meta.env.VITE_SERVER_URL;
 
 const SignUpPage: React.FC = () => {
   const [formData, setFormData] = useState({
