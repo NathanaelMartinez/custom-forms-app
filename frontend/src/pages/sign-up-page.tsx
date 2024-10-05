@@ -47,7 +47,7 @@ const SignUpPage: React.FC = () => {
 
       // handle successful registration (e.g., redirect to login or home)
       console.log("User registered successfully", response.data);
-      navigate("/home"); // redirect to home after successful registration
+      navigate("/"); // redirect to home after successful registration
 
     } catch (error) {
       // handle error response
@@ -68,7 +68,7 @@ const SignUpPage: React.FC = () => {
         {/* Logo */}
         <Row className="mb-5">
           <h1 className="display-3 fw-bold mx-5 text-start">
-            <Link to="/home" className="text-decoration-none text-light">
+            <Link to="/" className="text-decoration-none text-light">
               QuickFormr <FileText />
             </Link>
           </h1>
