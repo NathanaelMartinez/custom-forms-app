@@ -1,6 +1,5 @@
 import dotenv from "dotenv";
 import app from "./app";
-import cors from "cors";
 import { AppDataSource } from "./config/data-source";
 
 // get .env variables

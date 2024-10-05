@@ -13,6 +13,8 @@ import { Link, useNavigate } from "react-router-dom";
 import gatheringDataImage from "../assets/gathering_data.jpg";
 import axios, { AxiosError } from "axios";
 
+const SERVER_URL = import.meta.env.SERVER_URL;
+
 const SignUpPage: React.FC = () => {
   const [formData, setFormData] = useState({
     username: "",
@@ -36,21 +38,21 @@ const SignUpPage: React.FC = () => {
       setErrors("Passwords do not match");
       return;
     }
-
+  
     try {
-      // make the request to the backend
-      const response = await axios.post("/api/auth/register", {
+      // make request to backend
+      const response = await axios.post(`${SERVER_URL}/auth/register`, {
         username: formData.username,
         email: formData.email,
         password: formData.password,
       });
-
-      // handle successful registration (e.g., redirect to login or home)
+  
+      // handle successful registration
       console.log("User registered successfully", response.data);
       navigate("/"); // redirect to home after successful registration
-
+  
     } catch (error) {
-      // handle error response
+      // handle error messages
       if (axios.isAxiosError(error)) {
         const err = error as AxiosError<{ error: string }>; 
         const message = err.response?.data?.error || "Registration failed";
@@ -60,7 +62,6 @@ const SignUpPage: React.FC = () => {
       }
     }
   };
-
 
   return (
     <div className="signup-page bg-dark text-light min-vh-100 d-flex align-items-center">
