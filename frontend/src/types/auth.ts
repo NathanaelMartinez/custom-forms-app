@@ -3,4 +3,5 @@ export interface DecodedToken {
   username: string;
   email: string;
   role: string; // ('admin' || 'user')
+  exp: number;
 }

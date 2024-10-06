@@ -1,31 +1,13 @@
-import React, { useEffect, useState } from "react";
-import {
-  Button,
-  Card,
-  Container,
-  Row,
-  Col,
-  Form,
-  Navbar,
-  Nav,
-  Dropdown,
-} from "react-bootstrap";
-import {
-  Search,
-  FileText,
-  PersonCircle,
-  BookmarkFill,
-  ShieldFill,
-} from "react-bootstrap-icons";
+import React from "react";
+import { Button, Card, Container, Row, Col, Form } from "react-bootstrap";
+import { Search } from "react-bootstrap-icons";
 import { useNavigate } from "react-router-dom";
-import { jwtDecode } from "jwt-decode";
-import { DecodedToken } from "../types";
+import AppNavBar from "../components/app-nav-bar";
+import { useAuth } from "../context/auth-context";
 
 const HomePage: React.FC = () => {
+  const { isLoggedIn } = useAuth(); // use auth context
   const navigate = useNavigate();
-  const [isLoggedIn, setIsLoggedIn] = useState(false); // login state
-  const [username, setUsername] = useState<string | null>(null);
-  const [role, setRole] = useState<string | null>(null); // store role of user
 
   // placeholder data for top 5 all-time templates
   const popularTemplates = [
@@ -42,122 +24,9 @@ const HomePage: React.FC = () => {
     { id: 3, name: "Recent Form Template 3", dateCreated: "2024-01-10" },
   ];
 
-  // check login status on component mount
-  useEffect(() => {
-    const token = localStorage.getItem("authToken"); // get token from localStorage
-    if (token) {
-      try {
-        const decodedToken: DecodedToken = jwtDecode<DecodedToken>(token); // decode token with correct type
-        setUsername(decodedToken.username); // extract username
-        setRole(decodedToken.role); // extract role
-        setIsLoggedIn(true);
-      } catch (err) {
-        console.error("Failed to decode token", err);
-        setIsLoggedIn(false); // invalidate login if token can't be decoded
-      }
-    } else {
-      setIsLoggedIn(false);
-    }
-  }, []);
-
-  const handleSignUpClick = () => {
-    navigate("/sign-up"); // redirect to sign-up page
-  };
-
-  const handleLogInClick = () => {
-    navigate("/login");
-  };
-
-  const handleLogout = () => {
-    localStorage.removeItem("authToken"); // clear token from localStorage
-    setIsLoggedIn(false); // set login state to false
-  };
-
   return (
     <>
-      {/* top navbar */}
-      <Navbar bg="dark" expand="lg" className="mb-0">
-        <Container>
-          <Navbar.Brand
-            href="home"
-            className="fw-bold fs-2 d-flex align-items-center"
-          >
-            QuickFormr <FileText className="ms-2" />
-          </Navbar.Brand>
-          <Navbar.Toggle aria-controls="basic-navbar-nav" />
-          <Navbar.Collapse id="basic-navbar-nav">
-            <Nav className="ms-auto">
-              {isLoggedIn ? (
-                <>
-                  {/* saved templates icon */}
-                  <Button variant="link" className="p-0 me-2 custom-icon-btn">
-                    <BookmarkFill size={36} />
-                  </Button>
-
-                  {/* admin panel icon (visible if user is admin) */}
-                  {role === "admin" && (
-                    <Button
-                      variant="link"
-                      className="p-0 me-2 admin-icon-btn"
-                      onClick={() => navigate("/admin-panel")}
-                    >
-                      <ShieldFill size={36} />
-                    </Button>
-                  )}
-
-                  <Dropdown>
-                    <Dropdown.Toggle
-                      variant="link"
-                      id="profile-dropdown"
-                      className="d-flex align-items-center custom-icon-btn"
-                    >
-                      {/* profile icon */}
-                      <PersonCircle size={36} />
-                      {/* username */}
-                      <div className="ms-2 text-light">{username}</div>
-                    </Dropdown.Toggle>
-
-                    <Dropdown.Menu align="end">
-                      <Dropdown.Item onClick={() => navigate("/account")}>
-                        Account
-                      </Dropdown.Item>
-                      <Dropdown.Item
-                        onClick={() => navigate("/saved-templates")}
-                      >
-                        Saved Templates
-                      </Dropdown.Item>
-                      <Dropdown.Divider />
-                      <Dropdown.Item
-                        onClick={handleLogout}
-                        className="text-danger"
-                      >
-                        Log Out
-                      </Dropdown.Item>
-                    </Dropdown.Menu>
-                  </Dropdown>
-                </>
-              ) : (
-                <>
-                  <Button
-                    variant="secondary"
-                    onClick={handleLogInClick}
-                    className="me-2 custom-secondary-btn"
-                  >
-                    Login
-                  </Button>
-                  <Button
-                    variant="primary"
-                    onClick={handleSignUpClick}
-                    className="custom-primary-btn"
-                  >
-                    Sign Up
-                  </Button>
-                </>
-              )}
-            </Nav>
-          </Navbar.Collapse>
-        </Container>
-      </Navbar>
+      <AppNavBar />
 
       {/* search bar section */}
       <div className="bg-dark py-5 text-center">
@@ -222,7 +91,7 @@ const HomePage: React.FC = () => {
                 <Button
                   variant="primary"
                   className="custom-primary-btn"
-                  onClick={handleSignUpClick}
+                  onClick={() => navigate(isLoggedIn ? "/create-template" : "/sign-up")}
                   size="lg"
                 >
                   {isLoggedIn ? "Create Template" : "Sign Up"}

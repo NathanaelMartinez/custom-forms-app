@@ -2,13 +2,9 @@ import axios, { AxiosError } from 'axios';
 
 const SERVER_URL = import.meta.env.VITE_SERVER_URL;
 
-export const registerUser = async (username: string, email: string, password: string) => {
+export const registerUser = async (credentials: {username: string, email: string, password: string}) => {
   try {
-    const response = await axios.post(`${SERVER_URL}/api/auth/register`, {
-      username,
-      email,
-      password,
-    });
+    const response = await axios.post(`${SERVER_URL}/api/auth/register`, credentials);
     return response.data; // Return token or other data
   } catch (error) {
     if (axios.isAxiosError(error)) {
@@ -21,12 +17,9 @@ export const registerUser = async (username: string, email: string, password: st
   }
 };
 
-export const loginUser = async (email: string, password: string) => {
+export const loginUser = async (credentials: {email: string, password: string}) => {
   try {
-    const response = await axios.post(`${SERVER_URL}/api/auth/login`, {
-      email,
-      password,
-    });
+    const response = await axios.post(`${SERVER_URL}/api/auth/login`, credentials);
     return response.data;
   } catch (error) {
     if (axios.isAxiosError(error)) {

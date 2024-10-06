@@ -12,8 +12,10 @@ import { FileText } from "react-bootstrap-icons";
 import { Link, useNavigate } from "react-router-dom";
 import gatheringDataImage from "../assets/gathering_data.jpg";
 import { registerUser } from "../services/auth-service";
+import { useAuth } from "../context/auth-context";
 
 const SignUpPage: React.FC = () => {
+  const { login } = useAuth(); // use login from AuthContext to set login state
   const [formData, setFormData] = useState({
     username: "",
     email: "",
@@ -24,12 +26,14 @@ const SignUpPage: React.FC = () => {
   const [errors, setErrors] = useState<string | null>(null); // store error messages
 
   const navigate = useNavigate();
-  
+
+  // handle form input changes
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
     setErrors(null); // reset errors on input change
   };
 
+  // handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (formData.password !== formData.confirmPassword) {
@@ -38,12 +42,20 @@ const SignUpPage: React.FC = () => {
     }
 
     try {
-      const data = await registerUser(formData.username, formData.email, formData.password);
-      localStorage.setItem("authToken", data.token); // save token to localStorage
+      const data = await registerUser({ username: formData.username, email: formData.email, password: formData.password });
+      
+      // save token to localStorage
+      localStorage.setItem("authToken", data.token);
+      
+      // update AuthContext state
+      login(data.token);
+      
       console.log("User registered successfully", data);
-      navigate("/"); // redirect after successful registration
+      
+      // redirect to the home page after successful registration
+      navigate("/");
     } catch (error) {
-      setErrors(error as string); // display error to the user
+      setErrors(error as string); // display error to user
     }
   };
   

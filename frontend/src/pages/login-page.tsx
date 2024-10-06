@@ -12,8 +12,10 @@ import { FileText } from "react-bootstrap-icons";
 import { Link, useNavigate } from "react-router-dom";
 import gatheringDataImage from "../assets/gathering_data.jpg";
 import { loginUser } from "../services/auth-service";
+import { useAuth } from "../context/auth-context";
 
 const LoginPage: React.FC = () => {
+  const { login } = useAuth(); // use login method from context
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -32,12 +34,13 @@ const LoginPage: React.FC = () => {
     e.preventDefault();
 
     try {
-      const data = await loginUser(formData.email, formData.password);
+      const data = await loginUser({ email: formData.email, password: formData.password });
       localStorage.setItem("authToken", data.token); // save token to localStorage
+      login(data.token); // update AuthContext
       console.log("User logged in successfully", data);
       navigate("/"); // redirect to home after successful login
     } catch (error) {
-      setErrors(error as string);  // display error message to user
+      setErrors(error as string); // display error message to user
     }
   };
 
