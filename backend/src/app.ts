@@ -39,9 +39,9 @@ app.use(express.json());
 initializeAuth(); // init passport
 
 // routes
-app.use("/auth", authRoutes); // authentication routes
-app.use("/templates", templateRouter); // template and question routes (may require authentication)
-app.use("/admin", adminRouter); // admin user management routes
+app.use("/api/auth", authRoutes); // authentication routes
+app.use("/api/templates", templateRouter); // template and question routes (may require authentication)
+app.use("/api/admin", adminRouter); // admin user management routes
 
 // error handling
 app.use((req, res, next) => {

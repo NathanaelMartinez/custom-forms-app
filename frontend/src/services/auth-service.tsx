@@ -4,7 +4,7 @@ const SERVER_URL = import.meta.env.VITE_SERVER_URL;
 
 export const registerUser = async (username: string, email: string, password: string) => {
   try {
-    const response = await axios.post(`${SERVER_URL}/auth/register`, {
+    const response = await axios.post(`${SERVER_URL}/api/auth/register`, {
       username,
       email,
       password,
@@ -23,7 +23,7 @@ export const registerUser = async (username: string, email: string, password: st
 
 export const loginUser = async (email: string, password: string) => {
   try {
-    const response = await axios.post(`${SERVER_URL}/auth/login`, {
+    const response = await axios.post(`${SERVER_URL}/api/auth/login`, {
       email,
       password,
     });
