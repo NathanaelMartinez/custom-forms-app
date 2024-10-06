@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import UserTable from '../components/user-table';
+import AdminTable from '../components/admin-table';
 import Toolbar from '../components/admin-tool-bar';
 import { deleteUsers, fetchUsers, updateUserStatus } from '../services/admin-service';
 import { User } from '../types';
-import AppNavBar from '../components/app-nav-bar'; // Import AppNavBar
-import { useAuth } from '../context/auth-context'; // Use the Auth context
+import AppNavBar from '../components/app-nav-bar';
+import { useAuth } from '../context/auth-context';
 
 const AdminPage: React.FC = () => {
   const [users, setUsers] = useState<User[]>([]);
@@ -14,15 +14,15 @@ const AdminPage: React.FC = () => {
   const { logout } = useAuth(); // Get data from Auth context
   const navigate = useNavigate();
 
-  // Redirect to login if no token is found
+  // redirect to login if no token is found
   useEffect(() => {
-    const token = localStorage.getItem('authToken'); // get the token from localStorage
+    const token = localStorage.getItem('authToken'); // get token from localStorage
     if (!token) {
       navigate('/login'); // redirect to login if no token
     }
   }, [navigate]);
 
-  // Fetch users on component mount
+  // fetch users on component mount
   useEffect(() => {
     const getUsers = async () => {
       try {
@@ -44,7 +44,7 @@ const AdminPage: React.FC = () => {
     getUsers();
   }, [navigate, logout]);
 
-  // Refresh the list of users
+  // refresh list of users - call when action affects list
   const refreshUserList = async () => {
     try {
       const userData = await fetchUsers();
@@ -55,7 +55,7 @@ const AdminPage: React.FC = () => {
     }
   };
 
-  // Handle blocking selected users
+  // handle blocking selected users
   const handleBlockSelectedUsers = async () => {
     const usersToBlock = users.filter((_, index) => selectedUsers[index]).map(user => user.id);
     if (usersToBlock.length === 0) {
@@ -72,7 +72,7 @@ const AdminPage: React.FC = () => {
     }
   };
 
-  // Handle unblocking selected users
+  // handle unblocking selected users
   const handleUnblockSelectedUsers = async () => {
     const usersToUnblock = users.filter((_, index) => selectedUsers[index]).map(user => user.id);
     if (usersToUnblock.length === 0) {
@@ -89,7 +89,7 @@ const AdminPage: React.FC = () => {
     }
   };
 
-  // Handle deleting selected users
+  // handle deleting selected users
   const handleDeleteSelectedUsers = async () => {
     const usersToDelete = users.filter((_, index) => selectedUsers[index]).map(user => user.id);
     if (usersToDelete.length === 0) {
@@ -100,7 +100,7 @@ const AdminPage: React.FC = () => {
     try {
       await deleteUsers({ userIds: usersToDelete });
       console.log('Users deleted successfully.');
-      refreshUserList(); // refresh the user list
+      refreshUserList(); // refresh user list
     } catch (error) {
       console.error('Error deleting users:', error);
     }
@@ -108,12 +108,11 @@ const AdminPage: React.FC = () => {
 
   return (
     <>
-      {/* Render the AppNavBar with the appropriate props */}
       <AppNavBar />
 
       <div className="container mb-3 mt-3">
         <div className="d-flex justify-content-between align-items-center mb-3">
-          {/* Pass appropriate handlers to the Toolbar */}
+          {/* pass handlers to toolbar */}
           <Toolbar
             onBlock={handleBlockSelectedUsers}
             onUnblock={handleUnblockSelectedUsers}
@@ -121,8 +120,7 @@ const AdminPage: React.FC = () => {
           />
         </div>
 
-        {/* Render UserTable */}
-        <UserTable
+        <AdminTable
           users={users}
           onRefresh={refreshUserList}
           onSelectedUsersChange={setSelectedUsers}

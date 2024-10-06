@@ -3,6 +3,7 @@ import { DataSource } from "typeorm";
 import { User } from "../entities/user";
 import { Template } from "../entities/template";
 import { Question } from "../entities/question";
+import { Comment } from "../entities/comment";
 
 export const AppDataSource = new DataSource({
   type: "postgres",
@@ -13,7 +14,7 @@ export const AppDataSource = new DataSource({
   database: process.env.PG_DATABASE,
   synchronize: true, // automatically sync the schema (DISABLE IN PRODUCTION)
   logging: false,
-  entities: [User, Template, Question],
+  entities: [User, Template, Question, Comment],
   migrations: [],
   subscribers: [],
   ssl: {

@@ -3,16 +3,13 @@ import {
   Container,
   Row,
   Col,
-  Form,
-  Button,
-  FloatingLabel,
-  Alert,
 } from "react-bootstrap";
-import { FileText } from "react-bootstrap-icons";
 import { Link, useNavigate } from "react-router-dom";
 import gatheringDataImage from "../assets/gathering_data.jpg";
 import { loginUser } from "../services/auth-service";
 import { useAuth } from "../context/auth-context";
+import ProductPitch from "../components/product-pitch";
+import AuthForm from "../components/auth-form";
 
 const LoginPage: React.FC = () => {
   const { login } = useAuth(); // use login method from context
@@ -34,7 +31,10 @@ const LoginPage: React.FC = () => {
     e.preventDefault();
 
     try {
-      const data = await loginUser({ email: formData.email, password: formData.password });
+      const data = await loginUser({
+        email: formData.email,
+        password: formData.password,
+      });
       localStorage.setItem("authToken", data.token); // save token to localStorage
       login(data.token); // update AuthContext
       console.log("User logged in successfully", data);
@@ -49,100 +49,30 @@ const LoginPage: React.FC = () => {
       <Container>
         {/* Logo */}
         <Row className="mb-5">
-          <h1 className="display-3 fw-bold mx-5 text-start">
+          <h1 className="display-3 fw-bold mb-3 text-start">
             <Link to="/" className="text-decoration-none text-light">
-              QuickFormr <FileText />
+              QuickFormr
             </Link>
           </h1>
         </Row>
 
         {/* two sides layout */}
         <Row className="g-0">
-          {/* product pitch */}
-          <Col
-            md={7}
-            className="d-flex justify-content-center align-items-center"
-          >
-            <div className="product-info position-relative bg-secondary p-4 rounded text-center">
-              <img
-                src={gatheringDataImage}
-                alt="Gathering Data"
-                className="img-fluid rounded"
-              />
-              <div className="overlay-text position-absolute bottom-0 start-0 p-4">
-                <h2 className="fw-bold">Manage Your Custom Forms</h2>
-                <p>
-                  Log in to access, manage, and customize your forms. Make
+          <ProductPitch
+            imageSrc={gatheringDataImage}
+            title="Manage Your Custom Forms"
+            description="Log in to access, manage, and customize your forms. Make
                   smarter decisions with real-time insights and control over
-                  your data collection process.
-                </p>
-              </div>
-              <a
-                href="http://www.freepik.com"
-                className="attribution-link position-absolute"
-              >
-                Designed by studiogstock / Freepik
-              </a>
-            </div>
-          </Col>
-
+                  your data collection process."
+          />
           {/* login form */}
           <Col md={4}>
-            <div className="form-container p-5 rounded shadow-lg bg-light">
-              <h2 className="mb-4 fw-bold text-dark">Log In</h2>
-
-              {/* display errors */}
-              {errors && <Alert variant="danger">{errors}</Alert>}
-
-              <Form onSubmit={handleSubmit}>
-                <Form.Group controlId="formEmail" className="mb-3">
-                  <FloatingLabel controlId="floatingEmail" label="Email">
-                    <Form.Control
-                      type="email"
-                      name="email"
-                      placeholder="Enter your email"
-                      value={formData.email}
-                      onChange={handleChange}
-                      className="input-focus-muted"
-                      required
-                    />
-                  </FloatingLabel>
-                </Form.Group>
-
-                <Form.Group controlId="formPassword" className="mb-4">
-                  <FloatingLabel controlId="floatingPassword" label="Password">
-                    <Form.Control
-                      type="password"
-                      name="password"
-                      placeholder="Enter password"
-                      value={formData.password}
-                      onChange={handleChange}
-                      className="input-focus-muted"
-                      required
-                    />
-                  </FloatingLabel>
-                </Form.Group>
-
-                <Button
-                  variant="success"
-                  type="submit"
-                  size="lg"
-                  className="custom-success-btn w-100"
-                >
-                  Log In
-                </Button>
-              </Form>
-
-              {/* don't have an account link */}
-              <div className="text-center mt-3">
-                <p className="text-dark">
-                  Don't have an account?{" "}
-                  <Link to="/sign-up" className="text-primary">
-                    Sign Up Here
-                  </Link>
-                </p>
-              </div>
-            </div>
+            <AuthForm
+                formData={formData}
+                handleChange={handleChange}
+                handleSubmit={handleSubmit}
+                errors={errors}
+              />
           </Col>
         </Row>
       </Container>

@@ -24,7 +24,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   // function to handle user login, decode the token, and store the data
   const login = (token: string) => {
     try {
-      const decodedToken: DecodedToken = jwtDecode<DecodedToken>(token); // use DecodedToken interface
+      const decodedToken: DecodedToken = jwtDecode<DecodedToken>(token); // decode the jwt
       setIsLoggedIn(true);
       setUsername(decodedToken.username);
       setRole(decodedToken.role);
@@ -48,15 +48,15 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const token = localStorage.getItem('authToken');
     if (token) {
       try {
-        const decodedToken: DecodedToken = jwtDecode<DecodedToken>(token); // use DecodedToken interface
+        const decodedToken: DecodedToken = jwtDecode<DecodedToken>(token); // deconde the jwt
         setIsLoggedIn(true);
         setUsername(decodedToken.username);
         setRole(decodedToken.role);
 
-        // optionally, check if the token has expired
+        // check if token expired
         const currentTime = Date.now() / 1000;
         if (decodedToken.exp < currentTime) {
-          logout(); // if token is expired, log the user out
+          logout(); // if token expired, logout
         }
       } catch (error) {
         console.error('Error decoding token on mount:', error);

@@ -1,13 +1,13 @@
 import React, { ChangeEvent, useEffect, useState } from 'react';
 import { User } from '../types';
   
-interface UserTableProps {
+interface AdminTableProps {
     users: User[];
     onRefresh: () => void;
     onSelectedUsersChange: (selected: boolean[]) => void;
 }
 
-const UserTable: React.FC<UserTableProps> = ({ users, onSelectedUsersChange }) => {
+const AdminTable: React.FC<AdminTableProps> = ({ users, onSelectedUsersChange }) => {
     const [selectedUsers, setSelectedUsers] = useState<boolean[]>([]);
 
     useEffect(() => {
@@ -70,4 +70,4 @@ const UserTable: React.FC<UserTableProps> = ({ users, onSelectedUsersChange }) =
     );
 };
 
-export default UserTable;
+export default AdminTable;

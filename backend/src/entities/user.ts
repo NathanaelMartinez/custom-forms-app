@@ -1,5 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from "typeorm";
 import { Template } from "./template";
+import { Comment } from "./comment";
 
 @Entity("users")
 export class User {
@@ -23,6 +24,9 @@ export class User {
 
   @OneToMany(() => Template, (template) => template.author)
   templates!: Template[];
+
+  @OneToMany(() => Comment, (comment) => comment.author) // link to comments
+  comments!: Comment[];
 
   @Column({ default: () => "CURRENT_TIMESTAMP" })
   createdAt!: Date;

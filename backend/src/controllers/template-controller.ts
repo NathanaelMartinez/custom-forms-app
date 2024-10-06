@@ -3,6 +3,7 @@ import { AppDataSource } from "../config/data-source";
 import { Template } from "../entities/template";
 import { Question } from "../entities/question";
 import { User } from "../entities/user";
+import { Comment } from "../entities/comment";
 
 // create new template (authenticated users only)
 export const createTemplate = async (req: Request, res: Response) => {
@@ -143,5 +144,61 @@ export const deleteTemplate = async (req: Request, res: Response) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Internal server error." });
+  }
+};
+
+export const likeTemplate = async (req: Request, res: Response) => {
+  const { templateId } = req.params;
+
+  try {
+    const templateRepository = AppDataSource.getRepository(Template);
+
+    const template = await templateRepository.findOneBy({ id: templateId });
+
+    if (!template) {
+      return res.status(404).json({ message: "Template not found" });
+    }
+
+    // increment likes count
+    template.likes += 1;
+    await templateRepository.save(template);
+
+    return res.json({ message: "Template liked", likes: template.likes });
+  } catch (error) {
+    console.error("Error liking template:", error);
+    return res.status(500).json({ message: "Server error" });
+  }
+};
+
+export const addComment = async (req: Request, res: Response) => {
+  const { templateId } = req.params;
+  const { content } = req.body;
+
+  try {
+    const templateRepository = AppDataSource.getRepository(Template);
+    const commentRepository = AppDataSource.getRepository(Comment);
+
+    const template = await templateRepository.findOneBy({ id: templateId });
+
+    if (!template) {
+      return res.status(404).json({ message: "Template not found" });
+    }
+
+    // get authenticated user from req.user
+    const user = req.user as User;
+
+    // create new comment
+    const newComment = new Comment();
+    newComment.content = content;
+    newComment.template = template;
+    newComment.author = user;
+
+    // save comment
+    await commentRepository.save(newComment);
+
+    return res.status(201).json(newComment);
+  } catch (error) {
+    console.error("Error adding comment:", error);
+    return res.status(500).json({ message: "Server error" });
   }
 };

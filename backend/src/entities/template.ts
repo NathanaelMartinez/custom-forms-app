@@ -7,6 +7,7 @@ import {
 } from "typeorm";
 import { User } from "./user";
 import { Question } from "./question";
+import { Comment } from "./comment";
 
 @Entity("templates")
 export class Template {
@@ -27,4 +28,10 @@ export class Template {
 
   @Column({ default: () => "CURRENT_TIMESTAMP" })
   createdAt!: Date;
+
+  @Column({ default: 0 })
+  likes!: number;
+
+  @OneToMany(() => Comment, (comment) => comment.template, { cascade: true })
+  comments!: Comment[];
 }
