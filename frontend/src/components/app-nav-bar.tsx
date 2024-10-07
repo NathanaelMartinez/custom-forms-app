@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/auth-context";
 
 const AppNavBar: React.FC = () => {
-  const { isLoggedIn, username, role, logout } = useAuth(); // use auth context
+  const { isLoggedIn, user, logout } = useAuth(); // use auth context
   const navigate = useNavigate();
 
   const handleLogInClick = () => {
@@ -40,7 +40,7 @@ const AppNavBar: React.FC = () => {
                 </Button>
 
                 {/* Admin panel icon (visible if user is admin) */}
-                {role === "admin" && (
+                {user?.role === "admin" && (
                   <Button
                     variant="link"
                     className="p-0 admin-icon-btn"
@@ -58,7 +58,7 @@ const AppNavBar: React.FC = () => {
                   >
                     {/* Profile icon */}
                     <PersonCircle size={36} />
-                    <div className="ms-2 text-light">{username}</div>
+                    <div className="ms-2 text-light">{user?.username}</div>
                   </Dropdown.Toggle>
 
                   <Dropdown.Menu align="end">
@@ -68,7 +68,7 @@ const AppNavBar: React.FC = () => {
                     <Dropdown.Item onClick={() => navigate("/saved-templates")}>
                       Saved Templates
                     </Dropdown.Item>
-                    {role === "admin" && (
+                    {user?.role === "admin" && (
                       <Dropdown.Item onClick={() => navigate("/admin-panel")}>
                         Admin Panel
                       </Dropdown.Item>

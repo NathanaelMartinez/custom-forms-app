@@ -4,7 +4,7 @@
   --secondary-color: #2e3944; /* slate gray */
   --bg-dark: #212a31; /* dark gray */
   --bg-muted: #748d92; /* muted blue */
-  --bg-light: #d3d9d4; /* light gray */
+  --bg-light: #969c97; /* light gray */
   --text-light: #ffffff; /* white */
   --text-dark: #000000; /* black */
 }
@@ -83,6 +83,12 @@
   color: var(--secondary-color);
   opacity: 0.5;
 }
+
+.load-more-btn {
+  position: absolute;
+  bottom: 0;
+}
+
 .admin-icon-btn {
   color: rgb(200, 0, 0);
   border: none;
@@ -218,4 +224,8 @@ form-control {
 
 h1.display-3 {
   font-size: 3rem;
+}
+
+.dropdown-toggle-no-caret::after {
+  display: none !important;
 }

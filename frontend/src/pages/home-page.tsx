@@ -166,12 +166,14 @@ const recentTemplates: Template[] = [
       
       <CallToAction />
 
-      <Container className="p-4 bg-light">
-        <TemplateList title="New Templates" templates={recentTemplates} type="recent" />
-        <div className="d-flex justify-content-center mt-4">
-          <Button variant="primary" className="custom-primary-btn" disabled>
-            Load More Templates
-          </Button>
+      <Container className="px-4 bg-light">
+        <div className="bg-secondary p-4">
+          <TemplateList title="New Templates" templates={recentTemplates} type="recent" />
+          <div className="d-flex justify-content-center mt-4">
+            <Button variant="primary" className="custom-primary-btn" disabled>
+              Load More Templates
+            </Button>
+          </div>
         </div>
       </Container>
     </>

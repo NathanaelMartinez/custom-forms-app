@@ -5,7 +5,7 @@ const SERVER_URL = import.meta.env.VITE_SERVER_URL;
 export const fetchUsers = async () => {
     try {
         const token = localStorage.getItem('token'); // get token from localStorage
-        const response = await axios.get(`${SERVER_URL}/`, {
+        const response = await axios.get(`${SERVER_URL}/api/admin/users`, {
             headers: {
                 Authorization: `Bearer ${token}`, // put token in header for auth
             },
@@ -34,43 +34,11 @@ export const fetchUsers = async () => {
     }
 };
 
-export const loginUser = async (credentials: { email: string; password: string }) => {
-    try {
-        const response = await axios.post(`${SERVER_URL}/login`, credentials);
-        console.log('Login response:', response.data); // for debugging
-        const { token, user } = response.data; // get JWT and user from response
-        localStorage.setItem('token', token); // store token in localStorage
-        localStorage.setItem('userName', user.name); // this is for displaying user's name
-        localStorage.setItem('userId', user.id); // Assuming user ID is a string (UUID)
-        return user.name;
-    } catch (error) {
-        if (axios.isAxiosError(error) && error.response) {
-            // handle specific error messages
-            console.error('Login failed:', error.response.data.message);
-            throw new Error(error.response.data.message);
-        } else {
-            console.error('Login failed:', error);
-            throw new Error('An unexpected error occurred.');
-        }
-    }
-};
-
-export const registerUser = async (credentials: { name: string; email: string; password: string }) => {
-    try {
-        const response = await axios.post(`${SERVER_URL}/register`, credentials);
-        console.log('Register response:', response.data); // for debugging
-        return response.data;
-    } catch (error) {
-        console.error('Registration failed:', error);
-        throw error;
-    }
-};
-
 // Update user status function with string[] for userIds
 export const updateUserStatus = async (payload: { userIds: string[]; action: 'block' | 'unblock' }) => {
     try {
         const token = localStorage.getItem('token');
-        const response = await axios.patch(`${SERVER_URL}/block`, payload, {
+        const response = await axios.patch(`${SERVER_URL}/api/admin/users`, payload, {
             headers: {
                 Authorization: `Bearer ${token}`, 
             },
@@ -86,7 +54,7 @@ export const updateUserStatus = async (payload: { userIds: string[]; action: 'bl
 export const deleteUsers = async (payload: { userIds: string[] }) => {
     try {
         const token = localStorage.getItem('token');
-        const response = await axios.delete(`${SERVER_URL}/`, {
+        const response = await axios.delete(`${SERVER_URL}/api/admin/users`, {
             headers: {
                 Authorization: `Bearer ${token}`, 
             },

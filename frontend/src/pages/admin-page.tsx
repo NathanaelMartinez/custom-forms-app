@@ -11,16 +11,15 @@ import { useAuth } from '../context/auth-context';
 const AdminPage: React.FC = () => {
   const [users, setUsers] = useState<User[]>([]);
   const [selectedUsers, setSelectedUsers] = useState<boolean[]>([]);
-  const { logout } = useAuth(); // Get data from Auth context
+  const { isLoggedIn, logout } = useAuth(); // Get data from Auth context
   const navigate = useNavigate();
 
-  // redirect to login if no token is found
+  // redirect to login if user is not logged in
   useEffect(() => {
-    const token = localStorage.getItem('authToken'); // get token from localStorage
-    if (!token) {
-      navigate('/login'); // redirect to login if no token
+    if (!isLoggedIn) {
+      navigate("/login");
     }
-  }, [navigate]);
+  }, [isLoggedIn, navigate]);
 
   // fetch users on component mount
   useEffect(() => {

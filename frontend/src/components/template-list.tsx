@@ -27,7 +27,7 @@ const TemplateList: React.FC<TemplateListProps> = ({ title, templates, type }) =
             </Col>
           ))}
         </Row>
-      ) : ( // else recent list
+      ) : ( // else recent
         <Row>
           {templates.map((template) => (
             <Col key={template.id} sm={6} md={4} lg={2} className="mb-4">
