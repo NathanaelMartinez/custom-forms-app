@@ -34,7 +34,7 @@ const AppNavBar: React.FC = () => {
         <Container fluid>
           <Navbar.Brand
             href="/"
-            className="fw-bold fs-2 d-flex align-items-center text-light"
+            className="fw-bold fs-2 ms-4 custom-icon-btn"
           >
             QuickFormr
           </Navbar.Brand>
@@ -65,9 +65,9 @@ const AppNavBar: React.FC = () => {
                     <Dropdown.Toggle
                       variant="link"
                       id="profile-dropdown"
-                      className="d-flex align-items-center custom-icon-btn text-light"
+                      className="d-flex me-3 align-items-center custom-icon-btn"
                     >
-                      <PersonCircle size={36} className="text-light" />
+                      <PersonCircle size={36} />
                       <span className="ms-2">{user?.username}</span>
                     </Dropdown.Toggle>
 
