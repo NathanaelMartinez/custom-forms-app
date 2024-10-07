@@ -2,7 +2,6 @@ import React from "react";
 import { Button, Container } from "react-bootstrap";
 // import { useNavigate } from "react-router-dom";
 import AppNavBar from "../components/app-nav-bar";
-import SearchBar from "../components/search-bar";
 import CallToAction from "../components/call-to-action-banner";
 import TemplateList from "../components/template-list";
 import { Template } from "../types";
@@ -158,7 +157,6 @@ const recentTemplates: Template[] = [
   return (
     <>
       <AppNavBar />
-      <SearchBar />
 
       <Container className="p-4 bg-light">
         <TemplateList title="Top Templates" templates={popularTemplates} type="top" />

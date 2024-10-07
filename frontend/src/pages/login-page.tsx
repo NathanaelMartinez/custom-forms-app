@@ -38,7 +38,7 @@ const LoginPage: React.FC = () => {
       localStorage.setItem("authToken", data.token); // save token to localStorage
       login(data.token); // update AuthContext
       console.log("User logged in successfully", data);
-      navigate("/"); // redirect to home after successful login
+      navigate(-1); // redirect to home after successful login
     } catch (error) {
       setErrors(error as string); // display error message to user
     }
