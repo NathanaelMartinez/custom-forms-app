@@ -14,17 +14,18 @@ const options = {
 passport.use(
   new JwtStrategy(options, async (jwt_payload, done) => {
     try {
-      // find user by id (jwt_payload.sub)
       const userRepository = AppDataSource.getRepository(User);
       const user = await userRepository.findOneBy({ id: jwt_payload.sub });
 
       if (user) {
+        console.log("User found:", user);
         return done(null, user);
       } else {
-        // user doesn't exist
+        console.log("User not found");
         return done(null, false);
       }
     } catch (err) {
+      console.error("Error in JwtStrategy:", err);
       return done(err, false);
     }
   })

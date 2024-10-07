@@ -6,6 +6,7 @@ import authRoutes from "./routes/auth-routes";
 import { initializeAuth } from "./services/auth-service";
 import templateRouter from "./routes/template-routes";
 import adminRouter from "./routes/admin-routes";
+import passport from "passport";
 
 const app = express();
 
@@ -30,6 +31,7 @@ const corsOptions: cors.CorsOptions = {
   },
   methods: ["GET", "POST", "DELETE", "PATCH"],
   credentials: true,
+  exposedHeaders: ["Authorization"],
 };
 
 app.use(cors(corsOptions));
@@ -37,6 +39,7 @@ app.use(cors(corsOptions));
 // middleware
 app.use(express.json());
 initializeAuth(); // init passport
+app.use(passport.initialize());
 
 // routes
 app.use("/api/auth", authRoutes); // authentication routes
