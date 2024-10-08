@@ -15,7 +15,7 @@ export class Template {
   id!: string;
 
   @Column()
-  name!: string;
+  title!: string;
 
   @Column({ type: "text", nullable: true })
   description!: string;

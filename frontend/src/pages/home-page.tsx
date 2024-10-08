@@ -14,7 +14,7 @@ const HomePage: React.FC = () => {
   const popularTemplates: Template[] = [
     {
       id: "1",
-      name: "Top Form Template 1",
+      title: "Top Form Template 1",
       filledForms: 120,
       description: "A top template",
       author: {
@@ -31,7 +31,7 @@ const HomePage: React.FC = () => {
     },
     {
       id: "2",
-      name: "Top Form Template 2",
+      title: "Top Form Template 2",
       filledForms: 95,
       description: "A top template",
       author: {
@@ -48,7 +48,7 @@ const HomePage: React.FC = () => {
     },
     {
       id: "3",
-      name: "Top Form Template 3",
+      title: "Top Form Template 3",
       filledForms: 85,
       description: "A top template",
       author: {
@@ -65,7 +65,7 @@ const HomePage: React.FC = () => {
     },
     {
       id: "4",
-      name: "Top Form Template 4",
+      title: "Top Form Template 4",
       filledForms: 70,
       description: "A top template",
       author: {
@@ -82,7 +82,7 @@ const HomePage: React.FC = () => {
     },
     {
       id: "5",
-      name: "Top Form Template 5",
+      title: "Top Form Template 5",
       filledForms: 50,
       description: "A top template",
       author: {
@@ -103,7 +103,7 @@ const HomePage: React.FC = () => {
   const recentTemplates: Template[] = [
     {
       id: "6",
-      name: "Recent Form Template 1",
+      title: "Recent Form Template 1",
       description: "A recent template",
       filledForms: 0,
       author: {
@@ -120,7 +120,7 @@ const HomePage: React.FC = () => {
     },
     {
       id: "7",
-      name: "Recent Form Template 2",
+      title: "Recent Form Template 2",
       description: "A recent template",
       filledForms: 0,
       author: {
@@ -137,7 +137,7 @@ const HomePage: React.FC = () => {
     },
     {
       id: "8",
-      name: "Recent Form Template 3",
+      title: "Recent Form Template 3",
       description: "A recent template",
       filledForms: 0,
       author: {
@@ -171,7 +171,7 @@ const HomePage: React.FC = () => {
       <Container className="p-4 home-page-crawl">
         <Tabs
           defaultActiveKey="new-templates"
-          className="tabs-container rounded"
+          className="tabs-container"
         >
           <Tab
             eventKey="new-templates"

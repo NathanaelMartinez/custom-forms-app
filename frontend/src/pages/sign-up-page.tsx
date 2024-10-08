@@ -64,7 +64,7 @@ const SignUpPage: React.FC = () => {
     <div className="signup-page bg-dark text-light min-vh-100 d-flex align-items-center">
       <Container>
         {/* Logo */}
-          <h1 className="display-3 mb-5 fw-bold text-center">
+          <h1 className="display-3 mb-5 fw-bold text-start">
             <Link to="/" className="text-decoration-none text-light">
               QuickFormr
             </Link>

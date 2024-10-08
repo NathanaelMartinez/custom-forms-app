@@ -6,7 +6,7 @@ import { Template } from "../entities/template";
 
 // add a new question to an existing template
 export const addQuestion = async (req: Request, res: Response) => {
-  const { title, description, type, displayInTable } = req.body;
+  const { questionText, type, displayInTable } = req.body;
   const { templateId } = req.params;
 
   try {
@@ -22,8 +22,7 @@ export const addQuestion = async (req: Request, res: Response) => {
 
     // create new question
     const question = questionRepository.create({
-      title,
-      description,
+      questionText,
       type,
       displayInTable: displayInTable || false,
       template,
@@ -32,18 +31,16 @@ export const addQuestion = async (req: Request, res: Response) => {
     // save question
     await questionRepository.save(question);
     res.status(201).json({ message: "Question added successfully", question });
-    return;
   } catch (error) {
     console.error("Error adding question:", error);
     res.status(500).json({ message: "Internal server error" });
-    return;
   }
 };
 
 // edit an existing question
 export const editQuestion = async (req: Request, res: Response) => {
   const { id } = req.params;
-  const { title, description, type, displayInTable } = req.body;
+  const { questionText, type, displayInTable } = req.body;
   const user = req.user as User;
 
   if (!user) {
@@ -70,8 +67,7 @@ export const editQuestion = async (req: Request, res: Response) => {
     }
 
     // update and save
-    question.title = title || question.title;
-    question.description = description || question.description;
+    question.questionText = questionText || question.questionText;
     question.type = type || question.type;
     question.displayInTable = displayInTable ?? question.displayInTable;
 
@@ -79,11 +75,9 @@ export const editQuestion = async (req: Request, res: Response) => {
     res
       .status(200)
       .json({ message: "Question updated successfully.", question });
-    return;
   } catch (error) {
     console.error("Error editing question:", error);
     res.status(500).json({ message: "Internal server error" });
-    return;
   }
 };
 

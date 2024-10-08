@@ -9,17 +9,19 @@ import {
 } from "react-bootstrap";
 import {
   Plus,
-  UnlockFill,
   ThreeDotsVertical,
   GripVertical,
   Square,
+  LockFill,
 } from "react-bootstrap-icons";
 import AppNavBar from "../components/app-nav-bar";
 import { Question, Template, User } from "../types";
 import { useAuth } from "../context/auth-context";
 import { useNavigate } from "react-router-dom";
+import { createTemplate } from "../services/template-service";
 
 const CreateTemplatePage: React.FC = () => {
+  const [isSaving, setIsSaving] = useState<boolean>(false);
   const { isLoggedIn, user } = useAuth();
   const navigate = useNavigate();
 
@@ -38,7 +40,7 @@ const CreateTemplatePage: React.FC = () => {
   // initialize template state with current user
   const [template, setTemplate] = useState<Template>({
     id: "",
-    name: "New Template",
+    title: "New Template",
     description: "",
     author: user as User, // directly use the user object as author
     questions: [],
@@ -48,24 +50,66 @@ const CreateTemplatePage: React.FC = () => {
     comments: [],
   });
 
+  const handleSaveTemplate = async () => {
+    try {
+      setIsSaving(true);
+
+      // define the payload with updated structure
+      const payload = {
+        title: template.title,
+        description: template.description || "",
+        authorId: template.author.id,
+        topic: template.topic || "", // TODO: ensure a topic is selected before submission
+        questions: template.questions.map(
+          ({ type, questionText, options }) => ({
+            type,
+            questionText, // use questionText instead of title
+            options, // include options if they exist (for checkboxes)
+          })
+        ),
+      };
+
+      console.log("Payload to be sent:", payload);
+
+      // send the request to the backend using your template service
+      const response = await createTemplate(payload);
+
+      // handle successful response
+      console.log("Template saved successfully:", response.data);
+      navigate(`/template/${response.data.id}`);
+    } catch (error) {
+      console.error("Failed to save template:", error);
+      alert("Failed to save template. Please try again.");
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
   // adds a new question of specified type
   const handleAddQuestion = (type: Question["type"]) => {
+    const tempId = `temp-${Date.now()}`;
     const newQuestion: Question = {
-      id: "",
+      id: tempId,
       type,
-      placeholder:
-        type === "text"
-          ? "Short answer..."
-          : type === "textarea"
-          ? "Paragraph answer..."
-          : type === "integer"
-          ? "Number answer..."
-          : "Check all that apply...",
-      questionText: "",
+      questionText: "New Question", // set a default question text
       options: type === "checkbox" ? ["Option 1"] : undefined,
       template,
+      displayInTable: true,
     };
     const updatedQuestions = [...template.questions, newQuestion];
+    setTemplate({ ...template, questions: updatedQuestions });
+  };
+
+  // updates the question text as user types
+  const handleQuestionTextChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+    questionId: string
+  ) => {
+    const updatedQuestions = template.questions.map((question) =>
+      question.id === questionId
+        ? { ...question, questionText: e.currentTarget.value }
+        : question
+    );
     setTemplate({ ...template, questions: updatedQuestions });
   };
 
@@ -84,19 +128,6 @@ const CreateTemplatePage: React.FC = () => {
       id: "",
     };
     const updatedQuestions = [...template.questions, duplicatedQuestion];
-    setTemplate({ ...template, questions: updatedQuestions });
-  };
-
-  // updates the text of a question as user types
-  const handleQuestionTextChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
-    questionId: string
-  ) => {
-    const updatedQuestions = template.questions.map((question) =>
-      question.id === questionId
-        ? { ...question, questionText: e.currentTarget.value }
-        : question
-    );
     setTemplate({ ...template, questions: updatedQuestions });
   };
 
@@ -134,10 +165,10 @@ const CreateTemplatePage: React.FC = () => {
     setTemplate({ ...template, questions: updatedQuestions });
   };
 
-//   const handleTagInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-//     const inputValue = e.target.value;
-//     TODO: tag suggestions
-//   };
+  //   const handleTagInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  //     const inputValue = e.target.value;
+  //     TODO: tag suggestions
+  //   };
 
   return (
     <>
@@ -152,9 +183,9 @@ const CreateTemplatePage: React.FC = () => {
             {/* title input */}
             <Form.Control
               type="text"
-              value={template.name}
+              value={template.title}
               onChange={(e) =>
-                setTemplate({ ...template, name: e.target.value })
+                setTemplate({ ...template, title: e.target.value })
               }
               className="fs-3 fw-bold mb-4 text-start border-0 border-bottom input-focus-muted"
               placeholder="New Template"
@@ -177,9 +208,7 @@ const CreateTemplatePage: React.FC = () => {
                       type="text"
                       placeholder="Enter your question..."
                       value={question.questionText}
-                      onChange={(e) =>
-                        handleQuestionTextChange(e, question.id)
-                      }
+                      onChange={(e) => handleQuestionTextChange(e, question.id)}
                       className="mb-2 border-0 border-bottom input-focus-muted"
                     />
 
@@ -187,7 +216,7 @@ const CreateTemplatePage: React.FC = () => {
                     {question.type === "text" && (
                       <Form.Control
                         type="text"
-                        placeholder={question.placeholder}
+                        placeholder="Short answer..."
                         className="border-0 border-bottom input-focus-muted"
                         readOnly
                       />
@@ -196,7 +225,7 @@ const CreateTemplatePage: React.FC = () => {
                       <Form.Control
                         as="textarea"
                         rows={3}
-                        placeholder={question.placeholder}
+                        placeholder="Long answer..."
                         className="border-0 input-focus-muted"
                         readOnly
                       />
@@ -204,7 +233,7 @@ const CreateTemplatePage: React.FC = () => {
                     {question.type === "integer" && (
                       <Form.Control
                         type="number"
-                        placeholder={question.placeholder}
+                        placeholder="Number answer..."
                         className="border-0 border-bottom input-focus-muted"
                         readOnly
                       />
@@ -353,9 +382,18 @@ const CreateTemplatePage: React.FC = () => {
 
           {/* public or invite only */}
           <div className="mt-4 d-flex align-items-center">
-            <UnlockFill className="me-2 text-muted" />
+            <LockFill className="me-2 text-muted" />
             <span>Public: Answerable by all users</span>
           </div>
+
+          <Button
+            variant="primary"
+            className="mt-3 custom-success-btn"
+            onClick={handleSaveTemplate}
+            disabled={isSaving} // Optional: disable while saving
+          >
+            {isSaving ? "Saving..." : "Publish"}
+          </Button>
         </div>
       </div>
     </>

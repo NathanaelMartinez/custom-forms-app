@@ -1,12 +1,20 @@
 /* define color palette */
 :root {
-  --primary-color: #124e66; /* dark blue */
+  --primary-color: #124e66; /* deep ocean blue */
   --secondary-color: #2e3944; /* slate gray */
-  --bg-dark: #212a31; /* dark gray */
-  --bg-muted: #748d92; /* muted blue */
-  --bg-light: #d3d9d4; /* light gray */
+  --accent-color: #e89b4a; /* warm amber */
+  --bg-dark: #212a31; /* dark charcoal */
+  --bg-muted: #748d92; /* muted slate blue */
+  --bg-light: #d3d9d4; /* light cool gray */
+  --light-gray: #f4f4f4; /* off-white */
+  --medium-gray: #5b6b73; /* medium gray-blue */
+  --dark-accent: #1b2a34; /* rich teal */
   --text-light: #ffffff; /* white */
   --text-dark: #000000; /* black */
+  --muted-gray: #b0b7b2;
+  --extra-light-gray: #e8ecee; /* very light gray, almost white */
+  --soft-gray: #c7ced1; /* soft gray, slightly lighter than medium-gray */
+  --deep-gray: #3f4a52; /* deeper gray, between slate gray and dark charcoal */
 }
 
 /* navbar */
@@ -224,6 +232,7 @@ form-control {
 
 h1.display-3 {
   font-size: 3rem;
+  margin-left: 9%;
 }
 
 .dropdown-toggle-no-caret::after {
@@ -231,21 +240,22 @@ h1.display-3 {
 }
 
 .recent-templates-container {
-  background-color: var(--bg-muted);
-  border-top-right-radius: 0.5rem;
+  background-color: var(--muted-gray);
+  /* border-top-right-radius: 0.5rem; */
 }
 
 .home-page-crawl {
   background-color: var(--bg-light);
 }
 
-.tabs-container .nav-tabs {
-  background-color: var(--bg-muted); 
-  border-bottom: none;
+.tabs-container {
+  background-color: var(--bg-dark);
+  border-radius: 0rem;  
 }
 
 .nav-tabs .nav-link.active {
-  background-color: var(--bg-muted); 
+  background-color: var(--dark-accent); 
   color: var(--text-light); 
-  border: none;
+  /* border: none; */
+  border-radius: 0rem;  
 }

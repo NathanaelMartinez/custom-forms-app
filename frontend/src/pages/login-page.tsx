@@ -48,13 +48,11 @@ const LoginPage: React.FC = () => {
     <div className="login-page bg-dark text-light min-vh-100 d-flex align-items-center">
       <Container>
         {/* Logo */}
-        <Row className="mb-5">
-          <h1 className="display-3 fw-bold mb-3 text-start">
+          <h1 className="display-3 mb-5 fw-bold text-start">
             <Link to="/" className="text-decoration-none text-light">
               QuickFormr
             </Link>
           </h1>
-        </Row>
 
         {/* two sides layout */}
         <Row className="g-0">

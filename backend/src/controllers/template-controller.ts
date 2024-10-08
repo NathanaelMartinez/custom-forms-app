@@ -7,7 +7,7 @@ import { Comment } from "../entities/comment";
 
 // create new template (authenticated users only)
 export const createTemplate = async (req: Request, res: Response) => {
-  const { name, description, questions } = req.body;
+  const { title, description, questions } = req.body;
   const user = req.user as User;
 
   if (!user) {
@@ -17,42 +17,46 @@ export const createTemplate = async (req: Request, res: Response) => {
 
   try {
     const templateRepository = AppDataSource.getRepository(Template);
+    const questionRepository = AppDataSource.getRepository(Question);
 
-    // create template object
+    // create a new template object
     const template = templateRepository.create({
-      name,
+      title,
       description,
       author: user,
     });
 
+    // save the template first to generate its id
+    const savedTemplate = await templateRepository.save(template);
+
     // map questions only if provided
     if (questions && Array.isArray(questions)) {
-      const createdQuestions = questions.map((q: Question) => ({
-        title: q.title,
-        description: q.description,
-        type: q.type,
-        displayInTable: q.displayInTable || false,
-      }));
-      // assign questions to template
-      template.questions = createdQuestions as Question[];
+      const createdQuestions = questions.map((q: any) =>
+        questionRepository.create({
+          questionText: q.questionText,
+          type: q.type,
+          displayInTable: q.displayInTable || false,
+          template: savedTemplate, // associate each question with the saved template
+        })
+      );
+
+      // save the questions after template is saved
+      await questionRepository.save(createdQuestions);
     }
 
-    // save the template (also saves questions due to cascading)
-    await templateRepository.save(template);
-    res
-      .status(201)
-      .json({ message: "template created successfully", template });
+    res.status(201).json({
+      message: "template created successfully",
+      template: savedTemplate,
+    });
   } catch (error) {
     if (error instanceof Error) {
       console.error("error creating template:", error.message);
       res
         .status(500)
         .json({ message: "internal server error", error: error.message });
-      return;
     } else {
       console.error("unexpected error:", error);
       res.status(500).json({ message: "internal server error" });
-      return;
     }
   }
 };
@@ -98,7 +102,7 @@ export const editTemplate = async (req: Request, res: Response) => {
       return;
     }
 
-    template.name = name || template.name;
+    template.title = name || template.title;
     template.description = description || template.description;
 
     await templateRepository.save(template);

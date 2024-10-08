@@ -7,10 +7,7 @@ export class Question {
   id!: string;
 
   @Column()
-  title!: string;
-
-  @Column({ nullable: true })
-  description!: string;
+  questionText!: string; // the visible question text, like "What is your favorite color?"
 
   @Column()
   type!: string; // single-line, multiple-line, integer, checkbox, etc.
@@ -21,5 +18,5 @@ export class Question {
   template!: Template;
 
   @Column({ default: false })
-  displayInTable!: boolean; // boolean value that defines whether the question will be displayed in the table of the filled-out forms (on the tab of the template).
+  displayInTable!: boolean; // whether this question should be shown in table views of responses
 }

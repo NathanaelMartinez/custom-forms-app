@@ -3,7 +3,7 @@ import { User } from "./user";
 
 export interface Template {
   id: string;
-  name: string;
+  title: string;
   description?: string;
   author: User; // user who created template
   topic?: string;
