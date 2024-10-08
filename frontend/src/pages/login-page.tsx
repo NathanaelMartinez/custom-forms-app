@@ -8,8 +8,8 @@ import { Link, useNavigate } from "react-router-dom";
 import gatheringDataImage from "../assets/gathering_data.jpg";
 import { loginUser } from "../services/auth-service";
 import { useAuth } from "../context/auth-context";
-import ProductPitch from "../components/product-pitch";
-import AuthForm from "../components/auth-form";
+import ProductPitch from "../components/layout/product-pitch";
+import AuthForm from "../components/forms/auth-form";
 
 const LoginPage: React.FC = () => {
   const { login } = useAuth(); // use login method from context

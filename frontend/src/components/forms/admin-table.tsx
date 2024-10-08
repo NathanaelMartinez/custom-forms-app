@@ -1,5 +1,5 @@
 import React, { ChangeEvent, useEffect, useState } from 'react';
-import { User } from '../types';
+import { User } from '../../types';
   
 interface AdminTableProps {
     users: User[];

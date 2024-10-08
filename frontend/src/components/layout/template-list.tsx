@@ -1,7 +1,7 @@
 // components/TemplateList.tsx
 import React from "react";
 import { Card, Row, Col } from "react-bootstrap";
-import { Template } from "../types";
+import { Template } from "../../types";
 
 interface TemplateListProps {
   title: string;

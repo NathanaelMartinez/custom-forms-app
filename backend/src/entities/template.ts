@@ -34,4 +34,10 @@ export class Template {
 
   @OneToMany(() => Comment, (comment) => comment.template, { cascade: true })
   comments!: Comment[];
+
+  @Column({ type: "text", nullable: true }) // add image as a URL string
+  image!: string | null;
+
+  @Column("simple-array", { nullable: true })
+  tags!: string[]; // TODO: make tags into entity
 }

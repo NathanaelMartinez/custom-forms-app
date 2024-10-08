@@ -113,6 +113,68 @@
   opacity: 0.5;
 }
 
+.custom-outline-primary-btn {
+  background-color: transparent;
+  border-color: var(--primary-color);
+  color: var(--primary-color);
+}
+
+.custom-outline-primary-btn:hover,
+.custom-outline-primary-btn:focus {
+  background-color: var(--primary-color);
+  border-color: var(--primary-color);
+  color: var(--text-light);
+}
+
+.custom-outline-primary-btn:disabled {
+  background-color: transparent;
+  color: var(--primary-color);
+  border-color: var(--primary-color);
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.custom-outline-secondary-btn {
+  background-color: transparent;
+  border-color: var(--secondary-color);
+  color: var(--secondary-color);
+}
+
+.custom-outline-secondary-btn:hover,
+.custom-outline-secondary-btn:focus {
+  background-color: var(--secondary-color);
+  border-color: var(--secondary-color);
+  color: var(--text-light);
+}
+
+.custom-outline-secondary-btn:disabled {
+  background-color: transparent;
+  color: var(--secondary-color);
+  border-color: var(--secondary-color);
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.custom-outline-contrast-btn {
+  background-color: transparent;
+  border-color: var(--accent-color);
+  color: var(--accent-color);
+}
+
+.custom-outline-contrast-btn:hover,
+.custom-outline-contrast-btn:focus {
+  background-color: var(--accent-color);
+  border-color: var(--accent-color);
+  color: var(--text-light);
+}
+
+.custom-outline-contrast-btn:disabled {
+  background-color: transparent;
+  color: var(--accent-color);
+  border-color: var(--accent-color);
+  opacity: 0.65;
+  cursor: not-allowed;
+}
 
 /* Form control styles */
 form-control {

@@ -7,11 +7,11 @@ import { Comment } from "../entities/comment";
 
 // create new template (authenticated users only)
 export const createTemplate = async (req: Request, res: Response) => {
-  const { title, description, questions } = req.body;
+  const { title, description, questions, tags, image } = req.body;
   const user = req.user as User;
 
   if (!user) {
-    res.status(401).json({ message: "unauthorized" });
+    res.status(401).json({ message: "Unauthorized" });
     return;
   }
 
@@ -19,44 +19,42 @@ export const createTemplate = async (req: Request, res: Response) => {
     const templateRepository = AppDataSource.getRepository(Template);
     const questionRepository = AppDataSource.getRepository(Question);
 
-    // create a new template object
     const template = templateRepository.create({
       title,
       description,
       author: user,
+      image: image || null,
+      tags: tags || [], // default to an empty array if tags are not provided
     });
 
-    // save the template first to generate its id
     const savedTemplate = await templateRepository.save(template);
 
-    // map questions only if provided
     if (questions && Array.isArray(questions)) {
       const createdQuestions = questions.map((q: any) =>
         questionRepository.create({
           questionText: q.questionText,
           type: q.type,
           displayInTable: q.displayInTable || false,
-          template: savedTemplate, // associate each question with the saved template
+          template: savedTemplate,
         })
       );
 
-      // save the questions after template is saved
       await questionRepository.save(createdQuestions);
     }
 
     res.status(201).json({
-      message: "template created successfully",
+      message: "Template created successfully",
       template: savedTemplate,
     });
   } catch (error) {
     if (error instanceof Error) {
-      console.error("error creating template:", error.message);
+      console.error("Error creating template:", error.message);
       res
         .status(500)
-        .json({ message: "internal server error", error: error.message });
+        .json({ message: "Internal server error", error: error.message });
     } else {
-      console.error("unexpected error:", error);
-      res.status(500).json({ message: "internal server error" });
+      console.error("Unexpected error:", error);
+      res.status(500).json({ message: "Internal server error" });
     }
   }
 };
@@ -78,8 +76,7 @@ export const viewTemplates = async (req: Request, res: Response) => {
 // edit a template
 export const editTemplate = async (req: Request, res: Response) => {
   const { id } = req.params;
-  const { name, description } = req.body;
-
+  const { name, description, tags, image } = req.body;
   const user = req.user as User;
 
   if (!user) {
@@ -96,7 +93,6 @@ export const editTemplate = async (req: Request, res: Response) => {
       return;
     }
 
-    // only author or an admin can edit
     if (template.author.id !== user.id && user.role !== "admin") {
       res.status(403).json({ message: "Unauthorized to edit this template." });
       return;
@@ -104,6 +100,8 @@ export const editTemplate = async (req: Request, res: Response) => {
 
     template.title = name || template.title;
     template.description = description || template.description;
+    template.tags = tags || template.tags;
+    template.image = image || template.image;
 
     await templateRepository.save(template);
     res

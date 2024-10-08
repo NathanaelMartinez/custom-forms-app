@@ -1,7 +1,7 @@
 import React from "react";
 import { Button, Container, Row, Col } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../context/auth-context";
+import { useAuth } from "../../context/auth-context";
 
 const CallToAction: React.FC = () => {
   const { isLoggedIn } = useAuth();

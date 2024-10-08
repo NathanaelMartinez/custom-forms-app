@@ -1,11 +1,11 @@
 import React from "react";
 import { Button, Container, Tab, Tabs } from "react-bootstrap";
 // import { useNavigate } from "react-router-dom";
-import AppNavBar from "../components/app-nav-bar";
-import CallToAction from "../components/call-to-action-banner";
-import TemplateList from "../components/template-list";
+import AppNavBar from "../components/layout/app-nav-bar";
+import CallToAction from "../components/layout/call-to-action-banner";
+import TemplateList from "../components/layout/template-list";
 import { Template } from "../types";
-import Footer from "../components/app-footer";
+import Footer from "../components/layout/app-footer";
 
 const HomePage: React.FC = () => {
   // const navigate = useNavigate();

@@ -11,7 +11,7 @@ import {
 } from "react-bootstrap";
 import { PersonCircle, ShieldFill, Search } from "react-bootstrap-icons";
 import { useNavigate, useLocation } from "react-router-dom";
-import { useAuth } from "../context/auth-context";
+import { useAuth } from "../../context/auth-context";
 
 const AppNavBar: React.FC = () => {
   const { isLoggedIn, user, logout } = useAuth();

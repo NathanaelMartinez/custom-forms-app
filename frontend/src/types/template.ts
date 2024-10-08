@@ -12,4 +12,6 @@ export interface Template {
   filledForms?: number; // track how many times template has been filled
   likes?: number;
   comments?: Comment[];
+  tags?: string[];
+  image?: File | null; // use cloud service later to store uri as string
 }
