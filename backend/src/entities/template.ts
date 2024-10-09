@@ -8,6 +8,7 @@ import {
 import { User } from "./user";
 import { Question } from "./question";
 import { Comment } from "./comment";
+import { Response } from "./response";
 
 @Entity("templates")
 export class Template {
@@ -40,4 +41,7 @@ export class Template {
 
   @Column("simple-array", { nullable: true })
   tags!: string[]; // TODO: make tags into entity
+
+  @OneToMany(() => Response, (response) => response.template)
+  responses!: Response[];
 }

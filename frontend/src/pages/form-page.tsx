@@ -9,7 +9,7 @@ import AddQuestionButton from "../components/forms/add-question-button";
 import { Question, Template, User } from "../types";
 import { createTemplate } from "../services/template-service";
 
-const CreateTemplatePage: React.FC = () => {
+const FormPage: React.FC = () => {
   const [isSaving, setIsSaving] = useState<boolean>(false);
   const [questionsCount, setQuestionsCount] = useState<number>(0); // track number of questions for validation
   const { isLoggedIn, user } = useAuth();
@@ -207,4 +207,4 @@ const CreateTemplatePage: React.FC = () => {
   );
 };
 
-export default CreateTemplatePage;
+export default FormPage;

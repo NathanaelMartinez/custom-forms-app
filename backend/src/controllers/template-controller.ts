@@ -73,6 +73,37 @@ export const viewTemplates = async (req: Request, res: Response) => {
   }
 };
 
+// view a specific template
+export const getTemplate = async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const user = req.user as User;
+
+  if (!user) {
+    res.status(401).json({ message: "Unauthorized" });
+    return;
+  }
+
+  try {
+    const templateRepository = AppDataSource.getRepository(Template);
+    const template = await templateRepository.findOneBy({ id });
+
+    if (!template) {
+      res.status(404).json({ message: "Template not found." });
+      return;
+    }
+
+    if (template.author.id !== user.id && user.role !== "admin") {
+      res.status(403).json({ message: "Unauthorized to view this template." });
+      return;
+    }
+
+    res.status(200).json(template);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Internal server error." });
+  }
+};
+
 // edit a template
 export const editTemplate = async (req: Request, res: Response) => {
   const { id } = req.params;
