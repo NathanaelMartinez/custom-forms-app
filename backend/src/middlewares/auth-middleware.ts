@@ -14,3 +14,19 @@ export const authorizeRoles = (...roles: string[]) => {
     next(); // user is authorized, proceed
   };
 };
+
+export const checkIfNotBlocked = (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const user = req.user as User;
+  if (user.status === "blocked") {
+    res.status(403).json({
+      error:
+        "Your account has been blocked. Please contact the QuickFormr administrator if you think this is an error.",
+    });
+    return;
+  }
+  next(); // user is not blocked, proceed
+};

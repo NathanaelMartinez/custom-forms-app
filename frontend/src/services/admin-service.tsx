@@ -43,10 +43,11 @@ export const fetchUsers = async () => {
 // bulk update user status
 export const updateUserStatus = async (payload: {
   userIds: string[];
-  action: "block" | "unblock";
+  action: "block" | "unblock" | "promote" | "demote";
 }) => {
   // retrieve the token from local storage
   const token = localStorage.getItem("authToken");
+  console.log(payload);
 
   if (!token) {
     throw new Error("No token found, please login again.");

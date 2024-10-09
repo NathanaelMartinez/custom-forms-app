@@ -57,7 +57,16 @@ export const login = async (req: Request, res: Response) => {
   try {
     const user = await findUserByEmail(email);
     if (!user || !(await comparePasswords(password, user.password))) {
-      res.status(401).json({ error: "Invalid credentials" });
+      res.status(401).json({ error: "Invalid email or password" });
+      return;
+    }
+
+    // check if the user is blocked
+    if (user.status === "blocked") {
+      res.status(403).json({
+        error:
+          "Your account has been blocked. Please contact the QuickFormr administrator if you think this is an error.",
+      });
       return;
     }
 

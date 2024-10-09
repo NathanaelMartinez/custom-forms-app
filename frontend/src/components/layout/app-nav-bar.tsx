@@ -9,7 +9,12 @@ import {
   Row,
   Col,
 } from "react-bootstrap";
-import { PersonCircle, ShieldFill, Search } from "react-bootstrap-icons";
+import {
+  PersonCircle,
+  ShieldFill,
+  Search,
+  PersonLock,
+} from "react-bootstrap-icons";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../../context/auth-context";
 
@@ -32,10 +37,7 @@ const AppNavBar: React.FC = () => {
     <>
       <Navbar bg="dark" expand="lg" className="mb-0 py-1">
         <Container fluid>
-          <Navbar.Brand
-            href="/"
-            className="fw-bold fs-2 ms-4 custom-icon-btn"
-          >
+          <Navbar.Brand href="/" className="fw-bold fs-2 ms-4 custom-icon-btn">
             QuickFormr
           </Navbar.Brand>
           <Navbar.Toggle aria-controls="basic-navbar-nav" />
@@ -67,7 +69,11 @@ const AppNavBar: React.FC = () => {
                       id="profile-dropdown"
                       className="d-flex me-3 align-items-center custom-icon-btn"
                     >
-                      <PersonCircle size={36} />
+                      {user?.status === "active" ? (
+                        <PersonCircle size={36} />
+                      ) : (
+                        <PersonLock size={36} />
+                      )}
                       <span className="ms-2">{user?.username}</span>
                     </Dropdown.Toggle>
 

@@ -88,22 +88,31 @@ export const modifyUser = async (req: Request, res: Response) => {
 export const modifyUsersBatch = async (req: Request, res: Response) => {
   const { action, userIds } = req.body;
 
+  console.log("Received action:", action);
+  console.log("Received userIds:", userIds);
+
   const VALID_ACTIONS = ["block", "unblock", "promote", "demote"];
   if (!VALID_ACTIONS.includes(action)) {
-    return res.status(400).json({ message: "Invalid action." });
+    console.log("Invalid action received");
+    res.status(400).json({ message: "Invalid action." });
+    return;
   }
 
   if (!Array.isArray(userIds) || userIds.length === 0) {
-    return res
-      .status(400)
-      .json({ message: "userIds must be a non-empty array." });
+    console.log("No userIds provided or not an array");
+    res.status(400).json({ message: "userIds must be a non-empty array." });
+    return;
   }
 
   try {
     const userRepository = AppDataSource.getRepository(User);
-    const users = await userRepository.findBy({ id: In(userIds) }); // In in typeorm like IN in SQL
+    const users = await userRepository.findBy({ id: In(userIds) });
+    console.log("Fetched users:", users);
+
     if (users.length === 0) {
-      return res.status(404).json({ message: "No users found." });
+      console.log("No users found with provided IDs");
+      res.status(404).json({ message: "No users found." });
+      return;
     }
 
     users.forEach((user) => {
@@ -112,7 +121,7 @@ export const modifyUsersBatch = async (req: Request, res: Response) => {
           if (user.status !== "blocked") user.status = "blocked";
           break;
         case "unblock":
-          if (user.status === "blocked") user.status = "active";
+          if (user.status !== "active") user.status = "active";
           break;
         case "promote":
           if (user.role !== "admin") user.role = "admin";
@@ -123,10 +132,11 @@ export const modifyUsersBatch = async (req: Request, res: Response) => {
       }
     });
 
-    await userRepository.save(users); // save all changes at once
+    await userRepository.save(users);
+    console.log("Users updated successfully");
     res.status(200).json({ message: `Users have been ${action}ed.` });
   } catch (error) {
-    console.error(error);
+    console.error("Error in modifyUsersBatch:", error);
     res.status(500).json({ message: "Internal server error." });
   }
 };
@@ -153,9 +163,8 @@ export const deleteUsersBatch = async (req: Request, res: Response) => {
   const { userIds } = req.body;
 
   if (!Array.isArray(userIds) || userIds.length === 0) {
-    return res
-      .status(400)
-      .json({ message: "userIds must be a non-empty array." });
+    res.status(400).json({ message: "userIds must be a non-empty array." });
+    return;
   }
 
   try {
@@ -163,7 +172,8 @@ export const deleteUsersBatch = async (req: Request, res: Response) => {
     const users = await userRepository.findBy({ id: In(userIds) });
 
     if (users.length === 0) {
-      return res.status(404).json({ message: "No users found." });
+      res.status(404).json({ message: "No users found." });
+      return;
     }
 
     await userRepository.remove(users); // delete all users at once

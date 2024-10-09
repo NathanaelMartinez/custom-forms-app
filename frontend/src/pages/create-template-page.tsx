@@ -16,14 +16,18 @@ const CreateTemplatePage: React.FC = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    window.scrollTo(0, 0);
+    window.scrollTo(0, 0); // make sure scrolled up
   }, []);
 
+  // get template from storage if redirected from login
   useEffect(() => {
-    if (!isLoggedIn) {
-      navigate("/login");
+    const savedTemplate = localStorage.getItem("savedTemplate");
+    if (savedTemplate) {
+      setTemplate(JSON.parse(savedTemplate));
+      setQuestionsCount(JSON.parse(savedTemplate).questions.length);
+      localStorage.removeItem("savedTemplate"); // clear it after restoring
     }
-  }, [isLoggedIn, navigate]);
+  }, []);
 
   const [template, setTemplate] = useState<Template>({
     id: "",
@@ -40,6 +44,16 @@ const CreateTemplatePage: React.FC = () => {
   });
 
   const handleSaveTemplate = async () => {
+    // check if still logged in (tokens can expire)
+    if (!isLoggedIn) {
+      // save current state in localStorage
+      localStorage.setItem("savedTemplate", JSON.stringify(template));
+
+      // redirect to login page and include a return URL to bring the user back
+      navigate("/login", { state: { returnUrl: "/create-template" } });
+      return;
+    }
+
     try {
       setIsSaving(true);
       const payload = {
@@ -47,11 +61,13 @@ const CreateTemplatePage: React.FC = () => {
         description: template.description || "",
         authorId: template.author.id,
         topic: template.topic || "",
-        questions: template.questions.map(({ type, questionText, options }) => ({
-          type,
-          questionText,
-          options,
-        })),
+        questions: template.questions.map(
+          ({ type, questionText, options }) => ({
+            type,
+            questionText,
+            options,
+          })
+        ),
         tags: template.tags,
         image: template.image,
       };
@@ -112,7 +128,7 @@ const CreateTemplatePage: React.FC = () => {
       }
       return q;
     });
-    
+
     setTemplate({ ...template, questions: updatedQuestions });
   };
 
@@ -126,7 +142,7 @@ const CreateTemplatePage: React.FC = () => {
       }
       return q;
     });
-  
+
     setTemplate({ ...template, questions: updatedQuestions });
   };
 
@@ -135,7 +151,10 @@ const CreateTemplatePage: React.FC = () => {
       <AppNavBar />
       <div className="d-flex min-vh-100 bg-light">
         <div className="flex-grow-1 p-5 d-flex justify-content-center">
-          <Card className="shadow-lg p-4 bg-white rounded-3" style={{ width: "100%", maxWidth: "800px" }}>
+          <Card
+            className="shadow-lg p-4 bg-white rounded-3"
+            style={{ width: "100%", maxWidth: "800px" }}
+          >
             {/* title input */}
             <Form.Control
               type="text"
