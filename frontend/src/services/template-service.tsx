@@ -40,3 +40,13 @@ export const createTemplate = async (templateData: CreateTemplatePayload) => {
     throw error; // rethrow error to handle in calling function
   }
 };
+
+export const fetchTemplate = async (id: string) => {
+  try {
+    const response = await axios.get(`${SERVER_URL}/api/templates/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching template:', error);
+    throw error;
+  }
+};

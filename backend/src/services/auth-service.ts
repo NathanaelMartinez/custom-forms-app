@@ -18,7 +18,7 @@ passport.use(
       const user = await userRepository.findOneBy({ id: jwt_payload.sub });
 
       if (user) {
-        console.log("User found:", user);
+        // console.log("User found:", user);
         return done(null, user);
       } else {
         console.log("User not found");

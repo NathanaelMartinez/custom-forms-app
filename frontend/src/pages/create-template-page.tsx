@@ -81,7 +81,7 @@ const CreateTemplatePage: React.FC = () => {
         createdAt: new Date(),
       };
       const response = await createTemplate(payload);
-      navigate(`/template/${response.data.id}`);
+      navigate(`/form/${response.data.template.id}`);
     } catch (error) {
       console.error("Failed to save template:", error);
       alert("Failed to save template. Please try again.");

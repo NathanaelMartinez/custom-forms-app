@@ -4,6 +4,7 @@ import { User } from "../entities/user";
 import { Template } from "../entities/template";
 import { Question } from "../entities/question";
 import { Comment } from "../entities/comment";
+import { Response } from "../entities/response";
 
 export const AppDataSource = new DataSource({
   type: "postgres",
@@ -14,7 +15,7 @@ export const AppDataSource = new DataSource({
   database: process.env.PG_DATABASE,
   synchronize: true, // automatically sync the schema (DISABLE IN PRODUCTION)
   logging: false,
-  entities: [User, Template, Question, Comment],
+  entities: [User, Template, Question, Comment, Response],
   migrations: [],
   subscribers: [],
   ssl: {

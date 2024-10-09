@@ -75,25 +75,17 @@ export const viewTemplates = async (req: Request, res: Response) => {
 
 // view a specific template
 export const getTemplate = async (req: Request, res: Response) => {
-  const { id } = req.params;
-  const user = req.user as User;
-
-  if (!user) {
-    res.status(401).json({ message: "Unauthorized" });
-    return;
-  }
+  const { templateId } = req.params;
 
   try {
     const templateRepository = AppDataSource.getRepository(Template);
-    const template = await templateRepository.findOneBy({ id });
+    const template = await templateRepository.findOne({
+      where: { id: templateId },
+      relations: ["questions"], // include related questions
+    });
 
     if (!template) {
       res.status(404).json({ message: "Template not found." });
-      return;
-    }
-
-    if (template.author.id !== user.id && user.role !== "admin") {
-      res.status(403).json({ message: "Unauthorized to view this template." });
       return;
     }
 

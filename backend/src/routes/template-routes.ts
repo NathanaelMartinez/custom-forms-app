@@ -29,7 +29,7 @@ router.post("/", authenticateJWT, checkIfNotBlocked, createTemplate);
 router.get("/", viewTemplates);
 
 // get a specific template (author or admin only)
-router.get("/:templateId", authenticateJWT, getTemplate);
+router.get("/:templateId", getTemplate);
 
 // edit a template (author or admin only)
 router.patch("/:templateId", authenticateJWT, checkIfNotBlocked, editTemplate);

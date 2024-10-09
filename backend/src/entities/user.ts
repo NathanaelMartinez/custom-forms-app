@@ -1,7 +1,7 @@
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from "typeorm";
 import { Template } from "./template";
 import { Comment } from "./comment";
-import { Form } from "./form";
+import { Response } from "./response";
 
 @Entity("users")
 export class User {
@@ -32,6 +32,6 @@ export class User {
   @Column({ default: () => "CURRENT_TIMESTAMP" })
   createdAt!: Date;
 
-  @OneToMany(() => Form, (form) => form.user)
-  forms!: Form[];
+  @OneToMany(() => Response, (response) => response.user)
+  responses!: Response[];
 }
