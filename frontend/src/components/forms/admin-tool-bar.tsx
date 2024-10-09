@@ -33,21 +33,21 @@ const AdminToolBar: React.FC<ToolbarProps> = ({
       </button>
       <button
         type="button"
-        className="btn btn-success me-5"
+        className="btn btn-success ms-3"
         onClick={onPromote}
       >
         <i className="bi bi-person-up"></i> Make Admin
       </button>
       <button
         type="button"
-        className="btn btn-danger me-5"
+        className="btn btn-danger ms-2"
         onClick={onDemote}
       >
         <i className="bi bi-person-down"></i> Demote Admin
       </button>
       <button
         type="button"
-        className="btn btn-danger ms-5"
+        className="btn btn-danger position-absolute delete-btn"
         onClick={onDelete}
       >
         <i className="bi bi-trash"></i> Delete

@@ -176,6 +176,10 @@
   cursor: not-allowed;
 }
 
+.delete-btn {
+  right: 7%;
+}
+
 /* Form control styles */
 form-control {
   background-color: var(--bg-light);
