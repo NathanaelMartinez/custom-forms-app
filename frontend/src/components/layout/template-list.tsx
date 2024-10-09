@@ -12,7 +12,7 @@ interface TemplateListProps {
 const TemplateList: React.FC<TemplateListProps> = ({ title, templates, type }) => {
   return (
     <section className={`${type}-templates`}>
-      <h3 className="mb-4 text-start fw-bold">{title}</h3>
+      <h3 className="mb-4 text-start fw-bold fs-2">{title}</h3>
 
       {type === "top" ? (
         <Row className="justify-content-center">

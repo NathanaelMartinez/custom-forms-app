@@ -257,6 +257,10 @@ form-control {
 .featured-card {
 }
 
+.banner-dark {
+  background-color: var(--bg-dark);
+}
+
 .product-info {
   position: relative; /* allow child elements to be positioned */
   width: 68%;

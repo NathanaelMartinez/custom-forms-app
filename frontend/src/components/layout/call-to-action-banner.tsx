@@ -8,7 +8,7 @@ const CallToAction: React.FC = () => {
   const navigate = useNavigate();
 
   return (
-    <Container className="py-3 bg-dark text-light">
+    <Container className="py-3 banner-dark text-light">
       <Row className="align-items-center justify-content-evenly">
         <Col md={8}>
           <h3 className="text-center fw-bold">
