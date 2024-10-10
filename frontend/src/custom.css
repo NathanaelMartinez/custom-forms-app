@@ -92,6 +92,22 @@
   opacity: 0.5;
 }
 
+.custom-contrast-icon-btn {
+  color: var(--primary-color);
+  border: none;
+  background: none;
+}
+
+.custom-contrast-icon-btn:hover,
+.custom-icon-btn:focus {
+  color: var(--dark-accent);
+}
+
+.custom-contrast-icon-btn:disabled {
+  color: var(--secondary-color);
+  opacity: 0.5;
+}
+
 .load-more-btn {
   position: absolute;
   bottom: 0;

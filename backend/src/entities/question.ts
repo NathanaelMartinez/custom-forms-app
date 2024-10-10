@@ -12,11 +12,14 @@ export class Question {
   @Column()
   type!: string; // single-line, multiple-line, integer, checkbox, etc.
 
+  @Column("jsonb", { nullable: true }) // not every question is a checkbox
+  options?: string[]; // options for checkbox
+
   @ManyToOne(() => Template, (template) => template.questions, {
     onDelete: "CASCADE",
   })
   template!: Template;
 
-  @Column({ default: false })
+  @Column({ default: true })
   displayInTable!: boolean; // whether this question should be shown in table views of responses
 }
