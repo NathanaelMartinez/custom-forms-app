@@ -5,7 +5,7 @@ import AppNavBar from "../components/layout/app-nav-bar";
 import CallToAction from "../components/layout/call-to-action-banner";
 import TemplateList from "../components/layout/template-list";
 import { Template } from "../types";
-import Footer from "../components/layout/app-footer";
+import AppFooter from "../components/layout/app-footer";
 
 const HomePage: React.FC = () => {
   // const navigate = useNavigate();
@@ -188,7 +188,7 @@ const HomePage: React.FC = () => {
         </Tabs>
       </Container>
 
-      <Footer />
+      <AppFooter />
     </>
   );
 };

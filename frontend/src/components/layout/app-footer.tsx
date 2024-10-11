@@ -8,7 +8,7 @@ import {
   TwitterX,
 } from "react-bootstrap-icons";
 
-const Footer: React.FC = () => {
+const AppFooter: React.FC = () => {
   return (
     <footer className="bg-dark text-light py-5">
       <Container>
@@ -88,4 +88,4 @@ const Footer: React.FC = () => {
   );
 };
 
-export default Footer;
+export default AppFooter;

@@ -24,14 +24,14 @@ const AppNavBar: React.FC = () => {
   const location = useLocation();
 
   const handleLogInClick = () => {
-    navigate("/login");
+    navigate("/login", { state: { returnUrl: location.pathname } });
   };
 
   const handleSignUpClick = () => {
     navigate("/sign-up");
   };
 
-  const isHomePage = location.pathname === "/"; // for extra features
+  const isHomePage = location.pathname === "/"; // for extra features on homepage
 
   return (
     <>

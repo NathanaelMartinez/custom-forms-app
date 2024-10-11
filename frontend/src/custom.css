@@ -76,6 +76,14 @@
   border-color: #144b5e;
 }
 
+.custom-success-btn:disabled {
+  background-color: var(--primary-color);
+  color: var(--text-light);
+  border-color: var(--primary-color);
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
 .custom-icon-btn {
   color: var(--text-light);
   border: none;
@@ -198,7 +206,7 @@
 
 /* Form control styles */
 form-control {
-  background-color: var(--bg-light);
+  background-color: var(--bg-light); 
   border: 1px solid var(--bg-muted);
 }
 
@@ -344,4 +352,29 @@ h1.display-3 {
   color: var(--text-light); 
   /* border: none; */
   border-radius: 0rem;  
+}
+
+.comment-footer {
+  background-color: var(--bg-light);
+}
+
+
+.custom-card {
+  background-color: var(--light-gray);
+}
+
+.custom-card-title {
+  color: var(--primary-color);
+}
+
+.custom-comment {
+  background-color: var(--extra-light-gray);
+}
+
+.custom-comment-author {
+  color: var(--deep-gray);
+}
+
+.custom-comment-date {
+  color: var(--muted-gray);
 }
