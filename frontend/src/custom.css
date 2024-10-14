@@ -204,6 +204,55 @@
   right: 9.3%;
 }
 
+/* switch styling */
+.custom-toggle-switch .form-check-input {
+  width: 2.5rem; /* width of toggle */
+  height: 1.25rem; /* height of toggle */
+  cursor: pointer;
+  background-color: var(--light-gray); /* light gray background when off */
+  border: 2px solid var(--muted-gray);
+  border-radius: 1.25rem; /* rounded */
+  position: relative;
+  transition: background-color 0.3s ease, border-color 0.3s ease; /* transition smooth */
+}
+
+/* knob */
+.custom-toggle-switch .form-check-input::before {
+  content: '';
+  position: absolute;
+  width: 1.125rem;
+  height: 1.125rem;
+  top: 50%;
+  left: 0.125rem; /* start position */
+  transform: translateY(-50%);
+  background-color: var(--bg-light); /* knob color */
+  border-radius: 50%; /* round knob */
+  transition: left 0.3s ease;
+}
+
+/* switch checked */
+.custom-toggle-switch .form-check-input:checked {
+  background-color: var(--primary-color); /* primary color when checked */
+  border-color: var(--primary-color); /* border - primary color */
+}
+
+/* Move the knob to the right when checked */
+.custom-toggle-switch .form-check-input:checked::before {
+  left: calc(100% - 1.25rem);
+}
+
+.custom-toggle-switch .form-check-input:focus {
+  box-shadow: 0 0 0 0.2rem rgba(46, 57, 68, 0.3);
+}
+
+/* toggle label  */
+.custom-toggle-switch .form-label {
+  font-weight: 500; /* emphasize label as a button */
+  cursor: pointer;
+  padding-left: 0.5rem;
+  font-size: 0.875rem;
+}
+
 /* Form control styles */
 form-control {
   background-color: var(--bg-light); 

@@ -240,8 +240,7 @@ const FormPage: React.FC = () => {
                     placeholder="Join the conversation..."
                     value={newComment}
                     onChange={(e) => setNewComment(e.target.value)}
-                    className="mb-2"
-                    style={{ borderRadius: "20px" }}
+                    className="mb-2 input-focus-muted"
                   />
                   <Button
                     variant="primary"

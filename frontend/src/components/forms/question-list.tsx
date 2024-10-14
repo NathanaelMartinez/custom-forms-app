@@ -9,6 +9,7 @@ interface QuestionListProps {
   onDuplicate: (question: Question) => void;
   onOptionChange: (id: string, index: number, value: string) => void;
   onAddOption: (id: string) => void;
+  onToggleDisplayInTable: (id: string, value: boolean) => void; // New prop
 }
 
 const QuestionList: React.FC<QuestionListProps> = ({
@@ -18,6 +19,7 @@ const QuestionList: React.FC<QuestionListProps> = ({
   onDuplicate,
   onOptionChange,
   onAddOption,
+  onToggleDisplayInTable,
 }) => (
   <>
     {questions.map((question) => (
@@ -29,6 +31,7 @@ const QuestionList: React.FC<QuestionListProps> = ({
         onDuplicate={onDuplicate}
         onOptionChange={onOptionChange}
         onAddOption={onAddOption}
+        onToggleDisplayInTable={onToggleDisplayInTable}
       />
     ))}
   </>

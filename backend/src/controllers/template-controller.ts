@@ -34,8 +34,9 @@ export const createTemplate = async (req: Request, res: Response) => {
         questionRepository.create({
           questionText: q.questionText,
           type: q.type,
-          displayInTable: q.displayInTable || false,
+          displayInTable: q.displayInTable,
           template: savedTemplate,
+          options: q.options,
         })
       );
 

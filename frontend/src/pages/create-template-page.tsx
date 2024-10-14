@@ -22,7 +22,7 @@ const CreateTemplatePage: React.FC = () => {
       navigate("/login", { state: { returnUrl: "/create-template" } });
     }
   }, []);
-  
+
   useEffect(() => {
     window.scrollTo(0, 0); // make sure scrolled up
   }, []);
@@ -155,6 +155,13 @@ const CreateTemplatePage: React.FC = () => {
     setTemplate({ ...template, questions: updatedQuestions });
   };
 
+  const handleToggleDisplayInTable = (id: string, value: boolean) => {
+    const updatedQuestions = template.questions.map((q) =>
+      q.id === id ? { ...q, displayInTable: value } : q
+    );
+    setTemplate({ ...template, questions: updatedQuestions });
+  };
+
   return (
     <>
       <AppNavBar />
@@ -171,24 +178,24 @@ const CreateTemplatePage: React.FC = () => {
               onChange={(e) =>
                 setTemplate({ ...template, title: e.target.value })
               }
-              className="fs-3 fw-bold mb-4 text-start border-0 border-bottom input-focus-muted"
+              className="fs-3 fw-bold mb-3 text-start border-0 border-bottom input-focus-muted"
               placeholder="Untitled Form"
             />
 
-            {/* Description input */}
-      <Form.Group className="mb-3">
-        <Form.Label>Description</Form.Label>
-        <Form.Control
-          as="textarea"
-          rows={3}
-          value={template.description}
-          onChange={(e) =>
-            setTemplate({ ...template, description: e.target.value })
-          }
-          placeholder="Describe your template..."
-          className="input-focus-muted"
-        />
-      </Form.Group>
+            {/* description input */}
+            <Form.Group className="mb-3">
+              {/* <Form.Label>Description</Form.Label> */}
+              <Form.Control
+                as="textarea"
+                rows={3}
+                value={template.description}
+                onChange={(e) =>
+                  setTemplate({ ...template, description: e.target.value })
+                }
+                placeholder="Describe your form..."
+                className="input-focus-muted"
+              />
+            </Form.Group>
 
             {/* question list */}
             <QuestionList
@@ -198,6 +205,7 @@ const CreateTemplatePage: React.FC = () => {
               onDuplicate={handleDuplicateQuestion}
               onOptionChange={handleOptionChange}
               onAddOption={handleAddOption}
+              onToggleDisplayInTable={handleToggleDisplayInTable}
             />
             <AddQuestionButton onAddQuestion={handleAddQuestion} />
           </Card>
