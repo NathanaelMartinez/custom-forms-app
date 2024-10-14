@@ -175,6 +175,21 @@ const CreateTemplatePage: React.FC = () => {
               placeholder="Untitled Form"
             />
 
+            {/* Description input */}
+      <Form.Group className="mb-3">
+        <Form.Label>Description</Form.Label>
+        <Form.Control
+          as="textarea"
+          rows={3}
+          value={template.description}
+          onChange={(e) =>
+            setTemplate({ ...template, description: e.target.value })
+          }
+          placeholder="Describe your template..."
+          className="input-focus-muted"
+        />
+      </Form.Group>
+
             {/* question list */}
             <QuestionList
               questions={template.questions}
@@ -192,9 +207,6 @@ const CreateTemplatePage: React.FC = () => {
           topic={template.topic || ""}
           tags={template.tags || []}
           image={template.image || null}
-          onDescriptionChange={(value) =>
-            setTemplate({ ...template, description: value })
-          }
           onTopicChange={(value) => setTemplate({ ...template, topic: value })}
           onTagChange={(tags) => setTemplate({ ...template, tags })}
           onImageUpload={(image) => setTemplate({ ...template, image })}

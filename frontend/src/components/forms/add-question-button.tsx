@@ -11,7 +11,7 @@ const AddQuestionButton: React.FC<AddQuestionButtonProps> = ({ onAddQuestion }) 
   <DropdownButton
     title={<Plus size={24} />}
     variant="outline-secondary"
-    className="rounded-circle"
+    className="rounded-circle mt-2"
     drop="end"
   >
     <Dropdown.Item onClick={() => onAddQuestion("text")}>Short Answer</Dropdown.Item>

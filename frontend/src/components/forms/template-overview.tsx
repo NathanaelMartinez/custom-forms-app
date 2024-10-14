@@ -9,7 +9,6 @@ interface TemplateOverviewProps {
   topic: string;
   tags: string[];
   image: File | null;
-  onDescriptionChange: (value: string) => void;
   onTopicChange: (value: string) => void;
   onTagChange: (tags: string[]) => void;
   onImageUpload: (file: File | null) => void;
@@ -19,10 +18,8 @@ interface TemplateOverviewProps {
 }
 
 const TemplateOverview: React.FC<TemplateOverviewProps> = ({
-  description,
   topic,
   tags,
-  onDescriptionChange,
   onTopicChange,
   onTagChange,
   onImageUpload,
@@ -68,19 +65,6 @@ const TemplateOverview: React.FC<TemplateOverviewProps> = ({
   return (
     <div className="bg-white p-4 shadow-sm" style={{ width: "300px" }}>
       <h5 className="mb-3">Template Overview</h5>
-
-      {/* Description input */}
-      <Form.Group className="mb-3">
-        <Form.Label>Description</Form.Label>
-        <Form.Control
-          as="textarea"
-          rows={3}
-          value={description}
-          onChange={(e) => onDescriptionChange(e.target.value)}
-          placeholder="Describe your template..."
-          className="input-focus-muted"
-        />
-      </Form.Group>
 
       {/* Topic selection */}
       <Form.Group className="mb-3">
