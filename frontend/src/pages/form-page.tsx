@@ -7,7 +7,13 @@ import { Question, Template, Comment } from "../types";
 import { Form, Button, Card, Spinner, Alert } from "react-bootstrap";
 import AppNavBar from "../components/layout/app-nav-bar";
 import { useAuth } from "../context/auth-context";
-import { Heart, HeartFill, PencilSquare } from "react-bootstrap-icons";
+import {
+  ChatLeftText,
+  Heart,
+  HeartFill,
+  PencilSquare,
+  PersonCircle,
+} from "react-bootstrap-icons";
 import AppFooter from "../components/layout/app-footer";
 
 type FormResponseValue = string | number | string[];
@@ -22,6 +28,8 @@ const FormPage: React.FC = () => {
   >({});
   const [comments, setComments] = useState<Comment[]>([]);
   const [newComment, setNewComment] = useState<string>("");
+  const [isCommentSectionVisible, setIsCommentSectionVisible] =
+    useState<boolean>(false);
   const [liked, setLiked] = useState<boolean>(false);
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -105,147 +113,197 @@ const FormPage: React.FC = () => {
   return (
     <>
       <AppNavBar />
-      <div className="flex-grow-1 p-5 d-flex justify-content-center">
-        {/* big form card */}
-        <Card
-          className="shadow-lg p-4 bg-white rounded-3"
-          style={{ width: "100%", maxWidth: "800px", minHeight: "800px" }}
-        >
-          <div className="px-5 pt-3">
-            {/* alert if user is not logged in */}
-            {!user && (
-              <Alert variant="warning" className="mb-4">
-                Please log in or sign up to submit this form.
+      <div className="d-flex flex-grow-1" style={{ minHeight: "100vh" }}>
+        {/* Main form content */}
+        <div className="flex-grow-1 p-5 d-flex justify-content-center">
+          <Card
+            className="shadow-lg p-4 bg-white rounded-3"
+            style={{ width: "100%", maxWidth: "800px", minHeight: "800px" }}
+          >
+            <div className="px-5 pt-3">
+              {/* alert if user is not logged in */}
+              {!user && (
+                <Alert variant="warning" className="mb-4">
+                  Please log in or sign up to submit this form.
+                </Alert>
+              )}
+              {/* form title */}
+              <div
+                className="d-flex justify-content-between align-items-center mb-4 pb-2"
+                style={{ borderBottom: "2px solid #e0e0e0" }}
+              >
+                <h1 className="text-dark fs-2 fw-bold">{template?.title}</h1>
+                <div className="d-flex align-items-center gap-2">
+                  {(template?.author.id === user?.id ||
+                    user?.role === "admin") && (
+                    <Button
+                      variant="link"
+                      onClick={() => navigate(`/templates/${template?.id}`)}
+                      className="custom-contrast-icon-btn"
+                    >
+                      <PencilSquare size={24} />
+                    </Button>
+                  )}
+                  {user && template?.author.id !== user?.id && (
+                    <Button
+                      variant="link"
+                      className="custom-contrast-icon-btn"
+                      onClick={handleLikeToggle}
+                    >
+                      {liked ? (
+                        <HeartFill size={24} className="text-danger" />
+                      ) : (
+                        <Heart size={24} className="text-dark" />
+                      )}
+                    </Button>
+                  )}
+                  <Button
+                    variant="link"
+                    className="custom-contrast-icon-btn"
+                    onClick={() =>
+                      setIsCommentSectionVisible(!isCommentSectionVisible)
+                    }
+                  >
+                    <ChatLeftText
+                      size={24}
+                      className="custom-contrast-icon-btn"
+                    />
+                  </Button>
+                </div>
+              </div>
+              {/* description */}
+              <p
+                className="text-muted fs-5 fw-normal mb-4"
+                style={{ fontStyle: "italic" }}
+              >
+                {template?.description || "No description provided."}
+              </p>
+              {isLoading ? (
+                <Spinner />
+              ) : (
+                //  question cards
+                <div className="d-flex flex-column gap-3">
+                  {template?.questions.map((question) => (
+                    <Card
+                      key={question.id}
+                      className="p-3 shadow-sm border-light custom-card"
+                    >
+                      <Form.Group controlId={question.id}>
+                        <Form.Label className="fs-5 fw-bold text-dark mb-2">
+                          {question.questionText}
+                        </Form.Label>
+                        {renderQuestion(
+                          question,
+                          formResponses,
+                          handleInputChange
+                        )}
+                      </Form.Group>
+                    </Card>
+                  ))}
+                </div>
+              )}
+            </div>
+            {/* submit Button */}
+            <div className="d-flex justify-content-end mt-4 me-5">
+              <Button
+                variant="primary"
+                className="fw-bold custom-success-btn"
+                disabled={!user}
+              >
+                Submit
+              </Button>
+            </div>
+          </Card>
+        </div>
+
+        {/* Comment Section Column */}
+        {isCommentSectionVisible && (
+          <div
+            className="bg-white shadow-sm"
+            style={{
+              width: "400px",
+              padding: "20px",
+              minHeight: "100vh",
+              overflowY: "auto",
+            }}
+          >
+            <h3 className="fs-4 fw-bold text-dark mb-3">
+              {comments.length} Comments
+            </h3>
+            {user ? (
+              <div className="d-flex align-items-start mb-3">
+                <PersonCircle size={36} className="text-muted me-3" />
+                <Form.Group controlId="newComment" className="flex-grow-1">
+                  <Form.Control
+                    as="textarea"
+                    rows={3}
+                    placeholder="Join the conversation..."
+                    value={newComment}
+                    onChange={(e) => setNewComment(e.target.value)}
+                    className="mb-2"
+                    style={{ borderRadius: "20px" }}
+                  />
+                  <Button
+                    variant="primary"
+                    className="custom-success-btn"
+                    onClick={handleCommentSubmit}
+                  >
+                    Add Comment
+                  </Button>
+                </Form.Group>
+              </div>
+            ) : (
+              <Alert variant="info" className="mb-3">
+                <a href="/login" className="text-primary">
+                  Login
+                </a>{" "}
+                or{" "}
+                <a href="/sign-up" className="text-primary">
+                  Sign up
+                </a>{" "}
+                to join the conversation.
               </Alert>
             )}
-            {/* form title */}
-            <div
-              className="d-flex justify-content-between align-items-center mb-4 pb-2"
-              style={{ borderBottom: "2px solid #e0e0e0" }}
-            >
-              <h1 className="text-dark fs-2 fw-bold">{template?.title}</h1>
-              <div className="d-flex align-items-center gap-2">
-                {(template?.author.id === user?.id ||
-                  user?.role === "admin") && (
-                  <Button
-                    variant="link"
-                    onClick={() => navigate(`/templates/${template?.id}`)}
-                    className="custom-contrast-icon-btn"
-                  >
-                    <PencilSquare size={24} />
-                  </Button>
-                )}
-                {user && template?.author.id !== user?.id && (
-                  <Button
-                    variant="link"
-                    className="custom-contrast-icon-btn"
-                    onClick={handleLikeToggle}
-                  >
-                    {liked ? (
-                      <HeartFill size={24} className="text-danger" />
-                    ) : (
-                      <Heart size={24} className="text-dark" />
-                    )}
-                  </Button>
-                )}
-              </div>
-            </div>
-            {/* description */}
-            <p
-              className="text-muted fs-5 fw-normal mb-4"
-              style={{ fontStyle: "italic" }}
-            >
-              {template?.description || "No description provided."}
-            </p>
-            {isLoading ? (
-              <Spinner />
-            ) : (
-              //  question cards
-              <div className="d-flex flex-column gap-3">
-                {template?.questions.map((question) => (
+            <div>
+              {comments.length === 0 ? (
+                <p className="text-muted">
+                  No comments yet. Be the first to comment!
+                </p>
+              ) : (
+                comments.map((comment) => (
                   <Card
-                    key={question.id}
-                    className="p-3 shadow-sm border-light custom-card"
+                    key={comment.id}
+                    className="mb-2 p-2 shadow-sm custom-card"
                   >
-                    <Form.Group controlId={question.id}>
-                      <Form.Label className="fs-5 fw-bold text-dark mb-2">
-                        {question.questionText}
-                      </Form.Label>
-                      {renderQuestion(
-                        question,
-                        formResponses,
-                        handleInputChange
-                      )}
-                    </Form.Group>
+                    <Card.Body className="d-flex">
+                      <PersonCircle size={36} className="text-muted me-3" />
+                      <div>
+                        <Card.Title className="mb-1 fs-6 fw-bold text-dark">
+                          {comment.author?.username}{" "}
+                          <span
+                            className="text-muted"
+                            style={{ fontSize: "0.8rem" }}
+                          >
+                            {new Date(comment.createdAt).toLocaleString()}
+                          </span>
+                        </Card.Title>
+                        <Card.Text className="text-dark">
+                          {comment.content}
+                        </Card.Text>
+                      </div>
+                    </Card.Body>
                   </Card>
-                ))}
-              </div>
-            )}
+                ))
+              )}
+            </div>
           </div>
-          {/* submit Button */}
-          <div className="d-flex justify-content-end mt-4 me-5">
-            <Button
-              variant="primary"
-              className="fw-bold custom-success-btn"
-              disabled={!user}
-            >
-              Submit
-            </Button>
-          </div>
-        </Card>
-      </div>
-
-      {/* comments Section */}
-      <div className="comment-footer p-4 mt-4" style={{ width: "100%" }}>
-        <div
-          className="bg-white p-4 mt-4 rounded-3 shadow-sm"
-          style={{ maxWidth: "800px", margin: "0 auto" }}
-        >
-          <h3 className="fs-4 fw-bold text-dark mb-3">Comments</h3>
-          {user ? (
-            <Form.Group controlId="newComment" className="mb-3">
-              <Form.Control
-                as="textarea"
-                rows={3}
-                placeholder="Join the conversation..."
-                value={newComment}
-                onChange={(e) => setNewComment(e.target.value)}
-                className="mb-2 input-focus-muted"
-              />
-              <Button
-                variant="secondary"
-                className="custom-success-btn"
-                onClick={handleCommentSubmit}
-              >
-                Add Comment
-              </Button>
-            </Form.Group>
-          ) : (
-            <Alert variant="info" className="mb-3">
-              Please log in to add a comment.
-            </Alert>
-          )}
-          <div className="mt-3">
-            {comments.map((comment) => (
-              <Card key={comment.id} className="mb-2 p-2 shadow-sm custom-card">
-                <Card.Body>
-                  <Card.Title className="mb-1 fs-6 fw-bold text-dark">
-                    {comment.author?.username}{" "}
-                    <span className="text-muted" style={{ fontSize: "0.8rem" }}>
-                      {new Date(comment.createdAt).toLocaleString()}
-                    </span>
-                  </Card.Title>
-                  <Card.Text className="text-dark">{comment.content}</Card.Text>
-                </Card.Body>
-              </Card>
-            ))}
-          </div>
-        </div>
+        )}
       </div>
 
       <AppFooter />
     </>
   );
+
 };
 
 const renderQuestion = (
