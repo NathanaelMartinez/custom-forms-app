@@ -8,7 +8,7 @@ import { Comment } from "../entities/comment";
 // create new template (authenticated users only)
 export const createTemplate = async (req: Request, res: Response) => {
   const { title, description, questions, tags, image } = req.body;
-  const user = req.user as User; // req.user should already be populated by an auth middleware
+  const user = req.user as User;
 
   if (!user) {
     res.status(401).json({ message: "Unauthorized" });

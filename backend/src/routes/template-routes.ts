@@ -32,7 +32,7 @@ router.get("/", viewTemplates);
 router.get("/:templateId", getTemplate);
 
 // edit a template (author or admin only)
-router.patch("/:templateId", authenticateJWT, checkIfNotBlocked, editTemplate);
+router.put("/:templateId", authenticateJWT, checkIfNotBlocked, editTemplate);
 
 // delete a template (author or admin only)
 router.delete(
@@ -51,7 +51,7 @@ router.post(
 );
 
 // edit a question of a template (author or admin only)
-router.patch(
+router.put(
   "/:templateId/questions/:questionId",
   authenticateJWT,
   checkIfNotBlocked,
