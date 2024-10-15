@@ -14,6 +14,8 @@ import {
   ShieldFill,
   Search,
   PersonLock,
+  PlusCircle,
+  FilePlus,
 } from "react-bootstrap-icons";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../../context/auth-context";
@@ -52,6 +54,14 @@ const AppNavBar: React.FC = () => {
                   >
                     <BookmarkFill size={36} className="text-light" />
                   </Button> */}
+
+                  <Button
+                    variant="link"
+                    className="p-0 custom-icon-btn"
+                    onClick={() => navigate("/templates")}
+                  >
+                    <FilePlus size={36} />
+                  </Button>
 
                   {user?.role === "admin" && (
                     <Button
