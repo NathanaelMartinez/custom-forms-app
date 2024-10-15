@@ -94,6 +94,9 @@ const AppNavBar: React.FC = () => {
                       {/* <Dropdown.Item onClick={() => navigate("/saved-templates")}>
                         Saved Templates
                       </Dropdown.Item> */}
+                      <Dropdown.Item onClick={() => navigate("/templates")}>
+                        Create a Template
+                      </Dropdown.Item>
                       {user?.role === "admin" && (
                         <Dropdown.Item onClick={() => navigate("/admin-panel")}>
                           Admin Panel
