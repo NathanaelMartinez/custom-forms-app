@@ -17,7 +17,7 @@ const App: React.FC = () => {
           <Route path="/sign-up" element={<SignUpPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/admin-panel" element={<AdminPage />} />
-          <Route path="/create-template" element={<CreateTemplatePage />} />
+          <Route path="/templates/:templateId?" element={<CreateTemplatePage />} />
           <Route path="/forms/:id" element={<FormPage />} />
         </Routes>
       </Router>

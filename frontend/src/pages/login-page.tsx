@@ -19,7 +19,7 @@ const LoginPage: React.FC = () => {
   const location = useLocation();
 
   // extract returnUrl if exists
-  const returnUrl = new URLSearchParams(location.search).get("returnUrl");
+  const returnUrl = location.state?.returnUrl || "/";
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -37,12 +37,8 @@ const LoginPage: React.FC = () => {
       localStorage.setItem("authToken", data.token);
       login(data.token);
 
-      // redirect to returnUrl if available, otherwise go to home
-      if (returnUrl) {
-        navigate(returnUrl);
-      } else {
-        navigate("/");
-      }
+      // redirect to returnUrl if exists (defaults to home)
+      navigate(returnUrl);
     } catch (error) {
       setErrors(error as string); // display error message to user
     }

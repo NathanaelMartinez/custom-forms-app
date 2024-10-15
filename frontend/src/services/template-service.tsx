@@ -1,21 +1,9 @@
 import axios from "axios";
+import { TemplatePayload } from "../dtos/template-payload";
 
 const SERVER_URL = import.meta.env.VITE_SERVER_URL;
 
-// Define the structure for creating a template
-interface CreateTemplatePayload {
-  title: string;
-  description: string;
-  authorId: string;
-  topic?: string;
-  questions: {
-    type: "textarea" | "text" | "checkbox" | "integer";
-    questionText: string;
-    options?: string[];
-  }[];
-}
-
-export const createTemplate = async (templateData: CreateTemplatePayload) => {
+export const createTemplate = async (templateData: TemplatePayload) => {
   // retrieve the token from local storage
   const token = localStorage.getItem("authToken");
 
@@ -41,12 +29,34 @@ export const createTemplate = async (templateData: CreateTemplatePayload) => {
   }
 };
 
-export const fetchTemplate = async (id: string) => {
+export const fetchTemplateById = async (id: string) => {
   try {
     const response = await axios.get(`${SERVER_URL}/api/templates/${id}`);
     return response.data;
   } catch (error) {
-    console.error('Error fetching template:', error);
+    console.error("Error fetching template:", error);
+    throw error;
+  }
+};
+
+export const updateTemplate = async (
+  templateId: string,
+  updatedTemplateData: TemplatePayload
+) => {
+  const token = localStorage.getItem("authToken");
+  if (!token) throw new Error("No token found");
+
+  try {
+    const response = await axios.put(
+      `${SERVER_URL}/api/templates/${templateId}`,
+      updatedTemplateData,
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Failed to update template:", error);
     throw error;
   }
 };

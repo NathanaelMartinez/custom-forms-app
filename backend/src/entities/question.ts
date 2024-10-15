@@ -7,7 +7,7 @@ export class Question {
   id!: string;
 
   @Column()
-  questionText!: string; // the visible question text, like "What is your favorite color?"
+  questionText!: string; // visible question text - e.g. "What is your favorite color?"
 
   @Column()
   type!: string; // single-line, multiple-line, integer, checkbox, etc.
@@ -17,6 +17,7 @@ export class Question {
 
   @ManyToOne(() => Template, (template) => template.questions, {
     onDelete: "CASCADE",
+    eager: false, // prevent automatic loading of template in all queries
   })
   template!: Template;
 

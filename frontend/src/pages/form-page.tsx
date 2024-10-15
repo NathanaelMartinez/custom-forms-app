@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { fetchTemplate } from "../services/template-service";
+import { fetchTemplateById } from "../services/template-service";
 import { Question, Template, Comment } from "../types";
 import { Form, Button, Card, Spinner, Alert } from "react-bootstrap";
 import AppNavBar from "../components/layout/app-nav-bar";
@@ -37,7 +37,7 @@ const FormPage: React.FC = () => {
   useEffect(() => {
     const getTemplate = async () => {
       try {
-        const data = await fetchTemplate(id as string);
+        const data = await fetchTemplateById(id as string);
         setTemplate(data);
         // TODO: call fetchComments instead of mock data
         setComments([

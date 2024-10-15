@@ -8,7 +8,7 @@ import { Comment } from "../entities/comment";
 // create new template (authenticated users only)
 export const createTemplate = async (req: Request, res: Response) => {
   const { title, description, questions, tags, image } = req.body;
-  const user = req.user as User;
+  const user = req.user as User; // req.user should already be populated by an auth middleware
 
   if (!user) {
     res.status(401).json({ message: "Unauthorized" });
@@ -22,9 +22,9 @@ export const createTemplate = async (req: Request, res: Response) => {
     const template = templateRepository.create({
       title,
       description,
-      author: user,
+      author: user, // pass full user object here
       image: image || null,
-      tags: tags || [], // default to an empty array if tags are not provided
+      tags: tags || [], // default to empty array if tags not provided
     });
 
     const savedTemplate = await templateRepository.save(template);
@@ -35,7 +35,7 @@ export const createTemplate = async (req: Request, res: Response) => {
           questionText: q.questionText,
           type: q.type,
           displayInTable: q.displayInTable,
-          template: savedTemplate,
+          template: savedTemplate, // associate question with saved template
           options: q.options,
         })
       );
@@ -47,6 +47,7 @@ export const createTemplate = async (req: Request, res: Response) => {
       message: "Template created successfully",
       template: savedTemplate,
     });
+    return;
   } catch (error) {
     if (error instanceof Error) {
       console.error("Error creating template:", error.message);
@@ -68,20 +69,22 @@ export const viewTemplates = async (req: Request, res: Response) => {
       relations: ["author", "questions"], // fetch associated questions and authors
     });
     res.status(200).json(templates);
+    return;
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Internal server error." });
+    return;
   }
 };
 
-// view a specific template
+// view a specific template by ID
 export const getTemplate = async (req: Request, res: Response) => {
   const { templateId } = req.params;
 
   try {
     const templateRepository = AppDataSource.getRepository(Template);
     const template = await templateRepository.findOne({
-      where: { id: templateId },
+      where: { id: templateId }, // find template by its ID
       relations: ["questions"], // include related questions
     });
 
@@ -91,16 +94,18 @@ export const getTemplate = async (req: Request, res: Response) => {
     }
 
     res.status(200).json(template);
+    return;
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Internal server error." });
+    return;
   }
 };
 
-// edit a template
+// edit a template (only author or admin)
 export const editTemplate = async (req: Request, res: Response) => {
   const { id } = req.params;
-  const { name, description, tags, image } = req.body;
+  const { title, description, tags, image } = req.body;
   const user = req.user as User;
 
   if (!user) {
@@ -117,12 +122,13 @@ export const editTemplate = async (req: Request, res: Response) => {
       return;
     }
 
+    // only author or an admin can edit
     if (template.author.id !== user.id && user.role !== "admin") {
       res.status(403).json({ message: "Unauthorized to edit this template." });
       return;
     }
 
-    template.title = name || template.title;
+    template.title = title || template.title;
     template.description = description || template.description;
     template.tags = tags || template.tags;
     template.image = image || template.image;
@@ -131,16 +137,17 @@ export const editTemplate = async (req: Request, res: Response) => {
     res
       .status(200)
       .json({ message: "Template updated successfully.", template });
+    return;
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Internal server error." });
+    return;
   }
 };
 
-// delete a template
+// delete a template (only author or admin)
 export const deleteTemplate = async (req: Request, res: Response) => {
   const { id } = req.params;
-
   const user = req.user as User;
 
   if (!user) {
@@ -157,7 +164,7 @@ export const deleteTemplate = async (req: Request, res: Response) => {
       return;
     }
 
-    // only author or an admin can delete
+    // only author or admin can delete
     if (template.author.id !== user.id && user.role !== "admin") {
       res
         .status(403)
@@ -167,35 +174,41 @@ export const deleteTemplate = async (req: Request, res: Response) => {
 
     await templateRepository.remove(template);
     res.status(200).json({ message: "Template deleted successfully." });
+    return;
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Internal server error." });
+    return;
   }
 };
 
+// like a template
 export const likeTemplate = async (req: Request, res: Response) => {
   const { templateId } = req.params;
 
   try {
     const templateRepository = AppDataSource.getRepository(Template);
-
     const template = await templateRepository.findOneBy({ id: templateId });
 
     if (!template) {
-      return res.status(404).json({ message: "Template not found" });
+      res.status(404).json({ message: "Template not found" });
+      return;
     }
 
     // increment likes count
     template.likes += 1;
     await templateRepository.save(template);
 
-    return res.json({ message: "Template liked", likes: template.likes });
+    res.json({ message: "Template liked", likes: template.likes });
+    return;
   } catch (error) {
     console.error("Error liking template:", error);
-    return res.status(500).json({ message: "Server error" });
+    res.status(500).json({ message: "Server error" });
+    return;
   }
 };
 
+// add a comment to a template
 export const addComment = async (req: Request, res: Response) => {
   const { templateId } = req.params;
   const { content } = req.body;
@@ -207,24 +220,26 @@ export const addComment = async (req: Request, res: Response) => {
     const template = await templateRepository.findOneBy({ id: templateId });
 
     if (!template) {
-      return res.status(404).json({ message: "Template not found" });
+      res.status(404).json({ message: "Template not found" });
+      return;
     }
 
-    // get authenticated user from req.user
-    const user = req.user as User;
+    const user = req.user as User; // get authenticated user
 
     // create new comment
     const newComment = new Comment();
     newComment.content = content;
-    newComment.template = template;
-    newComment.author = user;
+    newComment.template = { id: templateId } as Template; // pass only the ID
+    newComment.author = user; // full user object
 
     // save comment
     await commentRepository.save(newComment);
 
-    return res.status(201).json(newComment);
+    res.status(201).json(newComment);
+    return;
   } catch (error) {
     console.error("Error adding comment:", error);
-    return res.status(500).json({ message: "Server error" });
+    res.status(500).json({ message: "Server error" });
+    return;
   }
 };

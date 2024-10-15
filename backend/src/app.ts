@@ -29,7 +29,7 @@ const corsOptions: cors.CorsOptions = {
       callback(new Error("Not allowed by CORS"));
     }
   },
-  methods: ["GET", "POST", "DELETE", "PATCH"],
+  methods: ["GET", "POST", "DELETE", "PATCH", "PUT"],
   credentials: true,
   exposedHeaders: ["Authorization"],
 };

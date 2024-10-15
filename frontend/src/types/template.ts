@@ -5,7 +5,7 @@ export interface Template {
   id: string;
   title: string;
   description?: string;
-  author: User; // user who created template
+  author: Partial<User>; // user who created template
   topic?: string;
   questions: Question[]; // Questions related to this template
   createdAt: Date;

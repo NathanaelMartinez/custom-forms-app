@@ -1,27 +1,55 @@
 import React, { useEffect, useState } from "react";
 import { Card, Form } from "react-bootstrap";
 import { useAuth } from "../context/auth-context";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import AppNavBar from "../components/layout/app-nav-bar";
 import QuestionList from "../components/forms/question-list";
 import TemplateOverview from "../components/forms/template-overview";
 import AddQuestionButton from "../components/forms/add-question-button";
-import { Question, Template, User } from "../types";
-import { createTemplate } from "../services/template-service";
+import { Question, Template } from "../types";
+
+import {
+  createTemplate,
+  fetchTemplateById,
+  updateTemplate,
+} from "../services/template-service";
+import { mapTemplateToPayload } from "../dtos/template-payload";
 
 const CreateTemplatePage: React.FC = () => {
   const [isSaving, setIsSaving] = useState<boolean>(false);
   const [questionsCount, setQuestionsCount] = useState<number>(0); // track number of questions for validation
   const { isLoggedIn, user } = useAuth();
+  const { templateId } = useParams<{ templateId?: string }>(); // fetch templateId from URL if exists
   const navigate = useNavigate();
 
   // redirect to login on component mount if user is not defined (just in case)
   useEffect(() => {
     if (!user) {
       console.warn("User is not defined, redirecting to login.");
-      navigate("/login", { state: { returnUrl: "/create-template" } });
+      navigate("/login", { state: { returnUrl: location.pathname } });
     }
-  }, []);
+
+    // fetch the existing template if in "edit" mode
+    if (templateId) {
+      const loadTemplate = async () => {
+        try {
+          const templateData: Template = await fetchTemplateById(templateId);
+          if (!user || templateData.author.id !== user.id && user.role !== "admin") {
+            console.warn(
+              "User is not the owner of the document, redirecting to home."
+            );
+            navigate("/");
+          }
+
+          setTemplate(templateData);
+          setQuestionsCount(templateData.questions.length);
+        } catch (error) {
+          console.error("Failed to fetch template:", error);
+        }
+      };
+      loadTemplate();
+    }
+  }, [templateId]);
 
   useEffect(() => {
     window.scrollTo(0, 0); // make sure scrolled up
@@ -41,7 +69,7 @@ const CreateTemplatePage: React.FC = () => {
     id: "",
     title: "Untitled Form",
     description: "",
-    author: user as User,
+    author: user || { id: "" }, // ensure author is not null
     questions: [],
     filledForms: 0,
     likes: 0,
@@ -58,30 +86,24 @@ const CreateTemplatePage: React.FC = () => {
       localStorage.setItem("savedTemplate", JSON.stringify(template));
 
       // redirect to login page and include a return URL to bring the user back
-      navigate("/login", { state: { returnUrl: "/create-template" } });
+      navigate("/login", { state: { returnUrl: location.pathname } });
       return;
     }
 
     try {
       setIsSaving(true);
-      const payload = {
-        title: template.title,
-        description: template.description || "",
-        authorId: template.author.id,
-        topic: template.topic || "",
-        questions: template.questions.map(
-          ({ type, questionText, options }) => ({
-            type,
-            questionText,
-            options,
-          })
-        ),
-        tags: template.tags,
-        image: template.image,
-        createdAt: new Date(),
-      };
-      const response = await createTemplate(payload);
-      navigate(`/forms/${response.data.template.id}`);
+      const payload = mapTemplateToPayload(template);
+
+      if (templateId) {
+        console.log("Template ID:", templateId);
+        // if templateId exists update existing template
+        await updateTemplate(templateId, payload);
+        navigate(`/forms/${templateId}`);
+      } else {
+        // Create a new template
+        const response = await createTemplate(payload);
+        navigate(`/forms/${response.data.template.id}`);
+      }
     } catch (error) {
       console.error("Failed to save template:", error);
       alert("Failed to save template. Please try again.");

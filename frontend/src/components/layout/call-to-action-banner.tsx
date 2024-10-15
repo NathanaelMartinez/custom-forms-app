@@ -29,7 +29,7 @@ const CallToAction: React.FC = () => {
                 variant="primary"
                 className="custom-primary-btn"
                 onClick={() =>
-                  navigate(isLoggedIn ? "/create-template" : "/sign-up")
+                  navigate(isLoggedIn ? "/templates" : "/sign-up")
                 }
                 size="lg"
               >
