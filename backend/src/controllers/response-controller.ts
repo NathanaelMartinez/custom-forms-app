@@ -5,7 +5,7 @@ import { User } from "../entities/user";
 import { Template } from "../entities/template";
 
 export const submitResponse = async (req: Request, res: Response) => {
-  const { id } = req.params;
+  const { templateId } = req.params;
   const user = req.user as User;
   const { answers } = req.body;
 
@@ -13,9 +13,20 @@ export const submitResponse = async (req: Request, res: Response) => {
     // get template
     const templateRepository = AppDataSource.getRepository(Template);
     const template = await templateRepository.findOne({
-      where: { id },
+      where: { id: templateId },
       relations: ["questions"], // load related questions
     });
+
+    if (!template) {
+      return;
+    }
+    console.log("Loaded template ID: ", template.id);
+    console.log("Submitted template ID: ", templateId);
+    console.log(
+      "Loaded question types: ",
+      template.questions.map((q) => q.type)
+    );
+    console.log("Submitted answers: ", Object.keys(answers));
 
     if (!template) {
       res.status(404).json({ message: "Template not found" });
@@ -25,13 +36,72 @@ export const submitResponse = async (req: Request, res: Response) => {
     // validate that each answer corresponds to valid question in template
     for (const [questionId, answer] of Object.entries(answers)) {
       const question = template.questions.find((q) => q.id === questionId);
+
+      console.log(
+        "Evaluating question with type:",
+        question?.type,
+        "and ID:",
+        questionId
+      );
+      console.log("Answer:", answer);
+
       if (!question) {
-        res.status(400).json({ message: `Invalid question ID: ${questionId}` });
+        console.log("Question not found for ID:", questionId);
+        res.status(400).json({
+          message: `Question not found for ID: ${questionId}`,
+        });
         return;
       }
 
-      // TODO: validate answer based on question type (string, number, array)
+      switch (question.type) {
+        case "integer":
+          console.log("Validating integer type answer:", answer);
+
+          // answer arrives as string
+          const numericAnswer = Number(answer); // make into number
+          if (isNaN(numericAnswer)) {
+            // if can't be made into number
+            res.status(400).json({
+              message: `Expected a valid number for question ID: ${questionId}`,
+            });
+            return;
+          }
+          answers[questionId] = numericAnswer;
+          break;
+
+        case "text":
+        case "textarea":
+          console.log("Validating text/textarea type answer:", answer);
+          if (typeof answer !== "string") {
+            res.status(400).json({
+              message: `Expected text for question ID: ${questionId}`,
+            });
+            return;
+          }
+          break;
+        case "checkbox":
+          console.log("Validating checkbox type answer:", answer);
+          if (!Array.isArray(answer)) {
+            console.log("Invalid checkbox answer (not array):", answer);
+            res.status(400).json({
+              message: `Expected array for checkbox question ID: ${questionId}`,
+            });
+            return;
+          }
+          console.log("Valid checkbox answer received:", answer);
+          break;
+        default:
+          console.log(`Unknown question type: ${question?.type}`);
+          res.status(400).json({
+            message: `Unsupported question type: ${question?.type}`,
+          });
+          return;
+      }
+
+      console.log(`Finished processing question ID: ${questionId}`);
     }
+
+    console.log("Finished processing all questions");
 
     // create and save the response
     const responseRepository = AppDataSource.getRepository(FormResponse);

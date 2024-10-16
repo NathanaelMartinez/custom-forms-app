@@ -14,7 +14,6 @@ import {
   ShieldFill,
   Search,
   PersonLock,
-  PlusCircle,
   FilePlus,
 } from "react-bootstrap-icons";
 import { useNavigate, useLocation } from "react-router-dom";
@@ -66,7 +65,7 @@ const AppNavBar: React.FC = () => {
                   {user?.role === "admin" && (
                     <Button
                       variant="link"
-                      className="p-0 admin-icon-btn"
+                      className="p-0 ms-2 admin-icon-btn"
                       onClick={() => navigate("/admin-panel")}
                     >
                       <ShieldFill size={36} />

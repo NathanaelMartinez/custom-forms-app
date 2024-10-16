@@ -32,7 +32,7 @@ export const mapPayloadToTemplate = (payload: TemplatePayload): Template => ({
   id: "",
   title: payload.title,
   description: payload.description,
-  author: { id: payload.authorId }, // Map back to User object (you can fetch user separately if needed)
+  author: { id: payload.authorId }, // map back to User object
   topic: payload.topic,
   questions: payload.questions.map((q) => ({
     id: q.id,
@@ -40,7 +40,7 @@ export const mapPayloadToTemplate = (payload: TemplatePayload): Template => ({
     questionText: q.questionText,
     options: q.options,
     displayInTable: q.displayInTable,
-    template: { id: q.templateId }, // Map back to full Template entity (you can fetch template separately if needed)
+    template: { id: q.templateId }, // map back to full Template entity
   })),
   createdAt: new Date(),
   tags: payload.tags,

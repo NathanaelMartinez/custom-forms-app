@@ -15,6 +15,38 @@ import {
   PersonCircle,
 } from "react-bootstrap-icons";
 import AppFooter from "../components/layout/app-footer";
+import { submitForm } from "../services/form-service";
+
+const mockComments = [
+  {
+    id: "1",
+    author: {
+      id: "user-1",
+      username: "Alice",
+      email: "alice@example.com",
+      role: "user",
+      status: "active",
+      createdAt: new Date(),
+      templates: [],
+    },
+    content: "This is a great form!",
+    createdAt: new Date(),
+  },
+  {
+    id: "2",
+    author: {
+      id: "user-2",
+      username: "Bob",
+      email: "bob@example.com",
+      role: "user",
+      status: "active",
+      createdAt: new Date(),
+      templates: [],
+    },
+    content: "I found it very useful.",
+    createdAt: new Date(),
+  },
+];
 
 type FormResponseValue = string | number | string[];
 
@@ -26,6 +58,7 @@ const FormPage: React.FC = () => {
   const [formResponses, setFormResponses] = useState<
     Record<string, FormResponseValue>
   >({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [comments, setComments] = useState<Comment[]>([]);
   const [newComment, setNewComment] = useState<string>("");
   const [isCommentSectionVisible, setIsCommentSectionVisible] =
@@ -35,41 +68,17 @@ const FormPage: React.FC = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
+    if (!id) {
+      setError("No template ID provided.");
+      return;
+    }
+
     const getTemplate = async () => {
       try {
         const data = await fetchTemplateById(id as string);
         setTemplate(data);
         // TODO: call fetchComments instead of mock data
-        setComments([
-          {
-            id: "1",
-            author: {
-              id: "user-1",
-              username: "Alice",
-              email: "alice@example.com",
-              role: "user",
-              status: "active",
-              createdAt: new Date(),
-              templates: [],
-            },
-            content: "This is a great form!",
-            createdAt: new Date(),
-          },
-          {
-            id: "2",
-            author: {
-              id: "user-2",
-              username: "Bob",
-              email: "bob@example.com",
-              role: "user",
-              status: "active",
-              createdAt: new Date(),
-              templates: [],
-            },
-            content: "I found it very useful.",
-            createdAt: new Date(),
-          },
-        ]);
+        setComments(mockComments);
       } catch (err) {
         console.log(err);
         setError("Failed to fetch template");
@@ -84,12 +93,19 @@ const FormPage: React.FC = () => {
   }, [id]);
 
   const handleInputChange = (questionId: string, value: FormResponseValue) => {
-    setFormResponses((prev) => ({ ...prev, [questionId]: value }));
+    setFormResponses((prev) => ({
+      ...prev,
+      [questionId]: value,
+    }));
   };
 
   const handleLikeToggle = () => {
-    setLiked(!liked);
-    // TODO: add call to backend to increment like
+    try {
+      setLiked(!liked);
+      // await toggleLike(template?.id); TODO: add call to backend to increment like
+    } catch (error) {
+      console.error("Failed to toggle like:", error);
+    }
   };
 
   const handleCommentSubmit = () => {
@@ -106,8 +122,46 @@ const FormPage: React.FC = () => {
     setNewComment("");
   };
 
+  const handleFormSubmit = async () => {
+    if (!user) {
+      alert("Please log in to submit the form.");
+      return;
+    }
+
+    // ensure templateId is defined
+    if (!template || !template.id) {
+      alert("Template is missing or not fully loaded. Cannot submit form.");
+      return;
+    }
+
+    console.log("submitting template:", template.id);
+
+    try {
+      setIsSubmitting(true);
+
+      // prepare payload for submission
+      const responsePayload = {
+        templateId: template?.id,
+        answers: formResponses,
+      };
+
+      console.log("Loaded template with questions: ", template.questions);
+      console.log("formResponses:", formResponses); // Ensure question IDs are correct
+
+      await submitForm(responsePayload);
+
+      alert("Form submitted successfully!");
+      navigate("/"); // redirect after submission
+    } catch (error) {
+      console.error("Failed to submit form:", error);
+      alert("Failed to submit the form. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   if (error) {
-    return <div>{error}</div>;
+    return <Alert variant="danger">{error}</Alert>;
   }
 
   return (
@@ -208,9 +262,10 @@ const FormPage: React.FC = () => {
               <Button
                 variant="primary"
                 className="fw-bold custom-success-btn"
-                disabled={!user}
+                disabled={!user || isSubmitting}
+                onClick={handleFormSubmit}
               >
-                Submit
+                {isSubmitting ? "Submitting..." : "Submit"}
               </Button>
             </div>
           </Card>
@@ -302,7 +357,6 @@ const FormPage: React.FC = () => {
       <AppFooter />
     </>
   );
-
 };
 
 const renderQuestion = (
@@ -342,7 +396,7 @@ const renderQuestion = (
             // regex used to prevent copy/pasting negatives
             const inputValue = e.target.value;
             if (/^\d*$/.test(inputValue)) {
-              handleInputChange(question.id, inputValue);
+              handleInputChange(question.id, Number(inputValue));
             }
           }}
           className="mt-2 input-focus-muted"
