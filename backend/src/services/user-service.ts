@@ -31,7 +31,8 @@ export const createUser = async (
 export const findUserByEmail = async (email: string): Promise<User | null> => {
   const userRepository = AppDataSource.getRepository(User)
     .createQueryBuilder("user")
-    .addSelect("user.password");
+    .addSelect("user.password")
+    .addSelect("user.email");
 
   try {
     const user = await userRepository

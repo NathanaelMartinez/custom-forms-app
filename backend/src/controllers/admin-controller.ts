@@ -5,8 +5,21 @@ import { In } from "typeorm";
 
 export const getUsers = async (req: Request, res: Response) => {
   try {
+    const user = req.user as User;
+
+    // only allow access to admins
+    if (user.role !== "admin") {
+      res.status(403).json({ message: "Forbidden: Admin access required." });
+      return;
+    }
+
     const userRepository = AppDataSource.getRepository(User);
-    const users = await userRepository.find();
+
+    const users = await userRepository
+      .createQueryBuilder("user")
+      .addSelect("user.email") // admins can see emails in dashboard
+      .getMany();
+
     res.status(200).json(users);
   } catch (error) {
     console.error(error);
