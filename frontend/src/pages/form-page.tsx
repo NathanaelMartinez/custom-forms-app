@@ -3,19 +3,15 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { fetchTemplateById } from "../services/template-service";
-import { Question, Template, Comment } from "../types";
+import { Template, Comment } from "../types";
 import { Form, Button, Card, Spinner, Alert } from "react-bootstrap";
 import AppNavBar from "../components/layout/app-nav-bar";
 import { useAuth } from "../context/auth-context";
-import {
-  ChatLeftText,
-  Heart,
-  HeartFill,
-  PencilSquare,
-  PersonCircle,
-} from "react-bootstrap-icons";
 import AppFooter from "../components/layout/app-footer";
 import { submitForm } from "../services/form-service";
+import RenderQuestion from "../components/forms/render-question";
+import CommentSection from "../components/comments/comment-section";
+import FormButtons from "../components/forms/form-buttons";
 
 const mockComments = [
   {
@@ -187,43 +183,15 @@ const FormPage: React.FC = () => {
                 style={{ borderBottom: "2px solid #e0e0e0" }}
               >
                 <h1 className="text-dark fs-2 fw-bold">{template?.title}</h1>
-                <div className="d-flex align-items-center gap-2">
-                  {(template?.author.id === user?.id ||
-                    user?.role === "admin") && (
-                    <Button
-                      variant="link"
-                      onClick={() => navigate(`/templates/${template?.id}`)}
-                      className="custom-contrast-icon-btn"
-                    >
-                      <PencilSquare size={24} />
-                    </Button>
-                  )}
-                  {user && template?.author.id !== user?.id && (
-                    <Button
-                      variant="link"
-                      className="custom-contrast-icon-btn"
-                      onClick={handleLikeToggle}
-                    >
-                      {liked ? (
-                        <HeartFill size={24} className="text-danger" />
-                      ) : (
-                        <Heart size={24} className="text-dark" />
-                      )}
-                    </Button>
-                  )}
-                  <Button
-                    variant="link"
-                    className="custom-contrast-icon-btn"
-                    onClick={() =>
-                      setIsCommentSectionVisible(!isCommentSectionVisible)
-                    }
-                  >
-                    <ChatLeftText
-                      size={24}
-                      className="custom-contrast-icon-btn"
-                    />
-                  </Button>
-                </div>
+                <FormButtons
+                  templateId={template?.id || ""}
+                  user={user}
+                  templateAuthorId={template?.author.id || ""}
+                  liked={liked}
+                  handleLikeToggle={handleLikeToggle}
+                  setIsCommentSectionVisible={setIsCommentSectionVisible}
+                  isCommentSectionVisible={isCommentSectionVisible}
+                />
               </div>
               {/* description */}
               <p
@@ -246,11 +214,12 @@ const FormPage: React.FC = () => {
                         <Form.Label className="fs-5 fw-bold text-dark mb-2">
                           {question.questionText}
                         </Form.Label>
-                        {renderQuestion(
-                          question,
-                          formResponses,
-                          handleInputChange
-                        )}
+                        {/* Replace renderQuestion with RenderQuestion component */}
+                        <RenderQuestion
+                          question={question}
+                          formResponses={formResponses}
+                          handleInputChange={handleInputChange}
+                        />
                       </Form.Group>
                     </Card>
                   ))}
@@ -272,177 +241,18 @@ const FormPage: React.FC = () => {
         </div>
 
         {/* Comment Section Column */}
-        {isCommentSectionVisible && (
-          <div
-            className="bg-white shadow-sm"
-            style={{
-              width: "400px",
-              padding: "20px",
-              minHeight: "100vh",
-              overflowY: "auto",
-            }}
-          >
-            <h3 className="fs-4 fw-bold text-dark mb-3">
-              {comments.length} Comments
-            </h3>
-            {user ? (
-              <div className="d-flex align-items-start mb-3">
-                <PersonCircle size={36} className="text-muted me-3" />
-                <Form.Group controlId="newComment" className="flex-grow-1">
-                  <Form.Control
-                    as="textarea"
-                    rows={3}
-                    placeholder="Join the conversation..."
-                    value={newComment}
-                    onChange={(e) => setNewComment(e.target.value)}
-                    className="mb-2 input-focus-muted"
-                  />
-                  <Button
-                    variant="primary"
-                    className="custom-success-btn"
-                    onClick={handleCommentSubmit}
-                  >
-                    Add Comment
-                  </Button>
-                </Form.Group>
-              </div>
-            ) : (
-              <Alert variant="info" className="mb-3">
-                <a href="/login" className="text-primary">
-                  Login
-                </a>{" "}
-                or{" "}
-                <a href="/sign-up" className="text-primary">
-                  Sign up
-                </a>{" "}
-                to join the conversation.
-              </Alert>
-            )}
-            <div>
-              {comments.length === 0 ? (
-                <p className="text-muted">
-                  No comments yet. Be the first to comment!
-                </p>
-              ) : (
-                comments.map((comment) => (
-                  <Card
-                    key={comment.id}
-                    className="mb-2 p-2 shadow-sm custom-card"
-                  >
-                    <Card.Body className="d-flex">
-                      <PersonCircle size={36} className="text-muted me-3" />
-                      <div>
-                        <Card.Title className="mb-1 fs-6 fw-bold text-dark">
-                          {comment.author?.username}{" "}
-                          <span
-                            className="text-muted"
-                            style={{ fontSize: "0.8rem" }}
-                          >
-                            {new Date(comment.createdAt).toLocaleString()}
-                          </span>
-                        </Card.Title>
-                        <Card.Text className="text-dark">
-                          {comment.content}
-                        </Card.Text>
-                      </div>
-                    </Card.Body>
-                  </Card>
-                ))
-              )}
-            </div>
-          </div>
-        )}
+        {isCommentSectionVisible && (<CommentSection
+          comments={comments}
+          user={user}
+          newComment={newComment}
+          setNewComment={setNewComment}
+          handleCommentSubmit={handleCommentSubmit}
+        />)}
       </div>
 
       <AppFooter />
     </>
   );
-};
-
-const renderQuestion = (
-  question: Question,
-  formResponses: Record<string, FormResponseValue>,
-  handleInputChange: (questionId: string, value: FormResponseValue) => void
-) => {
-  // render form input depending on type
-  switch (question.type) {
-    case "text":
-      return (
-        <Form.Control
-          type="text"
-          value={formResponses[question.id] || ""}
-          onChange={(e) => handleInputChange(question.id, e.target.value)}
-          className="mt-2 input-focus-muted"
-          placeholder="Enter your answer"
-        />
-      );
-    case "textarea":
-      return (
-        <Form.Control
-          as="textarea"
-          rows={4}
-          value={formResponses[question.id] || ""}
-          onChange={(e) => handleInputChange(question.id, e.target.value)}
-          className="mt-2 input-focus-muted"
-          placeholder="Write your response"
-        />
-      );
-    case "integer":
-      return (
-        <Form.Control
-          type="number"
-          value={formResponses[question.id] || ""}
-          onChange={(e) => {
-            // regex used to prevent copy/pasting negatives
-            const inputValue = e.target.value;
-            if (/^\d*$/.test(inputValue)) {
-              handleInputChange(question.id, Number(inputValue));
-            }
-          }}
-          className="mt-2 input-focus-muted"
-          placeholder="Enter a number"
-          min="0"
-        />
-      );
-    case "checkbox":
-      return (
-        <div className="mt-2">
-          {/* have to check if array */}
-          {Array.isArray(question.options) &&
-            question.options.map((option) => (
-              <Form.Check
-                key={option}
-                type="checkbox"
-                label={option}
-                className="text-dark ms-3"
-                checked={
-                  Array.isArray(formResponses[question.id]) &&
-                  (formResponses[question.id] as string[]).includes(option)
-                }
-                onChange={(e) => {
-                  // push selected checkboxes to array
-                  const updatedValues = Array.isArray(
-                    formResponses[question.id]
-                  )
-                    ? [...(formResponses[question.id] as string[])]
-                    : [];
-                  if (e.target.checked) {
-                    updatedValues.push(option);
-                  } else {
-                    const index = updatedValues.indexOf(option);
-                    if (index > -1) {
-                      updatedValues.splice(index, 1);
-                    }
-                  }
-                  handleInputChange(question.id, updatedValues);
-                }}
-              />
-            ))}
-        </div>
-      );
-    default:
-      return null;
-  }
 };
 
 export default FormPage;
