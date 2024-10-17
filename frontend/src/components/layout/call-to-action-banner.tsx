@@ -10,13 +10,13 @@ const CallToAction: React.FC = () => {
   return (
     <Container className="py-3 banner-dark text-light">
       <Row className="align-items-center justify-content-evenly">
-        <Col md={8}>
+        <Col md={5}>
           <h3 className="text-center fw-bold">
             Can't find what you're looking for?
           </h3>
         </Col>
         <Col md={4} className="text-center">
-          <div className="me-5">
+          <div >
             {isLoggedIn ? (
               <span className="fw-bold">Create your own custom Form!</span>
             ) : (
