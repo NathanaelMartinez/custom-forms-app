@@ -29,10 +29,14 @@ export const createUser = async (
 
 // find user by email
 export const findUserByEmail = async (email: string): Promise<User | null> => {
-  const userRepository = AppDataSource.getRepository(User);
+  const userRepository = AppDataSource.getRepository(User)
+    .createQueryBuilder("user")
+    .addSelect("user.password");
 
   try {
-    const user = await userRepository.findOneBy({ email });
+    const user = await userRepository
+      .where("user.email = :email", { email }) // have to do it with querybuilder for addSelect
+      .getOne();
     return user;
   } catch (error) {
     console.error("Error finding user by email:", error);
