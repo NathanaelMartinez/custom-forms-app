@@ -55,6 +55,7 @@ const FormPage: React.FC = () => {
     Record<string, FormResponseValue>
   >({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSubmitted, setIsSubmitted] = useState(false); // track form submission status to display success card
   const [comments, setComments] = useState<Comment[]>([]);
   const [newComment, setNewComment] = useState<string>("");
   const [isCommentSectionVisible, setIsCommentSectionVisible] =
@@ -120,21 +121,22 @@ const FormPage: React.FC = () => {
 
   const handleFormSubmit = async () => {
     if (!user) {
-      alert("Please log in to submit the form.");
+      setError("Please log in to submit the form.");
       return;
     }
 
     // ensure templateId is defined
     if (!template || !template.id) {
-      alert("Template is missing or not fully loaded. Cannot submit form.");
+      setError("Template is missing or not fully loaded. Cannot submit form.");
       return;
     }
 
     console.log("submitting template:", template.id);
 
-    try {
-      setIsSubmitting(true);
+    setIsSubmitting(true);
+    setError(null); // clear any errors
 
+    try {
       // prepare payload for submission
       const responsePayload = {
         templateId: template?.id,
@@ -146,17 +148,33 @@ const FormPage: React.FC = () => {
 
       await submitForm(responsePayload);
 
-      alert("Form submitted successfully!");
-      navigate("/"); // redirect after submission
+      setIsSubmitted(true);
+      // scroll back to top of the page
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth", // so it doesn't jerk it up
+      });
     } catch (error) {
       console.error("Failed to submit form:", error);
-      alert("Failed to submit the form. Please try again.");
+      setError("Something went wrong with our servers. Please try again.");
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  if (error) {
+  const handleTryAgain = () => {
+    setIsSubmitted(false); // reset submission status
+    setFormResponses({}); // clear form responses
+    navigate(`/forms/${template?.id}`); // navigate to same form
+
+    // scroll back to top of the page
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth", // so it doesn't jerk it up
+    });
+  };
+
+  if (error && !template) {
     return <Alert variant="danger">{error}</Alert>;
   }
 
@@ -193,61 +211,88 @@ const FormPage: React.FC = () => {
                   isCommentSectionVisible={isCommentSectionVisible}
                 />
               </div>
-              {/* description */}
-              <p
-                className="text-muted fs-5 fw-normal mb-4"
-                style={{ fontStyle: "italic" }}
-              >
-                {template?.description || "No description provided."}
-              </p>
-              {isLoading ? (
-                <Spinner />
-              ) : (
-                //  question cards
-                <div className="d-flex flex-column gap-3">
-                  {template?.questions.map((question) => (
-                    <Card
-                      key={question.id}
-                      className="p-3 shadow-sm border-light custom-card"
-                    >
-                      <Form.Group controlId={question.id}>
-                        <Form.Label className="fs-5 fw-bold text-dark mb-2">
-                          {question.questionText}
-                        </Form.Label>
-                        {/* Replace renderQuestion with RenderQuestion component */}
-                        <RenderQuestion
-                          question={question}
-                          formResponses={formResponses}
-                          handleInputChange={handleInputChange}
-                        />
-                      </Form.Group>
-                    </Card>
-                  ))}
+              {isSubmitted ? (
+                // Success message displayed after form submission
+                <div className="text-center">
+                  <h2 className="text-dark mt-5">
+                    Thank you for your submission!
+                  </h2>
+                  <p>Your form response was submitted successfully.</p>
+                  <Button
+                    onClick={handleTryAgain}
+                    variant="primary"
+                    className="custom-success-btn"
+                  >
+                    Submit Another Response
+                  </Button>
                 </div>
+              ) : (
+                <>
+                  <p
+                    className="text-muted fs-5 fw-normal mb-4"
+                    style={{ fontStyle: "italic" }}
+                  >
+                    {template?.description || "No description provided."}
+                  </p>
+
+                  {isLoading ? (
+                    <Spinner />
+                  ) : (
+                    <div className="d-flex flex-column gap-3">
+                      {template?.questions.map((question) => (
+                        <Card
+                          key={question.id}
+                          className="p-3 shadow-sm border-light custom-card"
+                        >
+                          <Form.Group controlId={question.id}>
+                            <Form.Label className="fs-5 fw-bold text-dark mb-2">
+                              {question.questionText}
+                            </Form.Label>
+                            <RenderQuestion
+                              question={question}
+                              formResponses={formResponses}
+                              handleInputChange={handleInputChange}
+                            />
+                          </Form.Group>
+                        </Card>
+                      ))}
+                    </div>
+                  )}
+                </>
               )}
             </div>
-            {/* submit Button */}
-            <div className="d-flex justify-content-end mt-4 me-5">
-              <Button
-                variant="primary"
-                className="fw-bold custom-success-btn"
-                disabled={!user || isSubmitting}
-                onClick={handleFormSubmit}
-              >
-                {isSubmitting ? "Submitting..." : "Submit"}
-              </Button>
-            </div>
+            {/* display errors */}
+            {error && (
+              <Alert variant="danger" className="mt-4">
+                {error}
+              </Alert>
+            )}
+            {!isSubmitted && (
+              // Submit button
+              <div className="d-flex justify-content-end mt-4 me-5">
+                <Button
+                  variant="primary"
+                  className="fw-bold custom-success-btn"
+                  disabled={!user || isSubmitting}
+                  onClick={handleFormSubmit}
+                >
+                  {isSubmitting ? "Submitting..." : "Submit"}
+                </Button>
+              </div>
+            )}
           </Card>
         </div>
 
         {/* Comment Section Column */}
-        {isCommentSectionVisible && (<CommentSection
-          comments={comments}
-          user={user}
-          newComment={newComment}
-          setNewComment={setNewComment}
-          handleCommentSubmit={handleCommentSubmit}
-        />)}
+        {isCommentSectionVisible && (
+          <CommentSection
+            comments={comments}
+            user={user}
+            newComment={newComment}
+            setNewComment={setNewComment}
+            handleCommentSubmit={handleCommentSubmit}
+          />
+        )}
       </div>
 
       <AppFooter />
