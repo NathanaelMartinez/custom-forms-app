@@ -5,9 +5,9 @@ import { useNavigate, useParams } from "react-router-dom";
 import { fetchTemplateById } from "../services/template-service";
 import { Template, Comment } from "../types";
 import { Form, Button, Card, Spinner, Alert } from "react-bootstrap";
-import AppNavBar from "../components/layout/app-nav-bar";
+import AppNavBar from "../components/common/app-nav-bar";
 import { useAuth } from "../context/auth-context";
-import AppFooter from "../components/layout/app-footer";
+import AppFooter from "../components/common/app-footer";
 import { submitForm } from "../services/form-service";
 import RenderQuestion from "../components/forms/render-question";
 import CommentSection from "../components/comments/comment-section";
@@ -170,7 +170,7 @@ const FormPage: React.FC = () => {
     // scroll back to top of the page
     window.scrollTo({
       top: 0,
-      behavior: "smooth", // so it doesn't jerk it up
+      behavior: "auto",
     });
   };
 

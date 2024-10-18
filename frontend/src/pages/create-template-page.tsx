@@ -2,10 +2,10 @@ import React, { useEffect, useState } from "react";
 import { Card, Form } from "react-bootstrap";
 import { useAuth } from "../context/auth-context";
 import { useNavigate, useParams } from "react-router-dom";
-import AppNavBar from "../components/layout/app-nav-bar";
-import QuestionList from "../components/forms/question-list";
-import TemplateOverview from "../components/forms/template-overview";
-import AddQuestionButton from "../components/forms/add-question-button";
+import AppNavBar from "../components/common/app-nav-bar";
+import QuestionList from "../components/templates/question-list";
+import TemplateOverview from "../components/templates/template-overview";
+import AddQuestionButton from "../components/templates/add-question-button";
 import { Question, Template } from "../types";
 
 import {

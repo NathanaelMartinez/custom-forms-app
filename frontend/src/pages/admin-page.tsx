@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import AdminTable from "../components/forms/admin-table";
-import Toolbar from "../components/forms/admin-tool-bar";
+import AdminTable from "../components/admin/admin-table";
+import Toolbar from "../components/admin/admin-tool-bar";
 import {
   deleteUsers,
   fetchUsers,
   updateUserStatus,
 } from "../services/admin-service";
 import { User } from "../types";
-import AppNavBar from "../components/layout/app-nav-bar";
+import AppNavBar from "../components/common/app-nav-bar";
 import { useAuth } from "../context/auth-context";
 
 const AdminPage: React.FC = () => {

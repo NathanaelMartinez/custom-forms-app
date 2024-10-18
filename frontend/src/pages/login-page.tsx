@@ -4,8 +4,8 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 import gatheringDataImage from "../assets/gathering_data.jpg";
 import { loginUser } from "../services/auth-service";
 import { useAuth } from "../context/auth-context";
-import ProductPitch from "../components/layout/product-pitch";
-import AuthForm from "../components/forms/auth-form";
+import ProductPitch from "../components/common/product-pitch";
+import AuthForm from "../components/auth/auth-form";
 
 const LoginPage: React.FC = () => {
   const { login } = useAuth();

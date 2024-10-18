@@ -8,8 +8,8 @@ import { Link, useNavigate } from "react-router-dom";
 import gatheringDataImage from "../assets/gathering_data.jpg";
 import { registerUser } from "../services/auth-service";
 import { useAuth } from "../context/auth-context";
-import ProductPitch from "../components/layout/product-pitch";
-import AuthForm from "../components/forms/auth-form";
+import ProductPitch from "../components/common/product-pitch";
+import AuthForm from "../components/auth/auth-form";
 
 const SignUpPage: React.FC = () => {
   const { login } = useAuth(); // use login from AuthContext to set login state

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Form, Button } from "react-bootstrap";
 import { LockFill, UnlockFill } from "react-bootstrap-icons";
-import TagInput from "./tag-input";
+import TagInput from "../forms/tag-input";
 import AccessControlModal from "./access-control-modal";
 
 interface TemplateOverviewProps {
