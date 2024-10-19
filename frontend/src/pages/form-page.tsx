@@ -2,13 +2,16 @@
 
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { fetchTemplateById } from "../services/template-service";
+import {
+  fetchAggregateResponses,
+  fetchTemplateById,
+  submitForm,
+} from "../services/template-service";
 import { Template, Comment } from "../types";
 import { Form, Button, Card, Spinner, Alert } from "react-bootstrap";
 import AppNavBar from "../components/common/app-nav-bar";
 import { useAuth } from "../context/auth-context";
 import AppFooter from "../components/common/app-footer";
-import { submitForm } from "../services/form-service";
 import RenderQuestion from "../components/forms/render-question";
 import CommentSection from "../components/comments/comment-section";
 import FormButtons from "../components/forms/form-buttons";
@@ -46,6 +49,36 @@ const mockComments = [
 
 type FormResponseValue = string | number | string[];
 
+interface NumericData {
+  [questionId: string]: {
+    questionText: string;
+    average?: number;
+    min?: number;
+    max?: number;
+  };
+}
+
+interface TextData {
+  [questionId: string]: {
+    questionText: string;
+    counts?: Record<string, number>;
+  };
+}
+
+interface CheckboxData {
+  [questionId: string]: {
+    questionText: string;
+    optionCounts?: Record<string, number>;
+  };
+}
+
+interface AggregatedData {
+  responseCount: number;
+  numericData: NumericData;
+  textData: TextData;
+  checkboxData: CheckboxData;
+}
+
 const FormPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const [template, setTemplate] = useState<Template | null>(null);
@@ -60,7 +93,14 @@ const FormPage: React.FC = () => {
   const [newComment, setNewComment] = useState<string>("");
   const [isCommentSectionVisible, setIsCommentSectionVisible] =
     useState<boolean>(false);
+  const [isDataTableVisible, setIsDataTableVisible] = useState<boolean>(false);
   const [liked, setLiked] = useState<boolean>(false);
+  const [aggregatedData, setAggregatedData] = useState<AggregatedData>({
+    responseCount: 0,
+    numericData: {},
+    textData: {},
+    checkboxData: {},
+  });
   const { user } = useAuth();
   const navigate = useNavigate();
 
@@ -88,6 +128,38 @@ const FormPage: React.FC = () => {
       getTemplate();
     }
   }, [id]);
+
+  useEffect(() => {
+    const fetchAggregatedData = async () => {
+      if (!id) {
+        setError("No template ID provided.");
+        return;
+      }
+
+      if (user?.id !== template?.author?.id && user?.role !== "admin") {
+        console.warn(
+          "Unauthorized access: You do not have permission to view this data."
+        );
+        return;
+      }
+      try {
+        const res = await fetchAggregateResponses(id);
+        setAggregatedData({
+          responseCount: res.responseCount,
+          numericData: res.numericData || {},
+          textData: res.textData || {},
+          checkboxData: res.checkboxData || {},
+        });
+        console.log("Aggregated Data:", res);
+      } catch (error) {
+        console.error("Error fetching aggregated data:", error);
+      }
+    };
+
+    if (isDataTableVisible) {
+      fetchAggregatedData();
+    }
+  }, [isDataTableVisible, id]);
 
   const handleInputChange = (questionId: string, value: FormResponseValue) => {
     setFormResponses((prev) => ({
@@ -144,7 +216,7 @@ const FormPage: React.FC = () => {
       };
 
       console.log("Loaded template with questions: ", template.questions);
-      console.log("formResponses:", formResponses); // Ensure question IDs are correct
+      console.log("formResponses:", formResponses); // ensure question IDs are correct
 
       await submitForm(responsePayload);
 
@@ -182,7 +254,7 @@ const FormPage: React.FC = () => {
     <>
       <AppNavBar />
       <div className="d-flex flex-grow-1" style={{ minHeight: "100vh" }}>
-        {/* Main form content */}
+        {/* form card */}
         <div className="flex-grow-1 p-5 d-flex justify-content-center">
           <Card
             className="shadow-lg p-4 bg-white rounded-3"
@@ -209,10 +281,142 @@ const FormPage: React.FC = () => {
                   handleLikeToggle={handleLikeToggle}
                   setIsCommentSectionVisible={setIsCommentSectionVisible}
                   isCommentSectionVisible={isCommentSectionVisible}
+                  setIsDataTableVisible={setIsDataTableVisible}
+                  isDataTableVisible={isDataTableVisible}
                 />
               </div>
-              {isSubmitted ? (
-                // Success message displayed after form submission
+              {isDataTableVisible ? (
+                // render data tables
+                <div className="text-start">
+                  {/* display number of responses */}
+                  <h2 className="text-dark mt-5">
+                    {aggregatedData.responseCount} Responses
+                  </h2>
+
+                  {/* numeric data */}
+                  {Object.keys(aggregatedData.numericData || {}).length > 0 && (
+                    <div className="table-responsive">
+                      <h3 className="text-dark mt-5">Numeric Data</h3>
+                      <table className="table table-bordered mt-4">
+                        <thead>
+                          <tr>
+                            <th>Question</th>
+                            <th>Average</th>
+                            <th>Min</th>
+                            <th>Max</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {Object.keys(aggregatedData.numericData).map(
+                            (questionId) => (
+                              <tr key={questionId}>
+                                <td>
+                                  {
+                                    aggregatedData.numericData[questionId]
+                                      .questionText
+                                  }
+                                </td>
+                                <td>
+                                  {aggregatedData.numericData[questionId]
+                                    .average ?? "N/A"}
+                                </td>
+                                <td>
+                                  {aggregatedData.numericData[questionId].min ??
+                                    "N/A"}
+                                </td>
+                                <td>
+                                  {aggregatedData.numericData[questionId].max ??
+                                    "N/A"}
+                                </td>
+                              </tr>
+                            )
+                          )}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
+
+                  {/* text data */}
+                  {Object.keys(aggregatedData.textData || {}).length > 0 && (
+                    <div className="table-responsive">
+                      <h3 className="text-dark mt-5">Text Responses</h3>
+                      <table className="table table-bordered mt-4">
+                        <thead>
+                          <tr>
+                            <th>Question</th>
+                            <th>Text Counts</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {Object.keys(aggregatedData.textData).map(
+                            (questionId) => (
+                              <tr key={questionId}>
+                                <td>
+                                  {
+                                    aggregatedData.textData[questionId]
+                                      .questionText
+                                  }
+                                </td>
+                                <td>
+                                  {Object.entries(
+                                    aggregatedData.textData[questionId]
+                                      .counts || {}
+                                  ).map(([answer, count]) => (
+                                    <p key={answer}>
+                                      <strong>{answer}:</strong> {count}
+                                    </p>
+                                  ))}
+                                </td>
+                              </tr>
+                            )
+                          )}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
+
+                  {/* checkbox data */}
+                  {Object.keys(aggregatedData.checkboxData || {}).length >
+                    0 && (
+                    <div className="table-responsive">
+                      <h3 className="text-dark mt-5">Checkbox Option Counts</h3>
+                      <table className="table table-bordered mt-4">
+                        <thead>
+                          <tr>
+                            <th>Question</th>
+                            <th>Option Counts</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {Object.keys(aggregatedData.checkboxData).map(
+                            (questionId) => (
+                              <tr key={questionId}>
+                                <td>
+                                  {
+                                    aggregatedData.checkboxData[questionId]
+                                      .questionText
+                                  }
+                                </td>
+                                <td>
+                                  {Object.entries(
+                                    aggregatedData.checkboxData[questionId]
+                                      .optionCounts || {}
+                                  ).map(([option, count]) => (
+                                    <p key={option}>
+                                      <strong>{option}:</strong> {count}
+                                    </p>
+                                  ))}
+                                </td>
+                              </tr>
+                            )
+                          )}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
+                </div>
+              ) : isSubmitted ? (
+                // success message
                 <div className="text-center">
                   <h2 className="text-dark mt-5">
                     Thank you for your submission!
@@ -267,8 +471,8 @@ const FormPage: React.FC = () => {
                 {error}
               </Alert>
             )}
-            {!isSubmitted && (
-              // Submit button
+            {!isSubmitted && !isDataTableVisible && (
+              // submit button
               <div className="d-flex justify-content-end mt-4 me-5">
                 <Button
                   variant="primary"
@@ -283,7 +487,7 @@ const FormPage: React.FC = () => {
           </Card>
         </div>
 
-        {/* Comment Section Column */}
+        {/* comment section column */}
         {isCommentSectionVisible && (
           <CommentSection
             comments={comments}

@@ -130,10 +130,23 @@ export const getResponsesAggregate = async (req: Request, res: Response) => {
     const templateRepository = AppDataSource.getRepository(Template);
     const template = await templateRepository.findOne({
       where: { id },
+      relations: ["questions"], // fetch related questions
     });
 
     if (!template) {
       res.status(404).json({ message: "Template not found" });
+      return;
+    }
+
+    // filter out questions that should not be displayed in the table
+    const validQuestions = template.questions.filter(
+      (question) => question.displayInTable
+    );
+
+    if (validQuestions.length === 0) {
+      res
+        .status(400)
+        .json({ message: "No questions available for aggregation" });
       return;
     }
 
@@ -142,63 +155,78 @@ export const getResponsesAggregate = async (req: Request, res: Response) => {
       where: { template: { id } }, // filter by templateId
     });
 
-    // init aggregate data object
-    const data: Record<string, any> = {};
+    const responseCount = responses.length;
+
+    // init data objects by type
+    const numericData: Record<string, any> = {};
+    const textData: Record<string, any> = {};
+    const checkboxData: Record<string, any> = {};
 
     for (const response of responses) {
-      // iterate over each answer in response's answers object
       for (const [questionId, answer] of Object.entries(response.answers)) {
-        // init questionId if does not exist in data object
-        if (!data[questionId]) {
-          data[questionId] = {
-            values: [], // numeric calculations
-            counts: {}, // counts for text answers or checkboxes
-            optionCounts: {}, // counts for checkbox options
-          };
-        }
+        const question = validQuestions.find((q) => q.id === questionId);
+        if (!question) continue;
 
-        /* handle different question types */
+        /* categorize question types */
         if (typeof answer === "number") {
-          data[questionId].values.push(answer);
-        } else if (typeof answer === "string") {
-          // if answer doesn't have count, init count
-          if (!data[questionId].counts[answer]) {
-            data[questionId].counts[answer] = 0;
+          if (!numericData[questionId]) {
+            numericData[questionId] = {
+              questionText: question.questionText,
+              values: [],
+              average: null,
+              min: null,
+              max: null,
+            };
           }
-          // increment count
-          data[questionId].counts[answer]++;
+          numericData[questionId].values.push(answer);
+        } else if (typeof answer === "string") {
+          if (!textData[questionId]) {
+            textData[questionId] = {
+              questionText: question.questionText,
+              counts: {},
+            };
+          }
+          if (!textData[questionId].counts[answer]) {
+            textData[questionId].counts[answer] = 0;
+          }
+          textData[questionId].counts[answer]++;
         } else if (Array.isArray(answer)) {
-          // iterate over selected options in the checkbox answer
+          if (!checkboxData[questionId]) {
+            checkboxData[questionId] = {
+              questionText: question.questionText,
+              optionCounts: {},
+            };
+          }
           for (const option of answer) {
-            // if option doesn't have count, inti count
-            if (!data[questionId].optionCounts[option]) {
-              data[questionId].optionCounts[option] = 0;
+            if (!checkboxData[questionId].optionCounts[option]) {
+              checkboxData[questionId].optionCounts[option] = 0;
             }
-            // increment count
-            data[questionId].optionCounts[option]++;
+            checkboxData[questionId].optionCounts[option]++;
           }
         }
       }
     }
 
-    // calculate numerical aggregates
-    for (const [questionId, details] of Object.entries(data)) {
-      if (details.values.length && typeof details.values[0] === "number") {
-        const values = details.values as number[];
-        const sum = values.reduce((acc, val) => acc + val, 0);
-        const average = sum / values.length;
-        const min = Math.min(...values);
-        const max = Math.max(...values);
-
-        // store calculations in data
-        data[questionId].average = average;
-        data[questionId].min = min;
-        data[questionId].max = max;
+    // calculate numeric data
+    for (const [questionId, details] of Object.entries(numericData)) {
+      if (details.values.length) {
+        const sum = details.values.reduce(
+          (acc: number, val: number) => acc + val,
+          0
+        );
+        numericData[questionId].average = sum / details.values.length;
+        numericData[questionId].min = Math.min(...details.values);
+        numericData[questionId].max = Math.max(...details.values);
       }
     }
 
-    // return aggregated data as JSON
-    res.status(200).json(data);
+    // return grouped data
+    res.status(200).json({
+      responseCount,
+      numericData,
+      textData,
+      checkboxData,
+    });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Internal server error" });

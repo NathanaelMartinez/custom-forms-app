@@ -1,6 +1,6 @@
 import React from "react";
 import { Button } from "react-bootstrap";
-import { ChatLeftText, Heart, HeartFill, PencilSquare } from "react-bootstrap-icons";
+import { BarChart, ChatLeftText, Heart, HeartFill, PencilSquare } from "react-bootstrap-icons";
 import { useNavigate } from "react-router-dom";
 import { User } from "../../types";
 
@@ -12,6 +12,8 @@ interface FormButtonsProps {
   handleLikeToggle: () => void;
   setIsCommentSectionVisible: (visible: boolean) => void;
   isCommentSectionVisible: boolean;
+  setIsDataTableVisible: (visible: boolean) => void;
+  isDataTableVisible: boolean;
 }
 
 const FormButtons: React.FC<FormButtonsProps> = ({
@@ -22,6 +24,8 @@ const FormButtons: React.FC<FormButtonsProps> = ({
   handleLikeToggle,
   setIsCommentSectionVisible,
   isCommentSectionVisible,
+  setIsDataTableVisible,
+  isDataTableVisible,
 }) => {
   const navigate = useNavigate();
 
@@ -34,6 +38,15 @@ const FormButtons: React.FC<FormButtonsProps> = ({
           className="custom-contrast-icon-btn"
         >
           <PencilSquare size={24} />
+        </Button>
+      )}
+      {(templateAuthorId === user?.id || user?.role === "admin") && (
+        <Button
+          variant="link"
+          onClick={() => setIsDataTableVisible(!isDataTableVisible)}
+          className="custom-contrast-icon-btn"
+        >
+          <BarChart size={24} />
         </Button>
       )}
       {user && templateAuthorId !== user?.id && (
