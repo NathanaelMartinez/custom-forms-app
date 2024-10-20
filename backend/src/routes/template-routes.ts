@@ -11,11 +11,6 @@ import {
   checkIfNotBlocked,
 } from "../middlewares/auth-middleware";
 import {
-  addQuestion,
-  deleteQuestion,
-  editQuestion,
-} from "../controllers/question-controller";
-import {
   getResponsesAggregate,
   submitResponse,
 } from "../controllers/response-controller";
@@ -40,30 +35,6 @@ router.delete(
   authenticateJWT,
   checkIfNotBlocked,
   deleteTemplate
-);
-
-// add a new question to a specific template (authenticated users only)
-router.post(
-  "/:templateId/questions",
-  authenticateJWT,
-  checkIfNotBlocked,
-  addQuestion
-);
-
-// edit a question of a template (author or admin only)
-router.put(
-  "/:templateId/questions/:questionId",
-  authenticateJWT,
-  checkIfNotBlocked,
-  editQuestion
-);
-
-// delete a question of a template (author or admin only)
-router.delete(
-  "/:templateId/questions/:questionId",
-  authenticateJWT,
-  checkIfNotBlocked,
-  deleteQuestion
 );
 
 // submit form responses

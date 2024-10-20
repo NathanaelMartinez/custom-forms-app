@@ -5,7 +5,7 @@ export interface TemplatePayload {
   title: string;
   description?: string;
   authorId: string;
-  topic?: string;
+  topic: string;
   questions: QuestionPayload[]; // Use QuestionPayload[] for questions
   tags?: string[];
   image?: File | null;

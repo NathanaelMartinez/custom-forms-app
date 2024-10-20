@@ -6,7 +6,7 @@ export interface Template {
   title: string;
   description?: string;
   author: Partial<User>; // user who created template
-  topic?: string;
+  topic: string;
   questions: Question[]; // Questions related to this template
   createdAt: Date;
   filledForms?: number; // track how many times template has been filled

@@ -74,6 +74,7 @@ const CreateTemplatePage: React.FC = () => {
     filledForms: 0,
     likes: 0,
     comments: [],
+    topic: "",
     tags: [],
     image: null,
     createdAt: new Date(),
@@ -93,9 +94,9 @@ const CreateTemplatePage: React.FC = () => {
     try {
       setIsSaving(true);
       const payload = mapTemplateToPayload(template);
+      console.log("payload",payload); //TODO: remove DEBUG comments
 
       if (templateId) {
-        console.log("Template ID:", templateId);
         // if templateId exists update existing template
         await updateTemplate(templateId, payload);
         navigate(`/forms/${templateId}`);

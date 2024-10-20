@@ -7,7 +7,7 @@ import { Comment } from "../entities/comment";
 
 // create new template (authenticated users only)
 export const createTemplate = async (req: Request, res: Response) => {
-  const { title, description, questions, tags, image } = req.body;
+  const { title, description, questions, topic, tags, image } = req.body;
   const user = req.user as User;
 
   if (!user) {
@@ -24,6 +24,7 @@ export const createTemplate = async (req: Request, res: Response) => {
       description,
       author: user, // pass full user object here
       image: image || null,
+      topic: topic || "other",
       tags: tags || [], // default to empty array if tags not provided
     });
 
@@ -105,7 +106,7 @@ export const getTemplate = async (req: Request, res: Response) => {
 // edit a template (only author or admin)
 export const editTemplate = async (req: Request, res: Response) => {
   const { id } = req.params;
-  const { title, description, tags, image } = req.body;
+  const { title, description, topic, tags, image, questions } = req.body;
   const user = req.user as User;
 
   if (!user) {
@@ -115,7 +116,10 @@ export const editTemplate = async (req: Request, res: Response) => {
 
   try {
     const templateRepository = AppDataSource.getRepository(Template);
-    const template = await templateRepository.findOneBy({ id });
+    const template = await templateRepository.findOne({
+      where: { id },
+      relations: ["questions"],
+    });
 
     if (!template) {
       res.status(404).json({ message: "Template not found." });
@@ -130,9 +134,56 @@ export const editTemplate = async (req: Request, res: Response) => {
 
     template.title = title || template.title;
     template.description = description || template.description;
+    template.topic = topic || template.topic;
     template.tags = tags || template.tags;
     template.image = image || template.image;
+    template.topic = topic || template.topic;
 
+    const questionRepository = AppDataSource.getRepository(Question);
+
+    // handle update questions
+    if (questions && Array.isArray(questions)) {
+      // map existing questions by ID
+      const existingQuestions = template.questions.reduce((acc, question) => {
+        acc[question.id] = question;
+        return acc;
+      }, {} as Record<string, Question>);
+
+      const updatedQuestionIds = questions.map((q) => q.id);
+
+      // handle delete questions during update
+      for (const questionId in existingQuestions) {
+        if (!updatedQuestionIds.includes(questionId)) {
+          await questionRepository.remove(existingQuestions[questionId]);
+        }
+      }
+
+      for (const questionData of questions) {
+        if (questionData.id && existingQuestions[questionData.id]) {
+          // update existing question
+          const questionToUpdate = existingQuestions[questionData.id];
+          questionToUpdate.questionText =
+            questionData.questionText || questionToUpdate.questionText;
+          questionToUpdate.type = questionData.type || questionToUpdate.type;
+          questionToUpdate.displayInTable =
+            questionData.displayInTable ?? questionToUpdate.displayInTable;
+
+          await questionRepository.save(questionToUpdate); // save updated question
+        } else if (!questionData.id) {
+          // add new question
+          const newQuestion = questionRepository.create({
+            questionText: questionData.questionText,
+            type: questionData.type,
+            displayInTable: questionData.displayInTable,
+            template: template, // new question goes with this template
+            options: questionData.options || [],
+          });
+          await questionRepository.save(newQuestion); // save new question
+        }
+      }
+    }
+
+    console.log("saving template...");
     await templateRepository.save(template);
     res
       .status(200)
@@ -173,7 +224,7 @@ export const deleteTemplate = async (req: Request, res: Response) => {
     }
 
     await templateRepository.remove(template);
-    res.status(200).json({ message: "Template deleted successfully." });
+    res.status(204).json({ message: "Template deleted successfully." });
     return;
   } catch (error) {
     console.error(error);

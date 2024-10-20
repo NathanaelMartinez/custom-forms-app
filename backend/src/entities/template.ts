@@ -39,6 +39,9 @@ export class Template {
   @Column({ type: "text", nullable: true }) // add image as a URL string
   image!: string | null;
 
+  @Column({ type: "text", nullable: true })
+  topic!: string;
+
   @Column("simple-array", { nullable: true })
   tags!: string[]; // TODO: make tags into entity
 

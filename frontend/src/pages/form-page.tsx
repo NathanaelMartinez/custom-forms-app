@@ -339,7 +339,7 @@ const FormPage: React.FC = () => {
                   {/* text data */}
                   {Object.keys(aggregatedData.textData || {}).length > 0 && (
                     <div className="table-responsive">
-                      <h3 className="text-dark mt-5">Text Responses</h3>
+                      <h3 className="text-dark mt-5">Text Response Data</h3>
                       <table className="table table-bordered mt-4">
                         <thead>
                           <tr>

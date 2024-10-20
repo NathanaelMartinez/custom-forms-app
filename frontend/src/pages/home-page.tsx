@@ -28,6 +28,7 @@ const HomePage: React.FC = () => {
       },
       questions: [],
       createdAt: new Date(),
+      topic: "other",
     },
     {
       id: "2",
@@ -45,6 +46,7 @@ const HomePage: React.FC = () => {
       },
       questions: [],
       createdAt: new Date(),
+      topic: "other",
     },
     {
       id: "3",
@@ -62,6 +64,7 @@ const HomePage: React.FC = () => {
       },
       questions: [],
       createdAt: new Date(),
+      topic: "other",
     },
     {
       id: "4",
@@ -79,6 +82,7 @@ const HomePage: React.FC = () => {
       },
       questions: [],
       createdAt: new Date(),
+      topic: "other",
     },
     {
       id: "5",
@@ -96,6 +100,7 @@ const HomePage: React.FC = () => {
       },
       questions: [],
       createdAt: new Date(),
+      topic: "other",
     },
   ];
 
@@ -117,6 +122,7 @@ const HomePage: React.FC = () => {
       },
       questions: [],
       createdAt: new Date("2024-01-01"),
+      topic: "other",
     },
     {
       id: "7",
@@ -134,6 +140,7 @@ const HomePage: React.FC = () => {
       },
       questions: [],
       createdAt: new Date("2024-01-05"),
+      topic: "other",
     },
     {
       id: "8",
@@ -151,6 +158,7 @@ const HomePage: React.FC = () => {
       },
       questions: [],
       createdAt: new Date("2024-01-10"),
+      topic: "other",
     },
   ];
 
