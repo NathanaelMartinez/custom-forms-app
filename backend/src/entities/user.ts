@@ -29,7 +29,7 @@ export class User {
   @OneToMany(() => Comment, (comment) => comment.author) // link to comments
   comments!: Comment[];
 
-  @Column({ default: () => "CURRENT_TIMESTAMP" })
+  @Column({ type: "timestamp" })
   createdAt!: Date;
 
   @OneToMany(() => Response, (response) => response.user)

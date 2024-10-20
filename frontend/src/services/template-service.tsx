@@ -4,6 +4,17 @@ import { FormResponsePayload } from "../dtos/form-response-payload";
 
 const SERVER_URL = import.meta.env.VITE_SERVER_URL;
 
+// fetch all templates for home page
+export const fetchTemplates = async () => {
+  try {
+    const response = await axios.get(`${SERVER_URL}/api/templates`)
+    return response.data;
+  } catch (error){
+    console.error("Error fetching templates:", error);
+    throw error;
+  }
+}
+
 export const createTemplate = async (templateData: TemplatePayload) => {
   // retrieve the token from local storage
   const token = localStorage.getItem("authToken");
@@ -58,16 +69,6 @@ export const updateTemplate = async (
     return response.data;
   } catch (error) {
     console.error("Failed to update template:", error);
-    throw error;
-  }
-};
-
-export const fetchTemplate = async (id: string) => {
-  try {
-    const response = await axios.get(`${SERVER_URL}/api/templates/${id}`);
-    return response.data;
-  } catch (error) {
-    console.error("Error fetching template:", error);
     throw error;
   }
 };

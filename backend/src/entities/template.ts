@@ -27,7 +27,7 @@ export class Template {
   @OneToMany(() => Question, (question) => question.template, { cascade: true }) // cascade means question changes automatically cascaded to templates
   questions!: Question[];
 
-  @Column({ default: () => "CURRENT_TIMESTAMP" })
+  @Column({ type: "timestamp" })
   createdAt!: Date;
 
   @Column({ default: 0 })
@@ -45,6 +45,6 @@ export class Template {
   @Column("simple-array", { nullable: true })
   tags!: string[]; // TODO: make tags into entity
 
-  @OneToMany(() => Response, (response) => response.template)
+  @OneToMany(() => Response, (response) => response.template, { eager: true })
   responses!: Response[];
 }

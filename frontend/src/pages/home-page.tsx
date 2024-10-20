@@ -1,197 +1,95 @@
-import React from "react";
-import { Button, Container, Tab, Tabs } from "react-bootstrap";
-// import { useNavigate } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { Button, Container, Tab, Tabs, Spinner, Alert } from "react-bootstrap";
 import AppNavBar from "../components/common/app-nav-bar";
 import CallToAction from "../components/dashboard/call-to-action-banner";
 import TemplateList from "../components/dashboard/template-list";
 import { Template } from "../types";
 import AppFooter from "../components/common/app-footer";
+import { fetchTemplates } from "../services/template-service"; // Import the fetchTemplates function
 
 const HomePage: React.FC = () => {
-  // const navigate = useNavigate();
+  const [templates, setTemplates] = useState<Template[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
 
-  // placeholder data for top 5 all-time templates
-  const popularTemplates: Template[] = [
-    {
-      id: "1",
-      title: "Top Form Template 1",
-      filledForms: 120,
-      description: "A top template",
-      author: {
-        id: "user1",
-        username: "User One",
-        email: "user1@example.com",
-        role: "user",
-        status: "active",
-        templates: [],
-        createdAt: new Date(),
-      },
-      questions: [],
-      createdAt: new Date(),
-      topic: "other",
-    },
-    {
-      id: "2",
-      title: "Top Form Template 2",
-      filledForms: 95,
-      description: "A top template",
-      author: {
-        id: "user2",
-        username: "User Two",
-        email: "user2@example.com",
-        role: "user",
-        status: "active",
-        templates: [],
-        createdAt: new Date(),
-      },
-      questions: [],
-      createdAt: new Date(),
-      topic: "other",
-    },
-    {
-      id: "3",
-      title: "Top Form Template 3",
-      filledForms: 85,
-      description: "A top template",
-      author: {
-        id: "user3",
-        username: "User Three",
-        email: "user3@example.com",
-        role: "user",
-        status: "active",
-        templates: [],
-        createdAt: new Date(),
-      },
-      questions: [],
-      createdAt: new Date(),
-      topic: "other",
-    },
-    {
-      id: "4",
-      title: "Top Form Template 4",
-      filledForms: 70,
-      description: "A top template",
-      author: {
-        id: "user4",
-        username: "User Four",
-        email: "user4@example.com",
-        role: "user",
-        status: "active",
-        templates: [],
-        createdAt: new Date(),
-      },
-      questions: [],
-      createdAt: new Date(),
-      topic: "other",
-    },
-    {
-      id: "5",
-      title: "Top Form Template 5",
-      filledForms: 50,
-      description: "A top template",
-      author: {
-        id: "user5",
-        username: "User Five",
-        email: "user5@example.com",
-        role: "user",
-        status: "active",
-        templates: [],
-        createdAt: new Date(),
-      },
-      questions: [],
-      createdAt: new Date(),
-      topic: "other",
-    },
-  ];
+  // Fetch the templates when the component mounts
+  useEffect(() => {
+    const loadTemplates = async () => {
+      try {
+        const data = await fetchTemplates();
+        setTemplates(data); // Set the fetched templates
+        setLoading(false);
+      } catch (err) {
+        console.error("Failed to fetch templates:", err);
+        setError("Failed to load templates. Please try again later.");
+        setLoading(false);
+      }
+    };
 
-  // placeholder data for recent templates
-  const recentTemplates: Template[] = [
-    {
-      id: "6",
-      title: "Recent Form Template 1",
-      description: "A recent template",
-      filledForms: 0,
-      author: {
-        id: "user6",
-        username: "User Six",
-        email: "user6@example.com",
-        role: "user",
-        status: "active",
-        templates: [],
-        createdAt: new Date(),
-      },
-      questions: [],
-      createdAt: new Date("2024-01-01"),
-      topic: "other",
-    },
-    {
-      id: "7",
-      title: "Recent Form Template 2",
-      description: "A recent template",
-      filledForms: 0,
-      author: {
-        id: "user7",
-        username: "User Seven",
-        email: "user7@example.com",
-        role: "user",
-        status: "active",
-        templates: [],
-        createdAt: new Date(),
-      },
-      questions: [],
-      createdAt: new Date("2024-01-05"),
-      topic: "other",
-    },
-    {
-      id: "8",
-      title: "Recent Form Template 3",
-      description: "A recent template",
-      filledForms: 0,
-      author: {
-        id: "user8",
-        username: "User Eight",
-        email: "user8@example.com",
-        role: "user",
-        status: "active",
-        templates: [],
-        createdAt: new Date(),
-      },
-      questions: [],
-      createdAt: new Date("2024-01-10"),
-      topic: "other",
-    },
-  ];
+    loadTemplates();
+  }, []);
+
+  // Sort templates by filledForms (number of responses) in descending order for top templates
+  const popularTemplates = [...templates]
+  .sort((a, b) => ((b.responses?.length ?? 0) - (a.responses?.length ?? 0)))
+  .slice(0, 5); // Get top 5 templates based on responses count
+
+    
+
+  // Sort templates by creation date for recent templates
+  const recentTemplates = [...templates].sort(
+    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+  );
 
   return (
     <>
       <AppNavBar />
 
       <Container className="p-4 home-page-crawl">
-        <TemplateList
-          title="Top Templates"
-          templates={popularTemplates}
-          type="top"
-        />
+        {/* Loading and Error Handling */}
+        {loading ? (
+          <Spinner animation="border" />
+        ) : error ? (
+          <Alert variant="danger">{error}</Alert>
+        ) : (
+          <>
+            {/* Top Templates (based on filledForms) */}
+            <TemplateList
+              title="Top Templates"
+              templates={popularTemplates}
+              type="top"
+            />
+          </>
+        )}
       </Container>
 
       <CallToAction />
 
       <Container className="p-4 home-page-crawl">
-        <Tabs
-          defaultActiveKey="new-templates"
-          className="tabs-container"
-        >
+        <Tabs defaultActiveKey="new-templates" className="tabs-container">
           <Tab
             eventKey="new-templates"
             title={<span className="fw-bold fs-3">New Templates</span>}
             className="recent-templates-container p-4"
           >
-            <TemplateList title="" templates={recentTemplates} type="recent" />
-            <div className="d-flex justify-content-center mt-4">
-              <Button variant="primary" className="custom-primary-btn">
-                Load More Templates
-              </Button>
-            </div>
+            {loading ? (
+              <Spinner animation="border" />
+            ) : error ? (
+              <Alert variant="danger">{error}</Alert>
+            ) : (
+              <>
+                <TemplateList
+                  title=""
+                  templates={recentTemplates}
+                  type="recent"
+                />
+                <div className="d-flex justify-content-center mt-4">
+                  <Button variant="primary" className="custom-primary-btn">
+                    Load More Templates
+                  </Button>
+                </div>
+              </>
+            )}
           </Tab>
         </Tabs>
       </Container>

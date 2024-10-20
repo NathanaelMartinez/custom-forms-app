@@ -1,5 +1,6 @@
 import { Question } from "./question";
 import { User } from "./user";
+import { Response } from "./response";
 
 export interface Template {
   id: string;
@@ -14,4 +15,5 @@ export interface Template {
   comments?: Comment[];
   tags?: string[];
   image?: File | null; // use cloud service later to store uri as string
+  responses?: Response[];
 }

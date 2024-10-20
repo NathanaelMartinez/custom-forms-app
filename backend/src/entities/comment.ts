@@ -18,6 +18,6 @@ export class Comment {
   })
   template!: Template;
 
-  @Column({ default: () => "CURRENT_TIMESTAMP" })
+  @Column({ type: "timestamp" })
   createdAt!: Date;
 }
