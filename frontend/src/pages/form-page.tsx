@@ -15,6 +15,8 @@ import AppFooter from "../components/common/app-footer";
 import RenderQuestion from "../components/forms/render-question";
 import CommentSection from "../components/comments/comment-section";
 import FormButtons from "../components/forms/form-buttons";
+import { AggregatedData } from "../types";
+import AggregatedDataTables from "../components/templates/aggregate-data-tables";
 
 const mockComments = [
   {
@@ -48,36 +50,6 @@ const mockComments = [
 ];
 
 type FormResponseValue = string | number | string[];
-
-interface NumericData {
-  [questionId: string]: {
-    questionText: string;
-    average?: number;
-    min?: number;
-    max?: number;
-  };
-}
-
-interface TextData {
-  [questionId: string]: {
-    questionText: string;
-    counts?: Record<string, number>;
-  };
-}
-
-interface CheckboxData {
-  [questionId: string]: {
-    questionText: string;
-    optionCounts?: Record<string, number>;
-  };
-}
-
-interface AggregatedData {
-  responseCount: number;
-  numericData: NumericData;
-  textData: TextData;
-  checkboxData: CheckboxData;
-}
 
 const FormPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -287,134 +259,7 @@ const FormPage: React.FC = () => {
               </div>
               {isDataTableVisible ? (
                 // render data tables
-                <div className="text-start">
-                  {/* display number of responses */}
-                  <h2 className="text-dark mt-5">
-                    {aggregatedData.responseCount} Responses
-                  </h2>
-
-                  {/* numeric data */}
-                  {Object.keys(aggregatedData.numericData || {}).length > 0 && (
-                    <div className="table-responsive">
-                      <h3 className="text-dark mt-5">Numeric Data</h3>
-                      <table className="table table-bordered mt-4">
-                        <thead>
-                          <tr>
-                            <th>Question</th>
-                            <th>Average</th>
-                            <th>Min</th>
-                            <th>Max</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {Object.keys(aggregatedData.numericData).map(
-                            (questionId) => (
-                              <tr key={questionId}>
-                                <td>
-                                  {
-                                    aggregatedData.numericData[questionId]
-                                      .questionText
-                                  }
-                                </td>
-                                <td>
-                                  {aggregatedData.numericData[questionId]
-                                    .average ?? "N/A"}
-                                </td>
-                                <td>
-                                  {aggregatedData.numericData[questionId].min ??
-                                    "N/A"}
-                                </td>
-                                <td>
-                                  {aggregatedData.numericData[questionId].max ??
-                                    "N/A"}
-                                </td>
-                              </tr>
-                            )
-                          )}
-                        </tbody>
-                      </table>
-                    </div>
-                  )}
-
-                  {/* text data */}
-                  {Object.keys(aggregatedData.textData || {}).length > 0 && (
-                    <div className="table-responsive">
-                      <h3 className="text-dark mt-5">Text Response Data</h3>
-                      <table className="table table-bordered mt-4">
-                        <thead>
-                          <tr>
-                            <th>Question</th>
-                            <th>Text Counts</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {Object.keys(aggregatedData.textData).map(
-                            (questionId) => (
-                              <tr key={questionId}>
-                                <td>
-                                  {
-                                    aggregatedData.textData[questionId]
-                                      .questionText
-                                  }
-                                </td>
-                                <td>
-                                  {Object.entries(
-                                    aggregatedData.textData[questionId]
-                                      .counts || {}
-                                  ).map(([answer, count]) => (
-                                    <p key={answer}>
-                                      <strong>{answer}:</strong> {count}
-                                    </p>
-                                  ))}
-                                </td>
-                              </tr>
-                            )
-                          )}
-                        </tbody>
-                      </table>
-                    </div>
-                  )}
-
-                  {/* checkbox data */}
-                  {Object.keys(aggregatedData.checkboxData || {}).length >
-                    0 && (
-                    <div className="table-responsive">
-                      <h3 className="text-dark mt-5">Checkbox Option Counts</h3>
-                      <table className="table table-bordered mt-4">
-                        <thead>
-                          <tr>
-                            <th>Question</th>
-                            <th>Option Counts</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {Object.keys(aggregatedData.checkboxData).map(
-                            (questionId) => (
-                              <tr key={questionId}>
-                                <td>
-                                  {
-                                    aggregatedData.checkboxData[questionId]
-                                      .questionText
-                                  }
-                                </td>
-                                <td>
-                                  {Object.entries(
-                                    aggregatedData.checkboxData[questionId]
-                                      .optionCounts || {}
-                                  ).map(([option, count]) => (
-                                    <p key={option}>
-                                      <strong>{option}:</strong> {count}
-                                    </p>
-                                  ))}
-                                </td>
-                              </tr>
-                            )
-                          )}
-                        </tbody>
-                      </table>
-                    </div>
-                  )}
-                </div>
+                <AggregatedDataTables aggregatedData={aggregatedData} />
               ) : isSubmitted ? (
                 // success message
                 <div className="text-center">
