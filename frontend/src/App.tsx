@@ -7,6 +7,7 @@ import LoginPage from './pages/login-page';
 import AdminPage from './pages/admin-page';
 import CreateTemplatePage from './pages/create-template-page';
 import FormPage from './pages/form-page';
+import RecentTemplatesPage from './pages/recent-templates-page';
 
 const App: React.FC = () => {
   return (
@@ -18,6 +19,7 @@ const App: React.FC = () => {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/admin-panel" element={<AdminPage />} />
           <Route path="/templates/:templateId?" element={<CreateTemplatePage />} />
+          <Route path="/recent-templates" element={<RecentTemplatesPage />} />
           <Route path="/forms/:id" element={<FormPage />} />
         </Routes>
       </Router>
