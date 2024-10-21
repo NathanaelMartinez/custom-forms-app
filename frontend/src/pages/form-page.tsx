@@ -225,128 +225,151 @@ const FormPage: React.FC = () => {
   return (
     <>
       <AppNavBar />
-      <div className="d-flex flex-grow-1" style={{ minHeight: "100vh" }}>
-        {/* form card */}
-        <div className="flex-grow-1 p-5 d-flex justify-content-center">
-          <Card
-            className="shadow-lg p-4 bg-white rounded-3"
-            style={{ width: "100%", maxWidth: "800px", minHeight: "800px" }}
-          >
-            <div className="px-5 pt-3">
-              {/* alert if user is not logged in */}
-              {!user && (
-                <Alert variant="warning" className="mb-4">
-                  Please log in or sign up to submit this form.
-                </Alert>
-              )}
-              {/* form title */}
-              <div
-                className="d-flex justify-content-between align-items-center mb-4 pb-2"
-                style={{ borderBottom: "2px solid #e0e0e0" }}
-              >
-                <h1 className="text-dark fs-2 fw-bold">{template?.title}</h1>
-                <FormButtons
-                  templateId={template?.id || ""}
-                  user={user}
-                  templateAuthorId={template?.author.id || ""}
-                  liked={liked}
-                  handleLikeToggle={handleLikeToggle}
-                  setIsCommentSectionVisible={setIsCommentSectionVisible}
-                  isCommentSectionVisible={isCommentSectionVisible}
-                  setIsDataTableVisible={setIsDataTableVisible}
-                  isDataTableVisible={isDataTableVisible}
+      <div className="d-flex flex-column min-vh-100 bg-light">
+        
+        <div className="flex-grow-1 d-flex">
+          {/* Main content (image and form card) */}
+          <div className="flex-grow-1 p-5 ms-auto" style={{ maxWidth: "80%" }}>
+            {/* Image Preview */}
+            {template?.image && (
+              <div className="w-100 mb-4" style={{ maxWidth: "800px" }}>
+                <img
+                  src={template.image}
+                  alt="Form banner image"
+                  className="img-fluid rounded"
+                  style={{
+                    width: "100%",
+                    height: "150px",
+                    objectFit: "cover",
+                  }}
                 />
               </div>
-              {isDataTableVisible ? (
-                // render data tables
-                <AggregatedDataTables aggregatedData={aggregatedData} />
-              ) : isSubmitted ? (
-                // success message
-                <div className="text-center">
-                  <h2 className="text-dark mt-5">
-                    Thank you for your submission!
-                  </h2>
-                  <p>Your form response was submitted successfully.</p>
+            )}
+  
+            {/* Form card */}
+            <Card
+              className="shadow-lg p-4 bg-white rounded-3"
+              style={{ width: "100%", maxWidth: "800px", minHeight: "800px" }}
+            >
+              <div className="px-5 pt-3">
+                {/* Alert if user is not logged in */}
+                {!user && (
+                  <Alert variant="warning" className="mb-4">
+                    Please log in or sign up to submit this form.
+                  </Alert>
+                )}
+  
+                {/* Form title */}
+                <div
+                  className="d-flex justify-content-between align-items-center mb-4 pb-2"
+                  style={{ borderBottom: "2px solid #e0e0e0" }}
+                >
+                  <h1 className="text-dark fs-2 fw-bold">{template?.title}</h1>
+                  <FormButtons
+                    templateId={template?.id || ""}
+                    user={user}
+                    templateAuthorId={template?.author.id || ""}
+                    liked={liked}
+                    handleLikeToggle={handleLikeToggle}
+                    setIsCommentSectionVisible={setIsCommentSectionVisible}
+                    isCommentSectionVisible={isCommentSectionVisible}
+                    setIsDataTableVisible={setIsDataTableVisible}
+                    isDataTableVisible={isDataTableVisible}
+                  />
+                </div>
+  
+                {/* Form content */}
+                {isDataTableVisible ? (
+                  <AggregatedDataTables aggregatedData={aggregatedData} />
+                ) : isSubmitted ? (
+                  <div className="text-center">
+                    <h2 className="text-dark mt-5">
+                      Thank you for your submission!
+                    </h2>
+                    <p>Your form response was submitted successfully.</p>
+                    <Button
+                      onClick={handleTryAgain}
+                      variant="primary"
+                      className="custom-success-btn"
+                    >
+                      Submit Another Response
+                    </Button>
+                  </div>
+                ) : (
+                  <>
+                    <p
+                      className="text-muted fs-5 fw-normal mb-4"
+                      style={{ fontStyle: "italic" }}
+                    >
+                      {template?.description || "No description provided."}
+                    </p>
+  
+                    {isLoading ? (
+                      <Spinner />
+                    ) : (
+                      <div className="d-flex flex-column gap-3">
+                        {template?.questions.map((question) => (
+                          <Card
+                            key={question.id}
+                            className="p-3 shadow-sm border-light custom-card"
+                          >
+                            <Form.Group controlId={question.id}>
+                              <Form.Label className="fs-5 fw-bold text-dark mb-2">
+                                {question.questionText}
+                              </Form.Label>
+                              <RenderQuestion
+                                question={question}
+                                formResponses={formResponses}
+                                handleInputChange={handleInputChange}
+                              />
+                            </Form.Group>
+                          </Card>
+                        ))}
+                      </div>
+                    )}
+                  </>
+                )}
+              </div>
+  
+              {/* Display errors */}
+              {error && (
+                <Alert variant="danger" className="mt-4">
+                  {error}
+                </Alert>
+              )}
+  
+              {!isSubmitted && !isDataTableVisible && (
+                <div className="d-flex justify-content-end mt-4 me-5">
                   <Button
-                    onClick={handleTryAgain}
                     variant="primary"
-                    className="custom-success-btn"
+                    className="fw-bold custom-success-btn"
+                    disabled={!user || isSubmitting}
+                    onClick={handleFormSubmit}
                   >
-                    Submit Another Response
+                    {isSubmitting ? "Submitting..." : "Submit"}
                   </Button>
                 </div>
-              ) : (
-                <>
-                  <p
-                    className="text-muted fs-5 fw-normal mb-4"
-                    style={{ fontStyle: "italic" }}
-                  >
-                    {template?.description || "No description provided."}
-                  </p>
-
-                  {isLoading ? (
-                    <Spinner />
-                  ) : (
-                    <div className="d-flex flex-column gap-3">
-                      {template?.questions.map((question) => (
-                        <Card
-                          key={question.id}
-                          className="p-3 shadow-sm border-light custom-card"
-                        >
-                          <Form.Group controlId={question.id}>
-                            <Form.Label className="fs-5 fw-bold text-dark mb-2">
-                              {question.questionText}
-                            </Form.Label>
-                            <RenderQuestion
-                              question={question}
-                              formResponses={formResponses}
-                              handleInputChange={handleInputChange}
-                            />
-                          </Form.Group>
-                        </Card>
-                      ))}
-                    </div>
-                  )}
-                </>
               )}
-            </div>
-            {/* display errors */}
-            {error && (
-              <Alert variant="danger" className="mt-4">
-                {error}
-              </Alert>
-            )}
-            {!isSubmitted && !isDataTableVisible && (
-              // submit button
-              <div className="d-flex justify-content-end mt-4 me-5">
-                <Button
-                  variant="primary"
-                  className="fw-bold custom-success-btn"
-                  disabled={!user || isSubmitting}
-                  onClick={handleFormSubmit}
-                >
-                  {isSubmitting ? "Submitting..." : "Submit"}
-                </Button>
-              </div>
-            )}
-          </Card>
+            </Card>
+          </div>
+  
+          {/* Comment section column */}
+          {isCommentSectionVisible && (
+            <CommentSection
+              comments={comments}
+              user={user}
+              newComment={newComment}
+              setNewComment={setNewComment}
+              handleCommentSubmit={handleCommentSubmit}
+            />
+          )}
         </div>
-
-        {/* comment section column */}
-        {isCommentSectionVisible && (
-          <CommentSection
-            comments={comments}
-            user={user}
-            newComment={newComment}
-            setNewComment={setNewComment}
-            handleCommentSubmit={handleCommentSubmit}
-          />
-        )}
+  
+        <AppFooter />
       </div>
-
-      <AppFooter />
     </>
   );
+  
 };
 
 export default FormPage;

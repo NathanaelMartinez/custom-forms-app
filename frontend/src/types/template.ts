@@ -14,6 +14,6 @@ export interface Template {
   likes?: number;
   comments?: Comment[];
   tags?: string[];
-  image?: File | null; // use cloud service later to store uri as string
+  image?: string | null; // use cloud service later to store uri as string
   responses?: Response[];
 }

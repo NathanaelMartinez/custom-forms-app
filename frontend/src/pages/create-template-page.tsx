@@ -14,12 +14,15 @@ import {
   updateTemplate,
 } from "../services/template-service";
 import { mapTemplateToPayload } from "../dtos/template-payload";
+import { uploadImageToCloudinary } from "../services/cloudinary-service";
 
 const CreateTemplatePage: React.FC = () => {
   const [isSaving, setIsSaving] = useState<boolean>(false);
   const [questionsCount, setQuestionsCount] = useState<number>(0); // track number of questions for validation
   const { isLoggedIn, user } = useAuth();
   const { templateId } = useParams<{ templateId?: string }>(); // fetch templateId from URL if exists
+  const [selectedImage, setSelectedImage] = useState<File | null>(null); // store selected image file
+  const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(null); // preview URL for the image
   const navigate = useNavigate();
 
   // redirect to login on component mount if user is not defined (just in case)
@@ -34,7 +37,10 @@ const CreateTemplatePage: React.FC = () => {
       const loadTemplate = async () => {
         try {
           const templateData: Template = await fetchTemplateById(templateId);
-          if (!user || templateData.author.id !== user.id && user.role !== "admin") {
+          if (
+            !user ||
+            (templateData.author.id !== user.id && user.role !== "admin")
+          ) {
             console.warn(
               "User is not the owner of the document, redirecting to home."
             );
@@ -43,6 +49,7 @@ const CreateTemplatePage: React.FC = () => {
 
           setTemplate(templateData);
           setQuestionsCount(templateData.questions.length);
+          setImagePreviewUrl(templateData.image!);
         } catch (error) {
           console.error("Failed to fetch template:", error);
         }
@@ -93,15 +100,19 @@ const CreateTemplatePage: React.FC = () => {
 
     try {
       setIsSaving(true);
-      const payload = mapTemplateToPayload(template);
-      console.log("payload",payload); //TODO: remove DEBUG comments
+
+      // upload image before saving template
+      const imageUrl = await handleImageUpload();
+
+      const payload = mapTemplateToPayload({ ...template, image: imageUrl });
+      console.log("payload", payload); //TODO: remove DEBUG comments
 
       if (templateId) {
         // if templateId exists update existing template
         await updateTemplate(templateId, payload);
         navigate(`/forms/${templateId}`);
       } else {
-        // Create a new template
+        // create new template
         const response = await createTemplate(payload);
         navigate(`/forms/${response.data.template.id}`);
       }
@@ -185,11 +196,55 @@ const CreateTemplatePage: React.FC = () => {
     setTemplate({ ...template, questions: updatedQuestions });
   };
 
+  // handle image selection for preview (before uploading)
+  const handleImageSelection = (file: File | null) => {
+    if (file) {
+      setSelectedImage(file);
+      const previewUrl = URL.createObjectURL(file); // create a preview URL for the selected image
+      setImagePreviewUrl(previewUrl); // set the image preview URL
+    } else {
+      // Clear the image if file is null
+      setSelectedImage(null);
+      setImagePreviewUrl(null); // clear the preview if no file is selected
+    }
+  };
+
+  // handle image upload to Cloudinary when "Publish" button is clicked
+  const handleImageUpload = async () => {
+    if (selectedImage) {
+      try {
+        const imageUrl = await uploadImageToCloudinary(selectedImage);
+        return imageUrl;
+      } catch (error) {
+        console.error("Image upload failed", error);
+        return null;
+      }
+    }
+    return null;
+  };
+
   return (
     <>
       <AppNavBar />
       <div className="d-flex min-vh-100 bg-light">
-        <div className="flex-grow-1 p-5 d-flex justify-content-center">
+        {/* TODO: find a way to get rid of this div */}
+        <div className="flex-grow-1"></div>
+        <div className="flex-grow-1 p-5">
+          {/* image Preview */}
+          {imagePreviewUrl && (
+            <div className="mb-4 w-100" style={{ maxWidth: "800px" }}>
+              <img
+                src={imagePreviewUrl}
+                alt="Form banner image"
+                className="img-fluid rounded"
+                style={{
+                  width: "100%",
+                  height: "150px",
+                  objectFit: "cover",
+                }}
+              />
+            </div>
+          )}
           <Card
             className="shadow-lg p-4 bg-white rounded-3"
             style={{ width: "100%", maxWidth: "800px" }}
@@ -237,10 +292,10 @@ const CreateTemplatePage: React.FC = () => {
           description={template.description || ""}
           topic={template.topic || ""}
           tags={template.tags || []}
-          image={template.image || null}
+          imagePreviewUrl={imagePreviewUrl}
           onTopicChange={(value) => setTemplate({ ...template, topic: value })}
           onTagChange={(tags) => setTemplate({ ...template, tags })}
-          onImageUpload={(image) => setTemplate({ ...template, image })}
+          onImageUpload={handleImageSelection}
           onSave={handleSaveTemplate}
           isSaving={isSaving}
           questionsCount={questionsCount}

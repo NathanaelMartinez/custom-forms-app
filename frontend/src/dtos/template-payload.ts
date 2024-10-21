@@ -8,7 +8,7 @@ export interface TemplatePayload {
   topic: string;
   questions: QuestionPayload[]; // Use QuestionPayload[] for questions
   tags?: string[];
-  image?: File | null;
+  image?: string | null;
 }
 
 export const mapTemplateToPayload = (template: Template): TemplatePayload => ({

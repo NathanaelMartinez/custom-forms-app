@@ -8,7 +8,7 @@ interface TemplateOverviewProps {
   description: string;
   topic: string;
   tags: string[];
-  image: File | null;
+  imagePreviewUrl: string | null; 
   onTopicChange: (value: string) => void;
   onTagChange: (tags: string[]) => void;
   onImageUpload: (file: File | null) => void;
@@ -20,6 +20,7 @@ interface TemplateOverviewProps {
 const TemplateOverview: React.FC<TemplateOverviewProps> = ({
   topic,
   tags,
+  imagePreviewUrl,
   onTopicChange,
   onTagChange,
   onImageUpload,
@@ -44,15 +45,20 @@ const TemplateOverview: React.FC<TemplateOverviewProps> = ({
     }
   };
 
+  const handleImageSelection = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0] || null;
+    onImageUpload(file); // this gives file to parent
+  };
+
   useEffect(() => {
-    // Reset question validation whenever the questions change
+    // if there are questions, there shouldn't be an error
     if (questionsCount > 0) {
       setAreQuestionsValid(true);
     }
   }, [questionsCount]);
 
   useEffect(() => {
-    // Reset topic validation when the topic changes
+    // if topic is selected, get rid of that error
     if (topic) {
       setIsTopicValid(true);
     }
@@ -66,13 +72,11 @@ const TemplateOverview: React.FC<TemplateOverviewProps> = ({
     <div className="bg-white p-4 shadow-sm" style={{ width: "300px" }}>
       <h5 className="mb-3">Template Overview</h5>
 
-      {/* Topic selection */}
+      {/* topic selector */}
       <Form.Group className="mb-3">
         <Form.Label>Topic</Form.Label>
         <Form.Select
-          className={`input-focus-muted ${
-            !isTopicValid ? "border-danger" : ""
-          }`}
+          className={`input-focus-muted ${!isTopicValid ? "border-danger" : ""}`}
           value={topic}
           onChange={(e) => {
             onTopicChange(e.target.value);
@@ -86,34 +90,41 @@ const TemplateOverview: React.FC<TemplateOverviewProps> = ({
           <option value="Survey">Survey</option>
           <option value="Other">Other</option>
         </Form.Select>
-        {!isTopicValid && (
-          <div className="text-danger mt-1">
-            Please select a topic before proceeding.
-          </div>
-        )}
+        {/* display error if topic not selected */}
+        {!isTopicValid && <div className="text-danger mt-1">Please select a topic before proceeding.</div>}
       </Form.Group>
 
-      {/* Tag input */}
+      {/* tag input TODO: search for library?*/}
       <Form.Group className="mb-3">
         <Form.Label>Tags</Form.Label>
         <TagInput tags={tags} onTagChange={onTagChange} />
       </Form.Group>
 
-      {/* Image upload */}
+      {/* image preview to demosntrate that img selected */}
+      {imagePreviewUrl && (
+        <img
+          src={imagePreviewUrl}
+          alt="Selected preview"
+          style={{
+            width: "100%",
+            height: "100px",
+            objectFit: "cover",
+            marginBottom: "10px",
+          }}
+        />
+      )}
+
+      {/* image upload selector */}
       <Form.Group className="mb-3">
-        <Form.Label>Top image</Form.Label>
+        <Form.Label>Top Image</Form.Label>
         <Form.Control
           type="file"
           accept="image/*"
-          onChange={(e) => {
-            const target = e.target as HTMLInputElement;
-            const file = target.files?.[0] || null;
-            onImageUpload(file);
-          }}
+          onChange={handleImageSelection} 
         />
       </Form.Group>
 
-      {/* Save button and access control */}
+      {/* access control */}
       <Button
         variant="outline-primary"
         className="d-flex align-items-center mt-4 custom-outline-contrast-btn"
@@ -132,25 +143,15 @@ const TemplateOverview: React.FC<TemplateOverviewProps> = ({
         )}
       </Button>
 
-      {/* Questions validation */}
-      {!areQuestionsValid && (
-        <div className="text-danger mt-4">
-          Please add at least one question to your template.
-        </div>
-      )}
+      {/* display error if no questions added */}
+      {!areQuestionsValid && <div className="text-danger mt-4">Please add at least one question to your template.</div>}
 
-      {/* Save button */}
-      <Button
-        variant="success"
-        size="lg"
-        className="custom-success-btn mt-4"
-        onClick={handleSave}
-        disabled={isSaving}
-      >
+      {/* publish button */}
+      <Button variant="success" size="lg" className="custom-success-btn mt-4" onClick={handleSave} disabled={isSaving}>
         {isSaving ? "Saving..." : "Publish"}
       </Button>
 
-      {/* Access Control Modal */}
+      {/* access control modal */}
       <AccessControlModal
         show={showModal}
         onClose={() => setShowModal(false)}
