@@ -5,19 +5,19 @@ import CallToAction from "../components/dashboard/call-to-action-banner";
 import TemplateList from "../components/dashboard/template-list";
 import { Template } from "../types";
 import AppFooter from "../components/common/app-footer";
-import { fetchTemplates } from "../services/template-service"; // Import the fetchTemplates function
+import { fetchTemplates } from "../services/template-service";
 
 const HomePage: React.FC = () => {
   const [templates, setTemplates] = useState<Template[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Fetch the templates when the component mounts
+  // fetch templates when component mounts
   useEffect(() => {
     const loadTemplates = async () => {
       try {
         const data = await fetchTemplates();
-        setTemplates(data); // Set the fetched templates
+        setTemplates(data);
         setLoading(false);
       } catch (err) {
         console.error("Failed to fetch templates:", err);
@@ -29,31 +29,32 @@ const HomePage: React.FC = () => {
     loadTemplates();
   }, []);
 
-  // Sort templates by filledForms (number of responses) in descending order for top templates
+  // sort templates by number of responses in descending order for featured templates
   const popularTemplates = [...templates]
-  .sort((a, b) => ((b.responses?.length ?? 0) - (a.responses?.length ?? 0)))
-  .slice(0, 5); // Get top 5 templates based on responses count
+    .sort((a, b) => (b.responses?.length ?? 0) - (a.responses?.length ?? 0))
+    .slice(0, 5); // only need 5 for top 5
 
-    
-
-  // Sort templates by creation date for recent templates
-  const recentTemplates = [...templates].sort(
-    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-  );
+  // sort templates by creation date for recent templates
+  const recentTemplates = [...templates]
+    .sort(
+      (a, b) =>
+        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    )
+    .slice(0, 20);
 
   return (
     <>
       <AppNavBar />
 
       <Container className="p-4 home-page-crawl">
-        {/* Loading and Error Handling */}
+        {/* loading and Error Handling */}
         {loading ? (
           <Spinner animation="border" />
         ) : error ? (
           <Alert variant="danger">{error}</Alert>
         ) : (
           <>
-            {/* Top Templates (based on filledForms) */}
+            {/* Featured Templates (top 5 responses length) */}
             <TemplateList
               title="Top Templates"
               templates={popularTemplates}
