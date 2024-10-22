@@ -10,7 +10,6 @@ import {
   Col,
 } from "react-bootstrap";
 import {
-  PersonCircle,
   ShieldFill,
   Search,
   PersonLock,
@@ -81,7 +80,13 @@ const AppNavBar: React.FC = () => {
                       className="d-flex me-3 align-items-center custom-icon-btn"
                     >
                       {user?.status === "active" ? (
-                        <PersonCircle size={36} />
+                        // TODO: allow adding of profile pictures
+                        <img
+                        src="https://i.pravatar.cc/300"
+                        alt="Profile"
+                        className="rounded-circle"
+                        width="42"
+                      />
                       ) : (
                         <PersonLock size={36} />
                       )}

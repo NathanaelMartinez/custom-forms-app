@@ -15,9 +15,10 @@ import { format } from "date-fns";
 import { useAuth } from "../context/auth-context";
 import AppNavBar from "../components/common/app-nav-bar";
 import AppFooter from "../components/common/app-footer";
-import { Template } from "../types";
+import { Template, Response as formResponse } from "../types";
 import { fetchTemplates, deleteTemplate } from "../services/template-service";
-import { Pencil, Trash } from "react-bootstrap-icons";
+import { Pencil, Trash, SortUp, SortDown } from "react-bootstrap-icons";
+import { fetchUserResponses } from "../services/user-service";
 
 const PersonalDashboardPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -27,6 +28,7 @@ const PersonalDashboardPage: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [sortColumn, setSortColumn] = useState<string>("title");
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
+  const [responses, setResponses] = useState<formResponse[]>([]);
   const navigate = useNavigate();
 
   // fetch templates on component mount
@@ -49,7 +51,38 @@ const PersonalDashboardPage: React.FC = () => {
     loadTemplates();
   }, [id]);
 
-  // Handle template deletion
+  // TODO: user management through this page
+  // useEffect(() => {
+  //   const loadUserDetails = async () => {
+  //     try {
+  //       const userData = await fetchUserById(id);
+  //       setPageUser(userData.username);
+  //       setLoading(false);
+  //     } catch (err) {
+  //       console.error("Failed to fetch user details:", err);
+  //       setError("Failed to load user details.");
+  //       setLoading(false);
+  //     }
+  //   };
+
+  //   loadUserDetails();
+  // }, [id]);
+
+  // fetch user responses on component mount
+  useEffect(() => {
+    const loadUserResponses = async () => {
+      try {
+        const userResponses = await fetchUserResponses(id!); // fetch responses for user
+        setResponses(userResponses);
+      } catch (err) {
+        console.error("Failed to fetch user responses:", err);
+        setError("Failed to load responses.");
+      }
+    };
+
+    loadUserResponses();
+  }, [id]);
+
   const handleDeleteTemplate = async (templateId: string) => {
     try {
       await deleteTemplate(templateId);
@@ -59,7 +92,7 @@ const PersonalDashboardPage: React.FC = () => {
     }
   };
 
-  // Sorting logic
+  // table sorting logic
   const handleSort = (column: string) => {
     const direction =
       sortColumn === column && sortDirection === "asc" ? "desc" : "asc";
@@ -70,21 +103,24 @@ const PersonalDashboardPage: React.FC = () => {
       const valA = a[column as keyof Template];
       const valB = b[column as keyof Template];
 
-      if (valA && valB) {
-        if (typeof valA === "string" && typeof valB === "string") {
-          return direction === "asc"
-            ? valA.localeCompare(valB)
-            : valB.localeCompare(valA);
-        } else if (typeof valA === "object" && typeof valB === "object") {
-          // Sorting dates
-          return direction === "asc"
-            ? new Date(valA as string).getTime() -
-                new Date(valB as string).getTime()
-            : new Date(valB as string).getTime() -
-                new Date(valA as string).getTime();
-        }
+      if (typeof valA === "string" && typeof valB === "string") {
+        return direction === "asc"
+          ? valA.localeCompare(valB)
+          : // else desc
+            valB.localeCompare(valA);
       }
-      return 0;
+
+      if (typeof valA === "object" && typeof valB === "object") {
+        // sort dates
+        return direction === "asc"
+          ? new Date(valA as string).getTime() -
+              new Date(valB as string).getTime()
+          : // else desc
+            new Date(valB as string).getTime() -
+              new Date(valA as string).getTime();
+      }
+
+      return 0; // fallback in case of invalid values
     });
 
     setTemplates(sortedTemplates);
@@ -102,26 +138,33 @@ const PersonalDashboardPage: React.FC = () => {
             className="rounded-circle img-thumbnail"
             width="120"
           />
-          <h5 className="ms-3">{user?.username}</h5>
+          {user && (user.id === id) ? (
+            // TODO: username should be displayed in all cases when viewing user page
+            <h5 className="ms-3 fw-bold fs-2">{user?.username}</h5>
+          ) : (
+            <h5 className="ms-3 fw-bold fs-2">{id}</h5>
+          )}
         </div>
 
-        <Button
-          variant="outline-secondary"
-          className="mb-4 custom-outline-secondary-btn"
-          onClick={() => alert("Edit Profile")} // TODO: allow profile editing
-        >
-          <Pencil /> Edit Profile
-        </Button>
-
-        {/* Dashboard Tabs */}
+        {user && (user.id === id) && (
+          <Button
+            variant="outline-secondary"
+            className="mb-4 custom-outline-secondary-btn"
+            onClick={() => alert("Edit Profile")}
+          >
+            <Pencil /> Edit Profile
+          </Button>
+        )}
+        {/* dashboard tabs */}
         <Row>
+          {/* fill up all the space */}
           <Col md={12}>
             <Tabs
               defaultActiveKey="templates"
               id="dashboard-tabs"
               className="tabs-container"
             >
-              {/* templates Tab */}
+              {/* templates tab */}
               <Tab
                 eventKey="templates"
                 title={<span className="fw-bold fs-3">Templates</span>}
@@ -133,27 +176,40 @@ const PersonalDashboardPage: React.FC = () => {
                 ) : (
                   <>
                     <div className="recent-templates-container p-4">
-                      <Button
-                        variant="primary"
-                        className="mb-3 custom-primary-btn"
-                        onClick={() => navigate("/create-template")}
-                      >
-                        Create New Template
-                      </Button>
+                      {user && (user.id === id || user.role === "admin") && (
+                        <Button
+                          variant="primary"
+                          className="mb-3 custom-primary-btn"
+                          onClick={() => navigate("/create-template")}
+                        >
+                          Create New Template
+                        </Button>
+                      )}
                       <Table striped bordered hover responsive>
                         <thead>
                           <tr>
                             <th onClick={() => handleSort("title")}>
                               Title{" "}
                               {sortColumn === "title" &&
-                                (sortDirection === "asc" ? "▲" : "▼")}
+                                (sortDirection === "asc" ? (
+                                  <SortUp />
+                                ) : (
+                                  <SortDown />
+                                ))}
                             </th>
                             <th onClick={() => handleSort("createdAt")}>
                               Date Created{" "}
                               {sortColumn === "createdAt" &&
-                                (sortDirection === "asc" ? "▲" : "▼")}
+                                (sortDirection === "asc" ? (
+                                  <SortUp />
+                                ) : (
+                                  <SortDown />
+                                ))}
                             </th>
-                            <th>Actions</th>
+                            {user &&
+                              (user.id === id || user.role === "admin") && (
+                                <th>Actions</th>
+                              )}
                           </tr>
                         </thead>
                         <tbody>
@@ -170,26 +226,31 @@ const PersonalDashboardPage: React.FC = () => {
                                   "MM-dd-yyyy"
                                 )}
                               </td>
-                              <td className="d-flex justify-content-evenly">
-                                <Button
-                                  variant="warning"
-                                  className="me-2 custom-outline-contrast-btn"
-                                  onClick={() =>
-                                    navigate(`/edit-template/${template.id}`)
-                                  }
-                                >
-                                 <Pencil /> Edit
-                                </Button>
-                                <Button
-                                  variant="danger"
-                                  className="custom-delete-btn"
-                                  onClick={() =>
-                                    handleDeleteTemplate(template.id)
-                                  }
-                                >
-                                  <Trash /> Delete
-                                </Button>
-                              </td>
+                              {user &&
+                                (user.id === id || user.role === "admin") && (
+                                  <td className="d-flex flex-column">
+                                    <Button
+                                      variant="warning"
+                                      className="me-2 mb-1 custom-outline-contrast-btn btn-sm"
+                                      onClick={() =>
+                                        navigate(
+                                          `/edit-template/${template.id}`
+                                        )
+                                      }
+                                    >
+                                      <Pencil /> Edit
+                                    </Button>
+                                    <Button
+                                      variant="danger"
+                                      className="custom-delete-btn btn-sm"
+                                      onClick={() =>
+                                        handleDeleteTemplate(template.id)
+                                      }
+                                    >
+                                      <Trash /> Delete
+                                    </Button>
+                                  </td>
+                                )}
                             </tr>
                           ))}
                         </tbody>
@@ -199,23 +260,54 @@ const PersonalDashboardPage: React.FC = () => {
                 )}
               </Tab>
 
-              {/* Responses Tab */}
-              <Tab
-                eventKey="responses"
-                title={<span className="fw-bold fs-3">Responses</span>}
-              >
-                <div className="recent-templates-container p-4">
-                  <Table striped bordered hover responsive>
-                    <thead>
-                      <tr>
-                        <th>Form Title</th>
-                        <th>Number of Responses</th>
-                      </tr>
-                    </thead>
-                    <tbody>{/* Add your placeholder responses */}</tbody>
-                  </Table>
-                </div>
-              </Tab>
+              {/* responses tab */}
+              {user && (user.id === id || user.role === "admin") && (
+                <Tab
+                  eventKey="responses"
+                  title={<span className="fw-bold fs-3">Responses</span>}
+                >
+                  <div className="recent-templates-container p-4">
+                    <Table striped bordered hover responsive>
+                      <thead>
+                        <tr>
+                        <th onClick={() => handleSort("title")}>
+                              Template Title{" "}
+                              {sortColumn === "title" &&
+                                (sortDirection === "asc" ? (
+                                  <SortUp />
+                                ) : (
+                                  <SortDown />
+                                ))}
+                            </th>
+                            <th onClick={() => handleSort("createdAt")}>
+                              Date Submitted{" "}
+                              {sortColumn === "createdAt" &&
+                                (sortDirection === "asc" ? (
+                                  <SortUp />
+                                ) : (
+                                  <SortDown />
+                                ))}
+                            </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {responses.length > 0 ? (
+                          responses.map((response) => (
+                            <tr key={response.id}>
+                              <td>{response.template.title}</td>
+                              <td>{format(new Date(response.submittedAt), "MM-dd-yyyy")}</td>
+                            </tr>
+                          ))
+                        ) : (
+                          <tr>
+                            <td colSpan={2}>No responses found</td>
+                          </tr>
+                        )}
+                      </tbody>
+                    </Table>
+                  </div>
+                </Tab>
+              )}
             </Tabs>
           </Col>
         </Row>

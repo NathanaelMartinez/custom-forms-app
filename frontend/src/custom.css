@@ -397,11 +397,26 @@ h1.display-3 {
 }
 
 .nav-tabs .nav-link.active {
-  background-color: var(--dark-accent); 
+  background-color: var(--deep-gray); 
   color: var(--text-light); 
   /* border: none; */
   border-radius: 0rem;  
 }
+
+.nav-tabs .nav-link {
+  background-color: var(--bg-dark); 
+  color: var(--text-light); 
+  border-color: var(--bg-light);
+  border-radius: 0rem;  
+}
+
+.nav-tabs .nav-link:hover {
+  background-color: var(--deep-gray); 
+  color: var(--text-light); 
+  /* border: none; */
+  border-radius: 0rem;  
+}
+
 
 .comment-footer {
   background-color: var(--bg-light);
@@ -427,3 +442,4 @@ h1.display-3 {
 .custom-comment-date {
   color: var(--muted-gray);
 }
+
