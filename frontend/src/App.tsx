@@ -8,6 +8,7 @@ import AdminPage from './pages/admin-page';
 import CreateTemplatePage from './pages/create-template-page';
 import FormPage from './pages/form-page';
 import RecentTemplatesPage from './pages/recent-templates-page';
+import PersonalDashboardPage from './pages/personal-dashboard-page';
 
 const App: React.FC = () => {
   return (
@@ -21,6 +22,7 @@ const App: React.FC = () => {
           <Route path="/templates/:templateId?" element={<CreateTemplatePage />} />
           <Route path="/recent-templates" element={<RecentTemplatesPage />} />
           <Route path="/forms/:id" element={<FormPage />} />
+          <Route path="/profile/:id" element={<PersonalDashboardPage />} />
         </Routes>
       </Router>
     </AuthProvider>

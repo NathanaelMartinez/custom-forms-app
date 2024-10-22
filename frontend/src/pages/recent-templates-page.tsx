@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Container, Tab, Tabs, Spinner, Alert } from "react-bootstrap";
 import AppNavBar from "../components/common/app-nav-bar";
-import TemplateList from "../components/dashboard/template-list";
+import TemplateList from "../components/home/template-list";
 import { Template } from "../types";
 import AppFooter from "../components/common/app-footer";
 import { fetchTemplates } from "../services/template-service";

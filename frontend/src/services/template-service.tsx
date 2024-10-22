@@ -7,13 +7,13 @@ const SERVER_URL = import.meta.env.VITE_SERVER_URL;
 // fetch all templates for home page
 export const fetchTemplates = async () => {
   try {
-    const response = await axios.get(`${SERVER_URL}/api/templates`)
+    const response = await axios.get(`${SERVER_URL}/api/templates`);
     return response.data;
-  } catch (error){
+  } catch (error) {
     console.error("Error fetching templates:", error);
     throw error;
   }
-}
+};
 
 export const createTemplate = async (templateData: TemplatePayload) => {
   // retrieve the token from local storage
@@ -73,6 +73,26 @@ export const updateTemplate = async (
   }
 };
 
+export const deleteTemplate = async (templateId: string) => {
+  const token = localStorage.getItem("authToken");
+  if (!token) throw new Error("No token found");
+
+  try {
+    const response = await axios.delete(
+      `${SERVER_URL}/api/templates/${templateId}`,
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
+    if (response.status === 204) {
+      console.log("Template deleted successfully.");
+    }
+  } catch (error) {
+    console.error("Error deleting template:", error);
+    throw error;
+  }
+};
+
 export const submitForm = async (formData: FormResponsePayload) => {
   // retrieve the token from local storage
   const token = localStorage.getItem("authToken");
@@ -127,7 +147,7 @@ export const fetchAggregateResponses = async (id: string) => {
   if (!token) {
     throw new Error("No token found, please login again.");
   }
-  
+
   try {
     const response = await axios.get(
       `${SERVER_URL}/api/templates/${id}/aggregate`,

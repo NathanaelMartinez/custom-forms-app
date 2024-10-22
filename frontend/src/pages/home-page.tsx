@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { Button, Container, Tab, Tabs, Spinner, Alert } from "react-bootstrap";
 import AppNavBar from "../components/common/app-nav-bar";
-import CallToAction from "../components/dashboard/call-to-action-banner";
-import TemplateList from "../components/dashboard/template-list";
+import CallToAction from "../components/home/call-to-action-banner";
+import TemplateList from "../components/home/template-list";
 import { Template } from "../types";
 import AppFooter from "../components/common/app-footer";
 import { fetchTemplates } from "../services/template-service";

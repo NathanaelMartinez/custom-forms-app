@@ -229,7 +229,7 @@ const FormPage: React.FC = () => {
         
         <div className="flex-grow-1 d-flex">
           {/* Main content (image and form card) */}
-          <div className="flex-grow-1 p-5 ms-auto" style={{ maxWidth: "80%" }}>
+          <div className="flex-grow-1 p-5 ms-auto" style={{ maxWidth: "10%" }}>
             {/* Image Preview */}
             {template?.image && (
               <div className="w-100 mb-4" style={{ maxWidth: "800px" }}>

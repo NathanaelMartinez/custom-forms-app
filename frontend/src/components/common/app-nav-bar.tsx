@@ -15,6 +15,8 @@ import {
   Search,
   PersonLock,
   PlusCircle,
+  CardList,
+  BoxArrowRight,
 } from "react-bootstrap-icons";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../../context/auth-context";
@@ -87,23 +89,20 @@ const AppNavBar: React.FC = () => {
                     </Dropdown.Toggle>
 
                     <Dropdown.Menu align="end">
-                      <Dropdown.Item onClick={() => navigate("/account")}>
-                        Account
-                      </Dropdown.Item>
                       {/* <Dropdown.Item onClick={() => navigate("/saved-templates")}>
                         Saved Templates
                       </Dropdown.Item> */}
-                      <Dropdown.Item onClick={() => navigate("/templates")}>
-                        Create a Template
+                      <Dropdown.Item onClick={() => navigate(`/profile/${user?.id}`)}>
+                        <CardList /> My Dashboard
                       </Dropdown.Item>
                       {user?.role === "admin" && (
                         <Dropdown.Item onClick={() => navigate("/admin-panel")}>
-                          Admin Panel
+                          <ShieldFill /> Admin Panel
                         </Dropdown.Item>
                       )}
                       <Dropdown.Divider />
                       <Dropdown.Item onClick={logout} className="text-danger">
-                        Log Out
+                        <BoxArrowRight /> Log Out
                       </Dropdown.Item>
                     </Dropdown.Menu>
                   </Dropdown>
