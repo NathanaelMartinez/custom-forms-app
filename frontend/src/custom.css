@@ -275,28 +275,18 @@ form-control {
 }
 
 /* cards */
-.card {
-  background-color: var(--bg-light);
-  color: var(--text-light);
-  border: none;
-  box-shadow: rgba(0, 0, 0, 0.15) 0px 3px 3px 0px;
-}
 
 .card-title {
-  color: var(--text-light);
+  color: var(--text-dark);
 }
 
 .card-text {
-  color: var(--text-light);
+  color: var(--text-dark);
 }
 
 /* template card styling */
 .template-card {
-  width: 100%;
   aspect-ratio: 8 / 11;
-  background-color: var(--bg-muted);
-  position: relative;
-  color: white;
   border-radius: 8px;
   overflow: hidden;
   transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
@@ -318,12 +308,8 @@ form-control {
 
 /* for thumbnails */
 .template-card .card-img-overlay {
-  background: rgba(0, 0, 0, 0.5);
+  background-color: rgba(0, 0, 0, 0.4);
   padding: 10px;
-  display: flex;
-  flex-direction: column;
-  justify-content: end;
-  height: 100%;
 }
 
 /* featured card for first card */
