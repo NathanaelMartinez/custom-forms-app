@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Form, Button, Card, Alert } from "react-bootstrap";
+import { format, isSameDay, differenceInMinutes } from "date-fns";
 import { Comment, User } from "../../types";
-import { PersonCircle } from "react-bootstrap-icons";
 import {
   fetchCommentsForTemplate,
   addCommentToTemplate,
@@ -12,7 +12,6 @@ interface CommentSectionProps {
   user: User | null;
   newComment: string;
   setNewComment: (comment: string) => void;
-  handleCommentSubmit: () => void;
 }
 
 const CommentSection: React.FC<CommentSectionProps> = ({
@@ -28,7 +27,8 @@ const CommentSection: React.FC<CommentSectionProps> = ({
     const fetchComments = async () => {
       try {
         const data = await fetchCommentsForTemplate(templateId);
-        setComments(data);
+        // Reverse the comments array to show the newest comments first
+        setComments(data.reverse());
       } catch (error) {
         console.error("Failed to load comments:", error);
       } finally {
@@ -45,11 +45,27 @@ const CommentSection: React.FC<CommentSectionProps> = ({
     try {
       const payload = { content: newComment };
       const newCommentData = await addCommentToTemplate(templateId, payload);
-      setComments((prevComments) => [...prevComments, newCommentData]);
+      setComments((prevComments) => [newCommentData, ...prevComments]); // Add new comment at the top
       setNewComment(""); // clear comment input after submission
     } catch (error) {
       console.error("Failed to add comment:", error);
     }
+  };
+
+  const formatDate = (commentDate: Date) => {
+    const now = new Date();
+
+    const minutesAgo = differenceInMinutes(now, commentDate);
+
+    if (minutesAgo < 60) {
+      return `${minutesAgo} minutes ago`; // show minutes if w/in hour
+    }
+
+    if (isSameDay(commentDate, now)) {
+      return format(commentDate, "p"); // show time if today
+    }
+
+    return format(commentDate, "MM/dd/yy"); // show date otherwise
   };
 
   return (
@@ -68,7 +84,13 @@ const CommentSection: React.FC<CommentSectionProps> = ({
 
       {user ? (
         <div className="d-flex align-items-start mb-3">
-          <PersonCircle size={36} className="text-muted me-3" />
+          <img
+            src="https://i.pravatar.cc/300?u=uniqueUser"
+            alt="Profile"
+            className="rounded-circle me-2"
+            width="56"
+            height="56"
+          />
           <Form.Group controlId="newComment" className="flex-grow-1">
             <Form.Control
               as="textarea"
@@ -108,21 +130,36 @@ const CommentSection: React.FC<CommentSectionProps> = ({
             No comments yet. Be the first to comment!
           </p>
         ) : (
-          comments.map((comment) => (
-            <Card key={comment.id} className="mb-2 p-2 shadow-sm custom-card">
-              <Card.Body className="d-flex">
-                <PersonCircle size={36} className="text-muted me-3" />
-                <div>
-                  <Card.Title className="mb-1 fs-6 fw-bold text-dark">
-                    {comment.author?.username}{" "}
-                    <span className="text-muted" style={{ fontSize: "0.8rem" }}>
-                      {new Date(comment.createdAt).toLocaleString()}
-                    </span>
-                  </Card.Title>
-                  <Card.Text className="text-dark">{comment.content}</Card.Text>
-                </div>
-              </Card.Body>
-            </Card>
+          comments.map((comment, index) => (
+            <Card.Body key={comment.id} className="d-flex">
+              {/* container to prevent picture stretching */}
+              <div
+                style={{
+                  width: "42px",
+                  height: "42px",
+                  overflow: "hidden",
+                  borderRadius: "50%",
+                }}
+                className="me-3"
+              >
+                <img
+                  src={`https://i.pravatar.cc/300?u=${index}`}
+                  alt="Profile"
+                  width="100%"
+                  height="100%"
+                  style={{ objectFit: "cover" }}
+                />
+              </div>
+              <div>
+                <Card.Title className="mb-1 fs-6 fw-bold text-dark">
+                  {comment.author?.username}{" "}
+                  <span className="text-muted" style={{ fontSize: "0.8rem" }}>
+                    {formatDate(comment.createdAt)}
+                  </span>
+                </Card.Title>
+                <Card.Text className="text-dark">{comment.content}</Card.Text>
+              </div>
+            </Card.Body>
           ))
         )}
       </div>
