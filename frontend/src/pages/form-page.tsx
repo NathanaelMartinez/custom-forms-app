@@ -7,7 +7,7 @@ import {
   fetchTemplateById,
   submitForm,
 } from "../services/template-service";
-import { Template, Comment } from "../types";
+import { Template } from "../types";
 import { Form, Button, Card, Spinner, Alert } from "react-bootstrap";
 import AppNavBar from "../components/common/app-nav-bar";
 import { useAuth } from "../context/auth-context";
@@ -17,37 +17,6 @@ import CommentSection from "../components/comments/comment-section";
 import FormButtons from "../components/forms/form-buttons";
 import { AggregatedData } from "../types";
 import AggregatedDataTables from "../components/templates/aggregate-data-tables";
-
-const mockComments = [
-  {
-    id: "1",
-    author: {
-      id: "user-1",
-      username: "Alice",
-      email: "alice@example.com",
-      role: "user",
-      status: "active",
-      createdAt: new Date(),
-      templates: [],
-    },
-    content: "This is a great form!",
-    createdAt: new Date(),
-  },
-  {
-    id: "2",
-    author: {
-      id: "user-2",
-      username: "Bob",
-      email: "bob@example.com",
-      role: "user",
-      status: "active",
-      createdAt: new Date(),
-      templates: [],
-    },
-    content: "I found it very useful.",
-    createdAt: new Date(),
-  },
-];
 
 type FormResponseValue = string | number | string[];
 
@@ -61,7 +30,6 @@ const FormPage: React.FC = () => {
   >({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false); // track form submission status to display success card
-  const [comments, setComments] = useState<Comment[]>([]);
   const [newComment, setNewComment] = useState<string>("");
   const [isCommentSectionVisible, setIsCommentSectionVisible] =
     useState<boolean>(false);
@@ -86,8 +54,6 @@ const FormPage: React.FC = () => {
       try {
         const data = await fetchTemplateById(id as string);
         setTemplate(data);
-        // TODO: call fetchComments instead of mock data
-        setComments(mockComments);
       } catch (err) {
         console.log(err);
         setError("Failed to fetch template");
@@ -147,20 +113,6 @@ const FormPage: React.FC = () => {
     } catch (error) {
       console.error("Failed to toggle like:", error);
     }
-  };
-
-  const handleCommentSubmit = () => {
-    if (!newComment.trim()) return;
-
-    const newCommentObj: Comment = {
-      id: Date.now().toString(), // tempid
-      author: user,
-      content: newComment,
-      createdAt: new Date(),
-    };
-
-    setComments([newCommentObj, ...comments]);
-    setNewComment("");
   };
 
   const handleFormSubmit = async () => {
@@ -228,7 +180,7 @@ const FormPage: React.FC = () => {
       <div className="d-flex flex-column min-vh-100 bg-light">
         <div className="flex-grow-1 d-flex">
           {/* Main content (image and form card) */}
-          <div className="flex-grow-1 p-5 ms-auto" style={{ maxWidth: "80%" }}>
+          <div className="flex-grow-1 p-5">
             {/* Image Preview */}
             {template?.image && (
               <div className="w-100 mb-4" style={{ maxWidth: "800px" }}>
@@ -359,7 +311,6 @@ const FormPage: React.FC = () => {
               user={user}
               newComment={newComment}
               setNewComment={setNewComment}
-              handleCommentSubmit={handleCommentSubmit}
             />
           )}
         </div>

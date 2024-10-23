@@ -85,7 +85,7 @@ const CommentSection: React.FC<CommentSectionProps> = ({
       {user ? (
         <div className="d-flex align-items-start mb-3">
           <img
-            src="https://i.pravatar.cc/300?u=uniqueUser"
+            src={`https://i.pravatar.cc/300?u=${user.username}`}
             alt="Profile"
             className="rounded-circle me-2"
             width="56"
@@ -130,36 +130,38 @@ const CommentSection: React.FC<CommentSectionProps> = ({
             No comments yet. Be the first to comment!
           </p>
         ) : (
-          comments.map((comment, index) => (
-            <Card.Body key={comment.id} className="d-flex">
-              {/* container to prevent picture stretching */}
-              <div
-                style={{
-                  width: "42px",
-                  height: "42px",
-                  overflow: "hidden",
-                  borderRadius: "50%",
-                }}
-                className="me-3"
-              >
-                <img
-                  src={`https://i.pravatar.cc/300?u=${index}`}
-                  alt="Profile"
-                  width="100%"
-                  height="100%"
-                  style={{ objectFit: "cover" }}
-                />
-              </div>
-              <div>
-                <Card.Title className="mb-1 fs-6 fw-bold text-dark">
-                  {comment.author?.username}{" "}
-                  <span className="text-muted" style={{ fontSize: "0.8rem" }}>
-                    {formatDate(comment.createdAt)}
-                  </span>
-                </Card.Title>
-                <Card.Text className="text-dark">{comment.content}</Card.Text>
-              </div>
-            </Card.Body>
+          comments.map((comment) => (
+            <Card key={comment.id} className="custom-card mb-2 shadow-sm">
+                <Card.Body  className="d-flex">
+                  {/* container to prevent picture stretching */}
+                  <div
+                    style={{
+                      width: "42px",
+                      height: "42px",
+                      overflow: "hidden",
+                      borderRadius: "50%",
+                    }}
+                    className="me-3"
+                  >
+                    <img
+                      src={`https://i.pravatar.cc/300?u=${comment.author?.username}`}
+                      alt="Profile"
+                      width="100%"
+                      height="100%"
+                      style={{ objectFit: "cover" }}
+                    />
+                  </div>
+                  <div>
+                    <Card.Title className="mb-1 fs-6 fw-bold text-dark">
+                      {comment.author?.username}{" "}
+                      <span className="text-muted" style={{ fontSize: "0.8rem" }}>
+                        {formatDate(comment.createdAt)}
+                      </span>
+                    </Card.Title>
+                    <Card.Text className="text-dark">{comment.content}</Card.Text>
+                  </div>
+                </Card.Body>
+            </Card>
           ))
         )}
       </div>

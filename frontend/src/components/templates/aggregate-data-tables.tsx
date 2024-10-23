@@ -13,12 +13,17 @@ const AggregatedDataTables: React.FC<AggregatedDataTablesProps> = ({
     return num !== undefined ? num.toFixed(decimals) : "N/A";
   };
 
+  // Safely handle if data is not in expected format
+  const hasData = (data?: object) => {
+    return data && Object.keys(data).length > 0;
+  };
+
   return (
     <div className="text-start">
       <h2 className="text-dark mt-5">{aggregatedData.responseCount} Responses</h2>
 
-      {/* numeric Data */}
-      {Object.keys(aggregatedData.numericData || {}).length > 0 && (
+      {/* Check if numeric data exists */}
+      {hasData(aggregatedData.numericData) && (
         <div className="table-responsive">
           <h3 className="text-dark mt-5">Numeric Data</h3>
           <table className="table table-bordered mt-4">
@@ -44,8 +49,8 @@ const AggregatedDataTables: React.FC<AggregatedDataTablesProps> = ({
         </div>
       )}
 
-      {/* text data */}
-      {Object.keys(aggregatedData.textData || {}).length > 0 && (
+      {/* Check if text data exists */}
+      {hasData(aggregatedData.textData) && (
         <div className="table-responsive">
           <h3 className="text-dark mt-5">Text Responses</h3>
           <table className="table table-bordered mt-4">
@@ -75,8 +80,8 @@ const AggregatedDataTables: React.FC<AggregatedDataTablesProps> = ({
         </div>
       )}
 
-      {/* checkbox data */}
-      {Object.keys(aggregatedData.checkboxData || {}).length > 0 && (
+      {/* Check if checkbox data exists */}
+      {hasData(aggregatedData.checkboxData) && (
         <div className="table-responsive">
           <h3 className="text-dark mt-5">Checkbox Option Counts</h3>
           <table className="table table-bordered mt-4">

@@ -133,7 +133,7 @@ const PersonalDashboardPage: React.FC = () => {
         {/* user profile section */}
         <div className="d-flex align-items-center mb-3">
           <img
-            src="https://i.pravatar.cc/300"
+            src={`https://i.pravatar.cc/300?u=${user?.username}`}
             alt="Profile"
             className="rounded-circle img-thumbnail"
             width="120"

@@ -84,7 +84,7 @@ const AppNavBar: React.FC = () => {
                       {user?.status === "active" ? (
                         // TODO: allow adding of profile pictures
                         <img
-                        src="https://i.pravatar.cc/300"
+                        src={`https://i.pravatar.cc/300?u=${user.username}`}
                         alt="Profile"
                         className="rounded-circle"
                         width="42"

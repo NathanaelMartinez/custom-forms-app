@@ -3,6 +3,7 @@ import { AppDataSource } from "../config/data-source";
 import { Response as FormResponse } from "../entities/response";
 import { User } from "../entities/user";
 import { Template } from "../entities/template";
+import { Question } from "../entities/question";
 
 export const submitResponse = async (req: Request, res: Response) => {
   const { templateId } = req.params;
@@ -123,13 +124,13 @@ export const submitResponse = async (req: Request, res: Response) => {
 };
 
 export const getResponsesAggregate = async (req: Request, res: Response) => {
-  const { id } = req.params;
+  const { templateId } = req.params;
 
   try {
     // get template
     const templateRepository = AppDataSource.getRepository(Template);
     const template = await templateRepository.findOne({
-      where: { id },
+      where: { id: templateId },
       relations: ["questions"], // fetch related questions
     });
 
@@ -152,7 +153,7 @@ export const getResponsesAggregate = async (req: Request, res: Response) => {
 
     const responseRepository = AppDataSource.getRepository(FormResponse);
     const responses = await responseRepository.find({
-      where: { template: { id } }, // filter by templateId
+      where: { template: { id: templateId } }, // filter by templateId
     });
 
     const responseCount = responses.length;
@@ -164,7 +165,9 @@ export const getResponsesAggregate = async (req: Request, res: Response) => {
 
     for (const response of responses) {
       for (const [questionId, answer] of Object.entries(response.answers)) {
-        const question = validQuestions.find((q) => q.id === questionId);
+        const question = validQuestions.find(
+          (q: Question) => q.id === questionId
+        );
         if (!question) continue;
 
         /* categorize question types */
@@ -180,16 +183,19 @@ export const getResponsesAggregate = async (req: Request, res: Response) => {
           }
           numericData[questionId].values.push(answer);
         } else if (typeof answer === "string") {
+          // Normalize the answer by converting to lowercase and trimming
+          const normalizedAnswer = answer.trim().toLowerCase();
+
           if (!textData[questionId]) {
             textData[questionId] = {
               questionText: question.questionText,
               counts: {},
             };
           }
-          if (!textData[questionId].counts[answer]) {
-            textData[questionId].counts[answer] = 0;
+          if (!textData[questionId].counts[normalizedAnswer]) {
+            textData[questionId].counts[normalizedAnswer] = 0;
           }
-          textData[questionId].counts[answer]++;
+          textData[questionId].counts[normalizedAnswer]++;
         } else if (Array.isArray(answer)) {
           if (!checkboxData[questionId]) {
             checkboxData[questionId] = {
@@ -198,10 +204,11 @@ export const getResponsesAggregate = async (req: Request, res: Response) => {
             };
           }
           for (const option of answer) {
-            if (!checkboxData[questionId].optionCounts[option]) {
-              checkboxData[questionId].optionCounts[option] = 0;
+            const normalizedOption = option.trim().toLowerCase(); // Normalize checkbox options as well
+            if (!checkboxData[questionId].optionCounts[normalizedOption]) {
+              checkboxData[questionId].optionCounts[normalizedOption] = 0;
             }
-            checkboxData[questionId].optionCounts[option]++;
+            checkboxData[questionId].optionCounts[normalizedOption]++;
           }
         }
       }
