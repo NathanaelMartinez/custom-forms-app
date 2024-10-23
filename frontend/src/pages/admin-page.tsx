@@ -26,6 +26,13 @@ const AdminPage: React.FC = () => {
     }
   }, [user, navigate]);
 
+  useEffect(() => {
+    if (user && (user.role !== "admin")) {
+      console.warn("User is not admin, redirecting to login.");
+      navigate("/");
+    }
+  }, [user, navigate]);
+
   // fetch users on component mount
   useEffect(() => {
     const getUsers = async () => {

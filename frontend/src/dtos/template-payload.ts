@@ -6,15 +6,16 @@ export interface TemplatePayload {
   description?: string;
   authorId: string;
   topic: string;
-  questions: QuestionPayload[]; // Use QuestionPayload[] for questions
+  questions: QuestionPayload[];
   tags?: string[];
   image?: string | null;
+  createdAt: Date;
 }
 
 export const mapTemplateToPayload = (template: Template): TemplatePayload => ({
   title: template.title,
   description: template.description,
-  authorId: template.author?.id ?? "", // Fallback to an empty string or handle null author
+  authorId: template.author?.id ?? "",
   topic: template.topic,
   questions: template.questions.map((question) => ({
     id: question.id,
@@ -22,8 +23,9 @@ export const mapTemplateToPayload = (template: Template): TemplatePayload => ({
     questionText: question.questionText,
     options: question.options,
     displayInTable: question.displayInTable,
-    templateId: template.id, // Only pass template ID in payload
+    templateId: template.id,
   })),
+  createdAt: template.createdAt || new Date(),
   tags: template.tags,
   image: template.image,
 });

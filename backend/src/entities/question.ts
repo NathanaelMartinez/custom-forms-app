@@ -1,4 +1,10 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from "typeorm";
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  ManyToOne,
+  JoinColumn,
+} from "typeorm";
 import { Template } from "./template";
 
 @Entity("questions")
@@ -23,4 +29,8 @@ export class Question {
 
   @Column({ default: true })
   displayInTable!: boolean; // whether this question should be shown in table views of responses
+
+  // this will help preserve order of the questions
+  @Column()
+  order_index!: number;
 }

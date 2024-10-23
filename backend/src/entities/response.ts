@@ -18,6 +18,6 @@ export class Response {
   @Column("jsonb")
   answers!: Record<string, any>; // eg. { "questionId1": "answer1", "questionId2": "answer2" }
 
-  @Column({ type: "timestamp" })
+  @Column({ type: "timestamp", default: () => "CURRENT_TIMESTAMP" })
   submittedAt!: Date;
 }

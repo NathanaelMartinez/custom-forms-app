@@ -31,13 +31,14 @@ export const createTemplate = async (req: Request, res: Response) => {
     const savedTemplate = await templateRepository.save(template);
 
     if (questions && Array.isArray(questions)) {
-      const createdQuestions = questions.map((q: any) =>
+      const createdQuestions = questions.map((q: Question, index: number) =>
         questionRepository.create({
           questionText: q.questionText,
           type: q.type,
           displayInTable: q.displayInTable,
           template: savedTemplate, // associate question with saved template
           options: q.options,
+          order_index: index + 1,
         })
       );
 
@@ -87,6 +88,11 @@ export const getTemplate = async (req: Request, res: Response) => {
     const template = await templateRepository.findOne({
       where: { id: templateId }, // find template by its ID
       relations: ["questions"], // include related questions
+      order: {
+        questions: {
+          order_index: "ASC", // order questions by order_index
+        },
+      },
     });
 
     if (!template) {
@@ -105,7 +111,7 @@ export const getTemplate = async (req: Request, res: Response) => {
 
 // edit a template (only author or admin)
 export const editTemplate = async (req: Request, res: Response) => {
-  const { id } = req.params;
+  const { templateId } = req.params;
   const { title, description, topic, tags, image, questions } = req.body;
   const user = req.user as User;
 
@@ -117,7 +123,7 @@ export const editTemplate = async (req: Request, res: Response) => {
   try {
     const templateRepository = AppDataSource.getRepository(Template);
     const template = await templateRepository.findOne({
-      where: { id },
+      where: { id: templateId },
       relations: ["questions"],
     });
 
@@ -126,71 +132,81 @@ export const editTemplate = async (req: Request, res: Response) => {
       return;
     }
 
-    // only author or an admin can edit
+    // check if user is authorized to edit
     if (template.author.id !== user.id && user.role !== "admin") {
       res.status(403).json({ message: "Unauthorized to edit this template." });
       return;
     }
 
+    // update template fields
     template.title = title || template.title;
     template.description = description || template.description;
     template.topic = topic || template.topic;
     template.tags = tags || template.tags;
     template.image = image || template.image;
-    template.topic = topic || template.topic;
 
     const questionRepository = AppDataSource.getRepository(Question);
 
-    // handle update questions
-    if (questions && Array.isArray(questions)) {
-      // map existing questions by ID
-      const existingQuestions = template.questions.reduce((acc, question) => {
-        acc[question.id] = question;
-        return acc;
-      }, {} as Record<string, Question>);
+    // accumulate existing questions on fetched template
+    const existingQuestions = template.questions.reduce((acc, question) => {
+      acc[question.id] = question;
+      return acc;
+    }, {} as Record<string, Question>);
 
-      const updatedQuestionIds = questions.map((q) => q.id);
+    // map questions from request body
+    const updatedQuestionIds = questions.map((q: Question) => q.id);
 
-      // handle delete questions during update
-      for (const questionId in existingQuestions) {
-        if (!updatedQuestionIds.includes(questionId)) {
-          await questionRepository.remove(existingQuestions[questionId]);
-        }
-      }
-
-      for (const questionData of questions) {
-        if (questionData.id && existingQuestions[questionData.id]) {
-          // update existing question
-          const questionToUpdate = existingQuestions[questionData.id];
-          questionToUpdate.questionText =
-            questionData.questionText || questionToUpdate.questionText;
-          questionToUpdate.type = questionData.type || questionToUpdate.type;
-          questionToUpdate.displayInTable =
-            questionData.displayInTable ?? questionToUpdate.displayInTable;
-
-          await questionRepository.save(questionToUpdate); // save updated question
-        } else if (!questionData.id) {
-          // add new question
-          const newQuestion = questionRepository.create({
-            questionText: questionData.questionText,
-            type: questionData.type,
-            displayInTable: questionData.displayInTable,
-            template: template, // new question goes with this template
-            options: questionData.options || [],
-          });
-          await questionRepository.save(newQuestion); // save new question
-        }
+    // handle deleting questions that are not in updated list
+    for (const questionId in existingQuestions) {
+      if (!updatedQuestionIds.includes(questionId)) {
+        await questionRepository.remove(existingQuestions[questionId]);
       }
     }
 
-    console.log("saving template...");
+    // process updated or new questions
+    const newQuestionsToReturn = []; // list to store new questions
+    for (const questionData of questions) {
+      const questionIndex =
+        questions.findIndex((q: Question) => q.id === questionData.id) + 1;
+      if (
+        questionData.id &&
+        !questionData.id.startsWith("temp-") &&
+        existingQuestions[questionData.id]
+      ) {
+        // update existing question
+        const questionToUpdate = existingQuestions[questionData.id];
+        questionToUpdate.questionText =
+          questionData.questionText || questionToUpdate.questionText;
+        questionToUpdate.type = questionData.type || questionToUpdate.type;
+        questionToUpdate.displayInTable =
+          questionData.displayInTable ?? questionToUpdate.displayInTable;
+        questionToUpdate.order_index = questionIndex;
+        await questionRepository.save(questionToUpdate);
+      } else if (template) {
+        // else has temp-id (new)
+        const newQuestion = questionRepository.create({
+          questionText: questionData.questionText,
+          type: questionData.type,
+          displayInTable: questionData.displayInTable,
+          template: template,
+          options: questionData.options || [],
+          order_index: questionIndex,
+        });
+        const savedQuestion = await questionRepository.save(newQuestion);
+        newQuestionsToReturn.push(savedQuestion); // add to array of new questions
+      }
+    }
+
+    // re-save template with updated questions
+    template.questions = [...template.questions, ...newQuestionsToReturn];
     await templateRepository.save(template);
-    res
-      .status(200)
-      .json({ message: "Template updated successfully.", template });
+
+    res.status(204).json({
+      message: "Template updated successfully.",
+    });
     return;
   } catch (error) {
-    console.error(error);
+    console.error("Error updating template:", error);
     res.status(500).json({ message: "Internal server error." });
     return;
   }
@@ -198,7 +214,7 @@ export const editTemplate = async (req: Request, res: Response) => {
 
 // delete a template (only author or admin)
 export const deleteTemplate = async (req: Request, res: Response) => {
-  const { id } = req.params;
+  const { templateId } = req.params;
   const user = req.user as User;
 
   if (!user) {
@@ -208,7 +224,7 @@ export const deleteTemplate = async (req: Request, res: Response) => {
 
   try {
     const templateRepository = AppDataSource.getRepository(Template);
-    const template = await templateRepository.findOneBy({ id });
+    const template = await templateRepository.findOneBy({ id: templateId });
 
     if (!template) {
       res.status(404).json({ message: "Template not found." });

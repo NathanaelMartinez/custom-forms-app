@@ -103,9 +103,11 @@ const CreateTemplatePage: React.FC = () => {
 
       // upload image before saving template
       const imageUrl = await handleImageUpload();
+      const updatedTemplate = { ...template, image: imageUrl };
 
-      const payload = mapTemplateToPayload({ ...template, image: imageUrl });
-      console.log("payload", payload); //TODO: remove DEBUG comments
+      const payload = mapTemplateToPayload(updatedTemplate);
+
+      console.log("Payload questions to be saved:", payload.questions);
 
       if (templateId) {
         // if templateId exists update existing template
@@ -223,6 +225,14 @@ const CreateTemplatePage: React.FC = () => {
     return null;
   };
 
+  const handleReorderQuestions = (newQuestions: Question[]) => {
+    const newOrder = [...newQuestions]; // Always ensure new array
+    setTemplate((prev) => ({
+      ...prev,
+      questions: newOrder, // Trigger proper state change
+    }));
+  };
+
   return (
     <>
       <AppNavBar />
@@ -277,6 +287,7 @@ const CreateTemplatePage: React.FC = () => {
 
             {/* question list */}
             <QuestionList
+              containerId={template.id}
               questions={template.questions}
               onChange={handleQuestionTextChange}
               onDelete={handleDeleteQuestion}
@@ -284,6 +295,7 @@ const CreateTemplatePage: React.FC = () => {
               onOptionChange={handleOptionChange}
               onAddOption={handleAddOption}
               onToggleDisplayInTable={handleToggleDisplayInTable}
+              onReorder={handleReorderQuestions}
             />
             <AddQuestionButton onAddQuestion={handleAddQuestion} />
           </Card>

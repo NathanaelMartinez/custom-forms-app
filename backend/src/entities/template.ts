@@ -27,7 +27,7 @@ export class Template {
   @OneToMany(() => Question, (question) => question.template, { cascade: true }) // cascade means question changes automatically cascaded to templates
   questions!: Question[];
 
-  @Column({ type: "timestamp" })
+  @Column({ type: "timestamp", default: () => "CURRENT_TIMESTAMP" })
   createdAt!: Date;
 
   @Column({ default: 0 })

@@ -180,7 +180,7 @@ const PersonalDashboardPage: React.FC = () => {
                         <Button
                           variant="primary"
                           className="mb-3 custom-primary-btn"
-                          onClick={() => navigate("/create-template")}
+                          onClick={() => navigate("/templates")}
                         >
                           Create New Template
                         </Button>
@@ -216,7 +216,7 @@ const PersonalDashboardPage: React.FC = () => {
                           {templates.map((template) => (
                             <tr key={template.id}>
                               <td>
-                                <a href={`/templates/${template.id}`}>
+                                <a href={`/forms/${template.id}`}>
                                   {template.title}
                                 </a>
                               </td>
@@ -234,7 +234,7 @@ const PersonalDashboardPage: React.FC = () => {
                                       className="me-2 mb-1 custom-outline-contrast-btn btn-sm"
                                       onClick={() =>
                                         navigate(
-                                          `/edit-template/${template.id}`
+                                          `/templates/${template.id}`
                                         )
                                       }
                                     >
