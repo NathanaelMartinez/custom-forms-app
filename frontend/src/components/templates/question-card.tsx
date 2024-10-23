@@ -1,7 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { draggable, dropTargetForElements } from "@atlaskit/pragmatic-drag-and-drop/element/adapter";
 import { combine } from "@atlaskit/pragmatic-drag-and-drop/combine";
-import { attachClosestEdge } from "@atlaskit/pragmatic-drag-and-drop-hitbox/closest-edge";
 import { Card, Form, InputGroup, Button, Dropdown } from "react-bootstrap";
 import {
   ThreeDotsVertical,
@@ -21,7 +20,9 @@ interface QuestionCardProps {
   onAddOption: (id: string) => void;
   onToggleDisplayInTable: (id: string, value: boolean) => void;
   dropTargetProps: {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     getData: () => any;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onDragEnter: (args: any) => void;
     onDragLeave: () => void;
     onDrop: () => void;

@@ -1,6 +1,5 @@
-import React, { useEffect, useRef, useState, useCallback } from "react";
+import React, { useEffect, useRef, useCallback } from "react";
 import { dropTargetForElements, monitorForElements } from "@atlaskit/pragmatic-drag-and-drop/element/adapter";
-import { getReorderDestinationIndex } from "@atlaskit/pragmatic-drag-and-drop-hitbox/util/get-reorder-destination-index";
 import { reorder } from "@atlaskit/pragmatic-drag-and-drop/reorder";
 import invariant from "tiny-invariant";
 import QuestionCard from "./question-card";
@@ -32,8 +31,11 @@ const QuestionList: React.FC<QuestionListProps> = ({
   const containerRef = useRef<HTMLDivElement | null>(null);
 
   // function to handle drop events and reorder cards
-  const handleDrop = useCallback(({ source, location }) => { // source is info on card, and location is where card being dropped
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const handleDrop = useCallback(({ source, location }: {source: any; location: any}) => { // source is info on card, and location is where card being dropped
     const numberOfDropTargets = location.current.dropTargets.length; // checks how many things card was dropped on
+    console.log("Source object:", source);
+    console.log("Location object:", location);
     
     // drop on card instead of container
     if (numberOfDropTargets === 2) {
@@ -103,6 +105,7 @@ const QuestionList: React.FC<QuestionListProps> = ({
           onAddOption={onAddOption}
           onToggleDisplayInTable={onToggleDisplayInTable}
           dropTargetProps={{
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             onDragEnter: (args: any) => console.log("onDragEnter", args),
             onDragLeave: () => console.log("onDragLeave"),
             onDrop: () => console.log("Dropped on card", question.id),
