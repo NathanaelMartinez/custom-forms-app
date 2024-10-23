@@ -6,6 +6,7 @@ import {
   fetchCommentsForTemplate,
   addCommentToTemplate,
 } from "../../services/comment-service";
+import ReactQuill from "react-quill";
 
 interface CommentSectionProps {
   templateId: string;
@@ -13,6 +14,15 @@ interface CommentSectionProps {
   newComment: string;
   setNewComment: (comment: string) => void;
 }
+
+// Quill modules to include in comment
+const modules = {
+  toolbar: [
+    ["bold", "italic", "underline"],
+    [{ list: "ordered" }, { list: "bullet" }],
+    ["link"],
+  ],
+};
 
 const CommentSection: React.FC<CommentSectionProps> = ({
   templateId,
@@ -55,24 +65,32 @@ const CommentSection: React.FC<CommentSectionProps> = ({
   const formatDate = (commentDate: Date) => {
     const now = new Date();
 
-    const minutesAgo = differenceInMinutes(now, commentDate);
+    const parsedCommentDate =
+      typeof commentDate === "string"
+        ? new Date(Date.parse(commentDate))
+        : commentDate;
 
+    if (parsedCommentDate > now) {
+      return "Just now"; // if somehow in the future, show as 'just now'
+    }
+
+    const minutesAgo = differenceInMinutes(now, parsedCommentDate);
     if (minutesAgo < 60) {
       return `${minutesAgo} minutes ago`; // show minutes if w/in hour
     }
 
-    if (isSameDay(commentDate, now)) {
-      return format(commentDate, "p"); // show time if today
+    if (isSameDay(parsedCommentDate, now)) {
+      return format(parsedCommentDate, "p"); // show time if today
     }
 
-    return format(commentDate, "MM/dd/yy"); // show date otherwise
+    return format(parsedCommentDate, "MM/dd/yy"); // show date otherwise
   };
 
   return (
     <div
       className="bg-white shadow-sm"
       style={{
-        width: "400px",
+        width: "500px",
         padding: "20px",
         minHeight: "100vh",
         overflowY: "auto",
@@ -92,13 +110,13 @@ const CommentSection: React.FC<CommentSectionProps> = ({
             height="56"
           />
           <Form.Group controlId="newComment" className="flex-grow-1">
-            <Form.Control
-              as="textarea"
-              rows={3}
-              placeholder="Join the conversation..."
+            <ReactQuill
               value={newComment}
-              onChange={(e) => setNewComment(e.target.value)}
+              onChange={setNewComment}
+              placeholder="Join the conversation..."
               className="mb-2 input-focus-muted"
+              theme="snow" // Add theme for editor style
+              modules={modules}
             />
             <Button
               variant="primary"
@@ -132,35 +150,35 @@ const CommentSection: React.FC<CommentSectionProps> = ({
         ) : (
           comments.map((comment) => (
             <Card key={comment.id} className="custom-card mb-2 shadow-sm">
-                <Card.Body  className="d-flex">
-                  {/* container to prevent picture stretching */}
-                  <div
-                    style={{
-                      width: "42px",
-                      height: "42px",
-                      overflow: "hidden",
-                      borderRadius: "50%",
-                    }}
-                    className="me-3"
-                  >
-                    <img
-                      src={`https://i.pravatar.cc/300?u=${comment.author?.username}`}
-                      alt="Profile"
-                      width="100%"
-                      height="100%"
-                      style={{ objectFit: "cover" }}
-                    />
-                  </div>
-                  <div>
-                    <Card.Title className="mb-1 fs-6 fw-bold text-dark">
-                      {comment.author?.username}{" "}
-                      <span className="text-muted" style={{ fontSize: "0.8rem" }}>
-                        {formatDate(comment.createdAt)}
-                      </span>
-                    </Card.Title>
-                    <Card.Text className="text-dark">{comment.content}</Card.Text>
-                  </div>
-                </Card.Body>
+              <Card.Body className="d-flex">
+                {/* container to prevent picture stretching */}
+                <div
+                  style={{
+                    width: "42px",
+                    height: "42px",
+                    overflow: "hidden",
+                    borderRadius: "50%",
+                  }}
+                  className="me-3"
+                >
+                  <img
+                    src={`https://i.pravatar.cc/300?u=${comment.author?.username}`}
+                    alt="Profile"
+                    width="100%"
+                    height="100%"
+                    style={{ objectFit: "cover" }}
+                  />
+                </div>
+                <div>
+                  <Card.Title className="mb-1 fs-6 fw-bold text-dark">
+                    {comment.author?.username}{" "}
+                    <span className="text-muted" style={{ fontSize: "0.8rem" }}>
+                      {formatDate(comment.createdAt)}
+                    </span>
+                  </Card.Title>
+                  <Card.Text className="text-dark">{comment.content}</Card.Text>
+                </div>
+              </Card.Body>
             </Card>
           ))
         )}
