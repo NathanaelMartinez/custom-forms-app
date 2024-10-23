@@ -7,6 +7,8 @@ import {
   addCommentToTemplate,
 } from "../../services/comment-service";
 import ReactQuill from "react-quill";
+import ReactMarkdown from "react-markdown";
+import rehypeRaw from "rehype-raw";
 
 interface CommentSectionProps {
   templateId: string;
@@ -69,15 +71,13 @@ const CommentSection: React.FC<CommentSectionProps> = ({
       typeof commentDate === "string"
         ? new Date(Date.parse(commentDate))
         : commentDate;
-
+    // If commentDate is in the future, set it to now
     if (parsedCommentDate > now) {
-      return "Just now"; // if somehow in the future, show as 'just now'
+      return "Just now"; // If in the future, show as 'just now'
     }
 
     const minutesAgo = differenceInMinutes(now, parsedCommentDate);
-    if (minutesAgo < 60) {
-      return `${minutesAgo} minutes ago`; // show minutes if w/in hour
-    }
+    console.log("Minutes ago:", minutesAgo); // Log for debugging
 
     if (isSameDay(parsedCommentDate, now)) {
       return format(parsedCommentDate, "p"); // show time if today
@@ -176,7 +176,10 @@ const CommentSection: React.FC<CommentSectionProps> = ({
                       {formatDate(comment.createdAt)}
                     </span>
                   </Card.Title>
-                  <Card.Text className="text-dark">{comment.content}</Card.Text>
+                  {/* Use ReactMarkdown with rehypeRaw to parse HTML */}
+                  <ReactMarkdown rehypePlugins={[rehypeRaw]}>
+                    {comment.content}
+                  </ReactMarkdown>
                 </div>
               </Card.Body>
             </Card>
