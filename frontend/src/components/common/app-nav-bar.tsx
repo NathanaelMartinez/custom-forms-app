@@ -1,3 +1,5 @@
+// <reference types="vite-plugin-svgr/client" />
+
 import React from "react";
 import {
   Navbar,
@@ -13,11 +15,11 @@ import {
   ShieldFill,
   Search,
   PersonLock,
-  PlusCircle,
   CardList,
   BoxArrowRight,
 } from "react-bootstrap-icons";
 import { useNavigate, useLocation } from "react-router-dom";
+import FormNewIcon from '../../assets/icons/form-new.svg?react';
 import { useAuth } from "../../context/auth-context";
 
 const AppNavBar: React.FC = () => {
@@ -60,7 +62,7 @@ const AppNavBar: React.FC = () => {
                     className="p-0 custom-icon-btn"
                     onClick={() => navigate("/templates")}
                   >
-                    <PlusCircle size={36} />
+                    <FormNewIcon width={36} height={36} style={{ fill: 'white' }}/>
                   </Button>
 
                   {user?.role === "admin" && (
