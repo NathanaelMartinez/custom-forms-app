@@ -17,6 +17,8 @@ import CommentSection from "../components/comments/comment-section";
 import FormButtons from "../components/forms/form-buttons";
 import { AggregatedData } from "../types";
 import AggregatedDataTables from "../components/templates/aggregate-data-tables";
+import ReactMarkdown from "react-markdown";
+import rehypeRaw from "rehype-raw";
 
 type FormResponseValue = string | number | string[];
 
@@ -252,12 +254,9 @@ const FormPage: React.FC = () => {
                   </div>
                 ) : (
                   <>
-                    <p
-                      className="text-muted fs-5 fw-normal mb-4"
-                      style={{ fontStyle: "italic" }}
-                    >
+                    <ReactMarkdown rehypePlugins={[rehypeRaw]}>
                       {template?.description || "No description provided."}
-                    </p>
+                    </ReactMarkdown>
 
                     {isLoading ? (
                       <Spinner />
