@@ -16,17 +16,17 @@ const app = express();
 // get .env variables
 dotenv.config();
 
-// allow local development
-const allowedOrigins = [
-  "http://localhost:5173",
-  process.env.FRONTEND_URL || "http://localhost:5173",
-];
-
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME!,
   api_key: process.env.CLOUDINARY_API_KEY!,
   api_secret: process.env.CLOUDINARY_API_SECRET!,
 });
+
+// allow local development
+const allowedOrigins = [
+  "http://localhost:5173",
+  process.env.FRONTEND_URL || "http://localhost:5173",
+];
 
 // cors config
 const corsOptions: cors.CorsOptions = {
@@ -35,6 +35,8 @@ const corsOptions: cors.CorsOptions = {
     if (!origin || allowedOrigins.indexOf(origin) !== -1) {
       callback(null, true);
     } else {
+      console.log("FRONTEND_URL:", process.env.FRONTEND_URL);
+      console.error(`Blocked by CORS: ${origin}`);
       callback(new Error("Not allowed by CORS"));
     }
   },
