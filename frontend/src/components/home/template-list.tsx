@@ -46,12 +46,19 @@ const TemplateList: React.FC<TemplateListProps> = ({
                   alt="Template placeholder"
                 />
                 <Card.ImgOverlay className="d-flex flex-column justify-content-end">
+                  <div
+                    className="position-absolute"
+                    style={{ top: "10px", right: "10px" }}
+                  >
+                    <Heart className="me-1" color="red" />
+                    <span>{template.likes}</span>
+                  </div>
                   <Card.Title className="fw-bold">{template.title}</Card.Title>
                   <Card.Text>
                     {/* display first few words of description */}
                     {template.description?.split(" ").slice(0, 5).join(" ")}...
                   </Card.Text>
-                  <div className="d-flex justify-content-between align-items-center mt-2">
+                  <div className="d-flex justify-content-between align-items-center">
                     <div className="d-flex align-items-center">
                       <Clipboard2Check className="me-1" />
                       <span>{template.responses?.length}</span>
@@ -59,10 +66,6 @@ const TemplateList: React.FC<TemplateListProps> = ({
                     <div className="d-flex align-items-center">
                       <ChatLeft className="me-1" />
                       <span>{template.comments?.length}</span>
-                    </div>
-                    <div className="d-flex align-items-center">
-                      <Heart className="me-1" color="red" />
-                      <span>{template.likes}</span>
                     </div>
                   </div>
                 </Card.ImgOverlay>

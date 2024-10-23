@@ -68,7 +68,7 @@ export const viewTemplates = async (req: Request, res: Response) => {
   try {
     const templateRepository = AppDataSource.getRepository(Template);
     const templates = await templateRepository.find({
-      relations: ["author", "questions"], // fetch associated questions and authors
+      relations: ["author", "questions", "comments"], // fetch associated questions and authors
     });
     res.status(200).json(templates);
     return;
