@@ -176,11 +176,15 @@ const FormPage: React.FC = () => {
 
   return (
     <>
-      <AppNavBar />
       <div className="d-flex flex-column min-vh-100 bg-light">
-        <div className="flex-grow-1 d-flex">
+        <AppNavBar />
+
+        <div className="d-flex justify-content-center flex-grow-1">
           {/* Main content (image and form card) */}
-          <div className="flex-grow-1 p-5">
+          <div
+            className="d-flex flex-column align-items-center p-5 w-100"
+            style={{ maxWidth: "1200px" }}
+          >
             {/* Image Preview */}
             {template?.image && (
               <div className="w-100 mb-4" style={{ maxWidth: "800px" }}>

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Card, Form } from "react-bootstrap";
+import ReactQuill from "react-quill";
 import { useAuth } from "../context/auth-context";
 import { useNavigate, useParams } from "react-router-dom";
 import AppNavBar from "../components/common/app-nav-bar";
@@ -236,7 +237,7 @@ const CreateTemplatePage: React.FC = () => {
   return (
     <>
       <AppNavBar />
-      <div className="d-flex min-vh-100 bg-light">
+      <div className="d-flex justify-content-center min-vh-100 bg-light">
         {/* TODO: find a way to get rid of this div */}
         <div className="flex-grow-1"></div>
         <div className="flex-grow-1 p-5">
@@ -272,13 +273,10 @@ const CreateTemplatePage: React.FC = () => {
 
             {/* description input */}
             <Form.Group className="mb-3">
-              {/* <Form.Label>Description</Form.Label> */}
-              <Form.Control
-                as="textarea"
-                rows={3}
+              <ReactQuill
                 value={template.description}
-                onChange={(e) =>
-                  setTemplate({ ...template, description: e.target.value })
+                onChange={(value) =>
+                  setTemplate({ ...template, description: value })
                 }
                 placeholder="Describe your form..."
                 className="input-focus-muted"
