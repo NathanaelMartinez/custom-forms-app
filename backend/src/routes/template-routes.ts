@@ -14,6 +14,10 @@ import {
   getResponsesAggregate,
   submitResponse,
 } from "../controllers/response-controller";
+import {
+  addCommentToTemplate,
+  getCommentsForTemplate,
+} from "../controllers/comment-controller";
 
 const router = express.Router();
 
@@ -40,5 +44,8 @@ router.delete(
 // submit form responses
 router.post("/:templateId/responses", authenticateJWT, submitResponse);
 router.get("/:templateId/aggregate", authenticateJWT, getResponsesAggregate);
+
+router.get("/:templateId/comments", getCommentsForTemplate);
+router.post("/:templateId/comments", authenticateJWT, addCommentToTemplate);
 
 export default router;

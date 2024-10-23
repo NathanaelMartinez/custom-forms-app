@@ -10,6 +10,9 @@ import FormPage from './pages/form-page';
 import RecentTemplatesPage from './pages/recent-templates-page';
 import PersonalDashboardPage from './pages/personal-dashboard-page';
 
+// Polyfill global for libraries that expect Node.js environment
+window.global = window;
+
 const App: React.FC = () => {
   return (
     <AuthProvider>

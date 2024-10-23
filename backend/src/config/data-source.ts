@@ -16,7 +16,7 @@ export const AppDataSource = new DataSource({
   synchronize: true, // automatically sync the schema (DISABLE IN PRODUCTION)
   logging: false,
   entities: [User, Template, Question, Comment, Response],
-  migrations: ["src/migrations/**/*.ts"],
+  migrations: [],
   subscribers: [],
   ssl: {
     rejectUnauthorized: false,

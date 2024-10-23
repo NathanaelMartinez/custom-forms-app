@@ -226,7 +226,6 @@ const FormPage: React.FC = () => {
     <>
       <AppNavBar />
       <div className="d-flex flex-column min-vh-100 bg-light">
-        
         <div className="flex-grow-1 d-flex">
           {/* Main content (image and form card) */}
           <div className="flex-grow-1 p-5 ms-auto" style={{ maxWidth: "80%" }}>
@@ -245,7 +244,7 @@ const FormPage: React.FC = () => {
                 />
               </div>
             )}
-  
+
             {/* Form card */}
             <Card
               className="shadow-lg p-4 bg-white rounded-3"
@@ -258,7 +257,7 @@ const FormPage: React.FC = () => {
                     Please log in or sign up to submit this form.
                   </Alert>
                 )}
-  
+
                 {/* Form title */}
                 <div
                   className="d-flex justify-content-between align-items-center mb-4 pb-2"
@@ -277,7 +276,7 @@ const FormPage: React.FC = () => {
                     isDataTableVisible={isDataTableVisible}
                   />
                 </div>
-  
+
                 {/* Form content */}
                 {isDataTableVisible ? (
                   <AggregatedDataTables aggregatedData={aggregatedData} />
@@ -303,7 +302,7 @@ const FormPage: React.FC = () => {
                     >
                       {template?.description || "No description provided."}
                     </p>
-  
+
                     {isLoading ? (
                       <Spinner />
                     ) : (
@@ -330,14 +329,14 @@ const FormPage: React.FC = () => {
                   </>
                 )}
               </div>
-  
+
               {/* Display errors */}
               {error && (
                 <Alert variant="danger" className="mt-4">
                   {error}
                 </Alert>
               )}
-  
+
               {!isSubmitted && !isDataTableVisible && (
                 <div className="d-flex justify-content-end mt-4 me-5">
                   <Button
@@ -352,11 +351,11 @@ const FormPage: React.FC = () => {
               )}
             </Card>
           </div>
-  
+
           {/* Comment section column */}
-          {isCommentSectionVisible && (
+          {id && isCommentSectionVisible && (
             <CommentSection
-              comments={comments}
+              templateId={id}
               user={user}
               newComment={newComment}
               setNewComment={setNewComment}
@@ -364,12 +363,11 @@ const FormPage: React.FC = () => {
             />
           )}
         </div>
-  
+
         <AppFooter />
       </div>
     </>
   );
-  
 };
 
 export default FormPage;

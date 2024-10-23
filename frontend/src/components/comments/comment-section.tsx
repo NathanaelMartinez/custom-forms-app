@@ -1,10 +1,14 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Form, Button, Card, Alert } from "react-bootstrap";
 import { Comment, User } from "../../types";
 import { PersonCircle } from "react-bootstrap-icons";
+import {
+  fetchCommentsForTemplate,
+  addCommentToTemplate,
+} from "../../services/comment-service";
 
 interface CommentSectionProps {
-  comments: Comment[];
+  templateId: string;
   user: User | null;
   newComment: string;
   setNewComment: (comment: string) => void;
@@ -12,12 +16,41 @@ interface CommentSectionProps {
 }
 
 const CommentSection: React.FC<CommentSectionProps> = ({
-  comments,
+  templateId,
   user,
   newComment,
   setNewComment,
-  handleCommentSubmit,
 }) => {
+  const [comments, setComments] = useState<Comment[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchComments = async () => {
+      try {
+        const data = await fetchCommentsForTemplate(templateId);
+        setComments(data);
+      } catch (error) {
+        console.error("Failed to load comments:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchComments();
+  }, [templateId]);
+
+  const handleSubmit = async () => {
+    if (!user || !newComment.trim()) return;
+
+    try {
+      const payload = { content: newComment };
+      const newCommentData = await addCommentToTemplate(templateId, payload);
+      setComments((prevComments) => [...prevComments, newCommentData]);
+      setNewComment(""); // clear comment input after submission
+    } catch (error) {
+      console.error("Failed to add comment:", error);
+    }
+  };
 
   return (
     <div
@@ -29,7 +62,9 @@ const CommentSection: React.FC<CommentSectionProps> = ({
         overflowY: "auto",
       }}
     >
-      <h3 className="fs-4 fw-bold text-dark mb-3">{comments.length} Comments</h3>
+      <h3 className="fs-4 fw-bold text-dark mb-3">
+        {comments.length} Comments
+      </h3>
 
       {user ? (
         <div className="d-flex align-items-start mb-3">
@@ -46,7 +81,7 @@ const CommentSection: React.FC<CommentSectionProps> = ({
             <Button
               variant="primary"
               className="custom-success-btn"
-              onClick={handleCommentSubmit}
+              onClick={handleSubmit}
             >
               Add Comment
             </Button>
@@ -66,8 +101,12 @@ const CommentSection: React.FC<CommentSectionProps> = ({
       )}
 
       <div>
-        {comments.length === 0 ? (
-          <p className="text-muted">No comments yet. Be the first to comment!</p>
+        {loading ? (
+          <p className="text-muted">Loading comments...</p>
+        ) : comments.length === 0 ? (
+          <p className="text-muted">
+            No comments yet. Be the first to comment!
+          </p>
         ) : (
           comments.map((comment) => (
             <Card key={comment.id} className="mb-2 p-2 shadow-sm custom-card">
