@@ -127,7 +127,7 @@ const PersonalDashboardPage: React.FC = () => {
   };
 
   return (
-    <>
+    <div className="bg-home">
       <AppNavBar />
       <Container className="p-4 home-page-crawl">
         {/* user profile section */}
@@ -140,7 +140,7 @@ const PersonalDashboardPage: React.FC = () => {
           />
           {user && (user.id === id) ? (
             // TODO: username should be displayed in all cases when viewing user page
-            <h5 className="ms-3 fw-bold fs-2">{user?.username}</h5>
+            <h5 className="ms-3 fw-bold fs-1 text-light">{user?.username}</h5>
           ) : (
             <h5 className="ms-3 fw-bold fs-2">{id}</h5>
           )}
@@ -149,7 +149,7 @@ const PersonalDashboardPage: React.FC = () => {
         {user && (user.id === id) && (
           <Button
             variant="outline-secondary"
-            className="mb-4 custom-outline-secondary-btn"
+            className="mb-4 custom-success-btn"
             onClick={() => alert("Edit Profile")}
           >
             <Pencil /> Edit Profile
@@ -223,7 +223,7 @@ const PersonalDashboardPage: React.FC = () => {
                               <td>
                                 {format(
                                   new Date(template.createdAt),
-                                  "MM-dd-yyyy"
+                                  "P"
                                 )}
                               </td>
                               {user &&
@@ -313,7 +313,7 @@ const PersonalDashboardPage: React.FC = () => {
         </Row>
       </Container>
       <AppFooter />
-    </>
+    </div>
   );
 };
 
