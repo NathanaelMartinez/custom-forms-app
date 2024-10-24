@@ -9,6 +9,8 @@ import {
   Clipboard2Check,
   Heart,
 } from "react-bootstrap-icons";
+import ReactMarkdown from "react-markdown";
+import rehypeRaw from "rehype-raw";
 
 interface TemplateListProps {
   title: string;
@@ -54,10 +56,12 @@ const TemplateList: React.FC<TemplateListProps> = ({
                     <span>{template.likes}</span>
                   </div>
                   <Card.Title className="fw-bold">{template.title}</Card.Title>
-                  <Card.Text>
-                    {/* display first few words of description */}
-                    {template.description?.split(" ").slice(0, 5).join(" ")}...
-                  </Card.Text>
+                  <ReactMarkdown rehypePlugins={[rehypeRaw]}>
+                    {template.description
+                      ? template.description.split(" ").slice(0, 5).join(" ") +
+                        "..."
+                      : ""}
+                  </ReactMarkdown>
                   <div className="d-flex justify-content-between align-items-center">
                     <div className="d-flex align-items-center">
                       <Clipboard2Check className="me-1" />

@@ -1,6 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { Form, Button, Card, Alert } from "react-bootstrap";
-import { format, isSameDay, differenceInMinutes } from "date-fns";
+import {
+  format,
+  parseISO,
+  differenceInSeconds,
+  differenceInMinutes,
+  differenceInHours,
+} from "date-fns";
 import { Comment, User } from "../../types";
 import {
   fetchCommentsForTemplate,
@@ -38,8 +44,8 @@ const CommentSection: React.FC<CommentSectionProps> = ({
   useEffect(() => {
     const fetchComments = async () => {
       try {
-        const data = await fetchCommentsForTemplate(templateId);
-        // Reverse the comments array to show the newest comments first
+        const data: Comment[] = await fetchCommentsForTemplate(templateId);
+        // reverse comments array to show newest comments first
         setComments(data.reverse());
       } catch (error) {
         console.error("Failed to load comments:", error);
@@ -64,26 +70,45 @@ const CommentSection: React.FC<CommentSectionProps> = ({
     }
   };
 
-  const formatDate = (commentDate: Date) => {
+  const formatDate = (createdAt: string | Date) => {
+    const commentDateUTC =
+      typeof createdAt === "string" ? parseISO(createdAt) : createdAt;
+
+    // get current time (will be local timezone)
     const now = new Date();
 
-    const parsedCommentDate =
-      typeof commentDate === "string"
-        ? new Date(Date.parse(commentDate))
-        : commentDate;
-    // If commentDate is in the future, set it to now
-    if (parsedCommentDate > now) {
-      return "Just now"; // If in the future, show as 'just now'
+    // get timezone offset in minutes and convert it to milliseconds
+    const timezoneOffsetInMs = now.getTimezoneOffset() * 60 * 1000;
+
+    // adjust commentDate by timezone offset
+    const localCommentDate = new Date(
+      commentDateUTC.getTime() - timezoneOffsetInMs
+    );
+
+    // calculate time differences
+    const secondsAgo = differenceInSeconds(now, localCommentDate);
+    const minutesAgo = differenceInMinutes(now, localCommentDate);
+    const hoursAgo = differenceInHours(now, localCommentDate);
+
+    // messages based on time differences
+    if (secondsAgo <= 30) {
+      return "Just now";
+    } else if (secondsAgo > 30 && minutesAgo < 1) {
+      return "Less than a minute ago";
+    } else if (minutesAgo >= 1 && minutesAgo < 60) {
+      return `${minutesAgo} minute${minutesAgo === 1 ? "" : "s"} ago`;
+    } else if (hoursAgo >= 1 && hoursAgo < 5) {
+      return `${hoursAgo} hour${hoursAgo === 1 ? "" : "s"} ago`;
+    } else if (
+      hoursAgo >= 5 &&
+      format(localCommentDate, "yyyy-MM-dd") === format(now, "yyyy-MM-dd")
+    ) {
+      // same day but more than 5 hours ago
+      return format(localCommentDate, "h:mm a") + " Today"; // e.g., "3:45 PM Today"
+    } else {
+      // if not same day, show full date in client's locale
+      return format(localCommentDate, "P"); // locale-specific date format (e.g., MM/DD/YYYY)
     }
-
-    const minutesAgo = differenceInMinutes(now, parsedCommentDate);
-    console.log("Minutes ago:", minutesAgo); // Log for debugging
-
-    if (isSameDay(parsedCommentDate, now)) {
-      return format(parsedCommentDate, "p"); // show time if today
-    }
-
-    return format(parsedCommentDate, "MM/dd/yy"); // show date otherwise
   };
 
   return (
