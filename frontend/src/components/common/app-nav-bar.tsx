@@ -146,24 +146,6 @@ const AppNavBar: React.FC = () => {
       )}
 
       {/* search bar - visible on every page */}
-      {/* <div className={"bg-dark text-center pb-4"}>
-        <Container>
-          <Row className="justify-content-center">
-            <Col md={6}>
-              <Form className="d-flex justify-content-center">
-                <Form.Control
-                  type="text"
-                  placeholder="I need a form for..."
-                  className="me-2"
-                />
-                <Button variant="primary" className="custom-primary-btn">
-                  <Search />
-                </Button>
-              </Form>
-            </Col>
-          </Row>
-        </Container>
-      </div> */}
       <AppSearchBar />
     </>
   );

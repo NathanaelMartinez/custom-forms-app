@@ -6,7 +6,7 @@ import { Template } from "../types";
 import AppFooter from "../components/common/app-footer";
 import { fetchTemplates } from "../services/template-service";
 
-const RecentTemplatesPage: React.FC = () => {
+const ViewTemplatesPage: React.FC = () => {
   const [templates, setTemplates] = useState<Template[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -36,11 +36,12 @@ const RecentTemplatesPage: React.FC = () => {
     )
 
   return (
-    <>
+    <div className="bg-home">
       <AppNavBar />
 
       <Container className="p-4 home-page-crawl">
         <Tabs defaultActiveKey="new-templates" className="tabs-container">
+          {/* add new tabs as needed */}
           <Tab
             eventKey="new-templates"
             title={<span className="fw-bold fs-3">New Templates</span>}
@@ -64,8 +65,8 @@ const RecentTemplatesPage: React.FC = () => {
       </Container>
 
       <AppFooter />
-    </>
+    </div>
   );
 };
 
-export default RecentTemplatesPage;
+export default ViewTemplatesPage;

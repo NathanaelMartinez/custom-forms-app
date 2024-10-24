@@ -7,11 +7,8 @@ import LoginPage from './pages/login-page';
 import AdminPage from './pages/admin-page';
 import CreateTemplatePage from './pages/create-template-page';
 import FormPage from './pages/form-page';
-import RecentTemplatesPage from './pages/recent-templates-page';
+import ViewTemplatesPage from './pages/view-all-templates-page';
 import PersonalDashboardPage from './pages/personal-dashboard-page';
-
-// Polyfill global for libraries that expect Node.js environment
-window.global = window;
 
 const App: React.FC = () => {
   return (
@@ -23,9 +20,9 @@ const App: React.FC = () => {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/admin-panel" element={<AdminPage />} />
           <Route path="/templates/:templateId?" element={<CreateTemplatePage />} />
-          <Route path="/recent-templates" element={<RecentTemplatesPage />} />
           <Route path="/forms/:id" element={<FormPage />} />
           <Route path="/profile/:id" element={<PersonalDashboardPage />} />
+          <Route path='/view-templates' element={<ViewTemplatesPage />} />
         </Routes>
       </Router>
     </AuthProvider>

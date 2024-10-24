@@ -90,7 +90,7 @@ const HomePage: React.FC = () => {
                   <Button
                     variant="primary"
                     className="custom-primary-btn"
-                    onClick={() => navigate("/recent-templates")}
+                    onClick={() => navigate("/view-templates")}
                   >
                     View All Templates
                   </Button>

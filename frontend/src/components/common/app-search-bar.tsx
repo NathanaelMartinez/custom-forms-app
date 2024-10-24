@@ -29,7 +29,7 @@ const AppSearchBar = () => {
                 <Form.Control
                   type="text"
                   placeholder="I need a form for..."
-                  className="me-2"
+                  className="me-2 input-focus-muted"
                   value={searchTerm} // bind input value to state
                   onChange={(e) => setSearchTerm(e.target.value)} // update state on input change
                 />
