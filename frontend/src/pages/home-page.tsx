@@ -45,7 +45,7 @@ const HomePage: React.FC = () => {
     .slice(0, 20);
 
   return (
-    <>
+    <div className="bg-home">
       <AppNavBar />
 
       <Container className="p-4 home-page-crawl">
@@ -102,7 +102,7 @@ const HomePage: React.FC = () => {
       </Container>
 
       <AppFooter />
-    </>
+    </div>
   );
 };
 

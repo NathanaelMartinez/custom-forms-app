@@ -3,17 +3,12 @@ import { useNavigate } from "react-router-dom";
 import { Card, Row, Col } from "react-bootstrap";
 import { format } from "date-fns";
 import { Template } from "../../types";
-import {
-  ChatDots,
-  ChatLeft,
-  Clipboard2Check,
-  Heart,
-} from "react-bootstrap-icons";
+import { ChatLeftDots, Clipboard2Check, Heart } from "react-bootstrap-icons";
 import ReactMarkdown from "react-markdown";
 import rehypeRaw from "rehype-raw";
 
 interface TemplateListProps {
-  title: string;
+  title: React.ReactNode;
   templates: Template[];
   type: "top" | "recent"; // could be top or recent templates
 }
@@ -31,7 +26,7 @@ const TemplateList: React.FC<TemplateListProps> = ({
 
   return (
     <section className={`${type}-templates`}>
-      <h3 className="mb-4 text-start fw-bold fs-2">{title}</h3>
+      <h3 className="mb-4 text-white fw-bold fs-2">{title}</h3>
 
       {type === "top" ? (
         <Row className="justify-content-center">
@@ -68,7 +63,7 @@ const TemplateList: React.FC<TemplateListProps> = ({
                       <span>{template.responses?.length}</span>
                     </div>
                     <div className="d-flex align-items-center">
-                      <ChatLeft className="me-1" />
+                      <ChatLeftDots className="me-1" />
                       <span>{template.comments?.length}</span>
                     </div>
                   </div>
@@ -93,10 +88,16 @@ const TemplateList: React.FC<TemplateListProps> = ({
                   alt="Template placeholder"
                 />
                 <Card.ImgOverlay className="d-flex flex-column justify-content-end">
+                  <div
+                    className="position-absolute"
+                    style={{ top: "10px", right: "10px" }}
+                  >
+                    <Heart className="me-1" color="red" />
+                    <span>{template.likes}</span>
+                  </div>
                   <Card.Title className="fw-bold">{template.title}</Card.Title>
                   <Card.Text>
-                    Uploaded:{" "}
-                    {format(new Date(template.createdAt), "MM-dd-yyyy")}
+                    Uploaded: {format(new Date(template.createdAt), "P")}
                   </Card.Text>
                   <div className="d-flex justify-content-between align-items-center mt-2">
                     <div className="d-flex align-items-center">
@@ -104,12 +105,8 @@ const TemplateList: React.FC<TemplateListProps> = ({
                       <span>{template.responses?.length}</span>
                     </div>
                     <div className="d-flex align-items-center">
-                      <ChatDots className="me-1" />
+                      <ChatLeftDots className="me-1" />
                       <span>{template.comments?.length}</span>
-                    </div>
-                    <div className="d-flex align-items-center">
-                      <Heart className="me-1" color="red" />
-                      <span>{template.likes}</span>
                     </div>
                   </div>
                 </Card.ImgOverlay>
