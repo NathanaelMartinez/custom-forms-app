@@ -7,13 +7,9 @@ import {
   Button,
   Dropdown,
   Container,
-  Form,
-  Row,
-  Col,
 } from "react-bootstrap";
 import {
   ShieldFill,
-  Search,
   PersonLock,
   CardList,
   BoxArrowRight,
@@ -21,6 +17,7 @@ import {
 import { useNavigate, useLocation } from "react-router-dom";
 import FormNewIcon from '../../assets/icons/form-new.svg?react';
 import { useAuth } from "../../context/auth-context";
+import AppSearchBar from "./app-search-bar";
 
 const AppNavBar: React.FC = () => {
   const { isLoggedIn, user, logout } = useAuth();
@@ -149,7 +146,7 @@ const AppNavBar: React.FC = () => {
       )}
 
       {/* search bar - visible on every page */}
-      <div className={"bg-dark text-center pb-4"}>
+      {/* <div className={"bg-dark text-center pb-4"}>
         <Container>
           <Row className="justify-content-center">
             <Col md={6}>
@@ -166,7 +163,8 @@ const AppNavBar: React.FC = () => {
             </Col>
           </Row>
         </Container>
-      </div>
+      </div> */}
+      <AppSearchBar />
     </>
   );
 };

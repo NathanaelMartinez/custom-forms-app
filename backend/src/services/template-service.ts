@@ -197,7 +197,7 @@ export const addCommentService = async (
 };
 
 // logic for searching templates
-export async function searchTemplates(searchTerm: string) {
+export async function searchTemplatesService(searchTerm: string) {
   const results = await searchTemplatesRepository(searchTerm);
   // potentially other operations done here
   return results;

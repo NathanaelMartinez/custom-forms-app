@@ -5,6 +5,7 @@ import {
   editTemplate,
   deleteTemplate,
   getTemplate,
+  searchTemplatesController,
 } from "../controllers/template-controller";
 import {
   authenticateJWT,
@@ -26,6 +27,9 @@ router.post("/", authenticateJWT, checkIfNotBlocked, createTemplate);
 
 // view all templates (available to all users and non-users)
 router.get("/", viewTemplates);
+
+// route for searching templates (must go before generic :id routes)
+router.get("/search", searchTemplatesController);
 
 // get a specific template (author or admin only)
 router.get("/:templateId", getTemplate);

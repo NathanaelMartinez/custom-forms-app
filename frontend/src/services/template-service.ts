@@ -163,3 +163,19 @@ export const fetchAggregateResponses = async (id: string) => {
     throw error;
   }
 };
+
+// function to search templates
+export async function searchTemplates(searchTerm: string) {
+  try {
+    const response = await axios.get(`${SERVER_URL}/api/templates/search`, {
+      params: {
+        q: searchTerm, // encodeURIComponent not needed
+      },
+    });
+
+    return response.data;
+  } catch (error) {
+    console.error("Error searching templates:", error);
+    throw error;
+  }
+}

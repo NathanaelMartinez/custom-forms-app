@@ -11,6 +11,7 @@ import {
   editTemplateService,
   getTemplateService,
   likeTemplateService,
+  searchTemplatesService,
   viewTemplatesService,
 } from "../services/template-service";
 
@@ -134,3 +135,14 @@ export const addComment = async (req: Request, res: Response) => {
     res.status(500).json({ message: "server error" });
   }
 };
+
+// controller for template search
+export async function searchTemplatesController(req: Request, res: Response) {
+  try {
+    const searchTerm = req.query.q as string; // extract query parameter
+    const results = await searchTemplatesService(searchTerm);
+    res.status(200).json(results);
+  } catch (error) {
+    res.status(500).json({ message: "Error searching templates", error });
+  }
+}
