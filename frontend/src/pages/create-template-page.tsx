@@ -24,6 +24,7 @@ const CreateTemplatePage: React.FC = () => {
   const { templateId } = useParams<{ templateId?: string }>(); // fetch templateId from URL if exists
   const [selectedImage, setSelectedImage] = useState<File | null>(null); // store selected image file
   const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(null); // preview URL for the image
+  const [exclusiveEmails, setExclusiveEmails] = useState<string[]>([]); // for making a template exclusive to selected emails
   const navigate = useNavigate();
 
   // redirect to login on component mount if user is not defined (just in case)
@@ -227,11 +228,21 @@ const CreateTemplatePage: React.FC = () => {
   };
 
   const handleReorderQuestions = (newQuestions: Question[]) => {
-    const newOrder = [...newQuestions]; // Always ensure new array
+    const newOrder = [...newQuestions]; // always ensure new array
     setTemplate((prev) => ({
       ...prev,
-      questions: newOrder, // Trigger proper state change
+      questions: newOrder, // trigger proper state change
     }));
+  };
+
+  const handleAddEmail = (emails: string[]) => {
+    setExclusiveEmails(emails); // replace full list with new array
+  };
+
+  const handleRemoveEmail = (email: string) => {
+    setExclusiveEmails((prevEmails) =>
+      prevEmails.filter((e) => e !== email)
+    ); // remove email if not in new list
   };
 
   return (
@@ -309,6 +320,9 @@ const CreateTemplatePage: React.FC = () => {
           onSave={handleSaveTemplate}
           isSaving={isSaving}
           questionsCount={questionsCount}
+          exclusiveEmails={exclusiveEmails}
+          onAddEmail={handleAddEmail}
+          onRemoveEmail={handleRemoveEmail}
         />
       </div>
     </>

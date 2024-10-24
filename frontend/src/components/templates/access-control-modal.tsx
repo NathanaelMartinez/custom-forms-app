@@ -1,13 +1,13 @@
-// access-control-modal.tsx
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Modal, Button, Form, InputGroup } from "react-bootstrap";
 import { EnvelopePlusFill } from "react-bootstrap-icons";
 
 interface AccessControlModalProps {
   show: boolean;
   onClose: () => void;
-  onSave: (emails: string[]) => void;
-  exclusiveEmails: string[];
+  onSave: (emails: string[]) => void; // Save all emails on modal close
+  onRemoveEmail: (email: string) => void;
+  exclusiveEmails: string[]; // Pass initial list of emails
 }
 
 const AccessControlModal: React.FC<AccessControlModalProps> = ({
@@ -16,24 +16,31 @@ const AccessControlModal: React.FC<AccessControlModalProps> = ({
   onSave,
   exclusiveEmails,
 }) => {
+  // Use local state to hold the emails within the modal
   const [inputValue, setInputValue] = useState<string>("");
-  const [emails, setEmails] = useState<string[]>(exclusiveEmails);
+  const [emails, setEmails] = useState<string[]>(exclusiveEmails); // Start with exclusiveEmails
+
+  // Ensure emails are reset when modal opens
+  useEffect(() => {
+    setEmails(exclusiveEmails);
+  }, [exclusiveEmails]);
 
   const handleAddEmail = () => {
     const trimmedEmail = inputValue.trim();
     if (trimmedEmail && !emails.includes(trimmedEmail)) {
-      setEmails([...emails, trimmedEmail]);
-      setInputValue("");
+      setEmails([...emails, trimmedEmail]); // Update local state
+      setInputValue(""); // Clear input field
     }
   };
 
   const handleRemoveEmail = (emailToRemove: string) => {
-    setEmails(emails.filter((email) => email !== emailToRemove));
+    setEmails(emails.filter((email) => email !== emailToRemove)); // Update local state
   };
 
+  // Save changes when "Save" is clicked
   const handleSaveChanges = () => {
-    onSave(emails);
-    onClose();
+    onSave(emails); // Pass the entire email list to parent component
+    onClose(); // Close the modal
   };
 
   return (
@@ -53,10 +60,11 @@ const AccessControlModal: React.FC<AccessControlModalProps> = ({
           <Form.Control
             type="email"
             placeholder="Enter user email..."
+            className="input-focus-muted"
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
           />
-          <Button variant="outline-primary" onClick={handleAddEmail}>
+          <Button variant="outline-primary" className="custom-outline-primary-btn" onClick={handleAddEmail}>
             <EnvelopePlusFill />
           </Button>
         </InputGroup>
@@ -68,7 +76,7 @@ const AccessControlModal: React.FC<AccessControlModalProps> = ({
                 variant="link"
                 size="sm"
                 className="ms-2 text-danger"
-                onClick={() => handleRemoveEmail(email)}
+                onClick={() => handleRemoveEmail(email)} // modify local state
               >
                 &times;
               </Button>
@@ -77,10 +85,10 @@ const AccessControlModal: React.FC<AccessControlModalProps> = ({
         </div>
       </Modal.Body>
       <Modal.Footer>
-        <Button variant="secondary" onClick={onClose}>
+        <Button variant="secondary" className="" onClick={onClose}>
           Cancel
         </Button>
-        <Button variant="primary" onClick={handleSaveChanges}>
+        <Button variant="primary" className="custom-success-btn" onClick={handleSaveChanges}>
           Save Changes
         </Button>
       </Modal.Footer>
