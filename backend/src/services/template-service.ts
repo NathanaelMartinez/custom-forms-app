@@ -3,6 +3,10 @@ import { Template } from "../entities/template";
 import { Question } from "../entities/question";
 import { User } from "../entities/user";
 import { Comment } from "../entities/comment";
+import {
+  getTemplateRepository,
+  searchTemplatesRepository,
+} from "../repositories/template-repository";
 
 export const createTemplateService = async (data: any, user: User) => {
   const { title, description, questions, topic, tags, image } = data;
@@ -191,3 +195,10 @@ export const addCommentService = async (
 
   return await commentRepository.save(newComment);
 };
+
+// logic for searching templates
+export async function searchTemplates(searchTerm: string) {
+  const results = await searchTemplatesRepository(searchTerm);
+  // potentially other operations done here
+  return results;
+}
