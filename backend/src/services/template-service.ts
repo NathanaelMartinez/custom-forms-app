@@ -4,17 +4,35 @@ import { Question } from "../entities/question";
 import { User } from "../entities/user";
 import { Comment } from "../entities/comment";
 import {
+  getAllTemplates,
   getTemplateById,
   getTemplateRepository,
   searchTemplatesRepository,
 } from "../repositories/template-repository";
 import { getQuestionRepository } from "../repositories/question-repository";
+import { Tag } from "../entities/tag";
 
 export const createTemplateService = async (data: any, user: User) => {
   const { title, description, questions, topic, tags, image } = data;
 
   const templateRepository = AppDataSource.getRepository(Template);
   const questionRepository = AppDataSource.getRepository(Question);
+  const tagRepository = AppDataSource.getRepository(Tag);
+
+  // Process tags: find existing or create new tags
+  const tagEntities = [];
+  for (const tagName of tags) {
+    const formattedTag = tagName
+      .toLowerCase()
+      .replace(/\b(a|an|the)\b/g, "")
+      .trim();
+    let tag = await tagRepository.findOne({ where: { name: formattedTag } });
+    if (!tag) {
+      tag = tagRepository.create({ name: formattedTag });
+      await tagRepository.save(tag);
+    }
+    tagEntities.push(tag);
+  }
 
   const template = templateRepository.create({
     title,
@@ -22,7 +40,7 @@ export const createTemplateService = async (data: any, user: User) => {
     author: user,
     image: image || null,
     topic: topic || "other",
-    tags: tags || [],
+    tags: tagEntities, // Set the processed tags
   });
 
   const savedTemplate = await templateRepository.save(template);
@@ -44,28 +62,26 @@ export const createTemplateService = async (data: any, user: User) => {
   return savedTemplate;
 };
 
-// service: view all templates
-export const viewTemplatesService = async () => {
-  const templateRepository = AppDataSource.getRepository(Template);
-  const templates = await templateRepository.find({
-    relations: ["author", "questions", "comments"],
-    cache: 60000,
-  });
-  return templates;
-};
-
-// service: get a specific template
 export const getTemplateService = async (templateId: string) => {
-  return await getTemplateById(templateId);
+  try {
+    const template = await getTemplateById(templateId);
+    if (!template) {
+      throw new Error("Template not found.");
+    }
+    return template;
+  } catch (error) {
+    console.error("Error fetching template:", error);
+    throw error;
+  }
 };
 
-// service: edit template
+// service: view all templates
 export const editTemplateService = async (
   templateId: string,
   data: any,
   user: User
 ) => {
-  const { title, description, topic, tags, image, questions } = data;
+  const { title, description, topic, tags = [], image, questions } = data; // default to empty array
 
   const templateRepository = getTemplateRepository();
   const questionRepository = getQuestionRepository();
@@ -87,9 +103,10 @@ export const editTemplateService = async (
   template.title = title || template.title;
   template.description = description || template.description;
   template.topic = topic || template.topic;
-  template.tags = tags || template.tags;
+  template.tags = Array.isArray(tags) ? tags : []; // Ensure it's always an array
   template.image = image || template.image;
 
+  // handle existing and new questions
   const existingQuestionsMap = template.questions.reduce((acc, question) => {
     acc[question.id] = question;
     return acc;
@@ -97,21 +114,21 @@ export const editTemplateService = async (
 
   const updatedQuestionIds = questions.map((q: Question) => q.id);
 
-  // Remove old questions that were not included in the update
+  // remove old questions not included in update
   for (const questionId in existingQuestionsMap) {
     if (!updatedQuestionIds.includes(questionId)) {
       await questionRepository.remove(existingQuestionsMap[questionId]);
     }
   }
 
-  // Update existing and add new questions
+  // update existing and add new questions
   const updatedQuestions = [];
   for (const questionData of questions) {
     const questionIndex =
       questions.findIndex((q: Question) => q.id === questionData.id) + 1;
 
     if (questionData.id && existingQuestionsMap[questionData.id]) {
-      // Update existing question
+      // update existing question
       const questionToUpdate = existingQuestionsMap[questionData.id];
       questionToUpdate.questionText =
         questionData.questionText || questionToUpdate.questionText;
@@ -189,6 +206,19 @@ export const addCommentService = async (
   newComment.author = user;
 
   return await commentRepository.save(newComment);
+};
+
+export const viewTemplatesService = async () => {
+  try {
+    const templates = await getAllTemplates();
+    if (!templates) {
+      throw new Error("No templates found.");
+    }
+    return templates;
+  } catch (error) {
+    console.error("Error fetching templates:", error);
+    throw error;
+  }
 };
 
 // logic for searching templates

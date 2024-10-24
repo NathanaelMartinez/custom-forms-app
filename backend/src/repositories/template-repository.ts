@@ -10,18 +10,24 @@ export function getTemplateRepository() {
 export async function searchTemplatesRepository(searchTerm: string) {
   const repository = getTemplateRepository();
 
-  const processedSearchTerm = searchTerm.trim().split(/\s+/).join(" & ");
+  const processedSearchTerm = searchTerm
+    .trim()
+    .split(/\s+/)
+    .map((term) => term.toLowerCase().replace(/\b(a|an|the)\b/g, "")) // normalize get rid of articles and fillers
+    .join(" & ");
 
   try {
     const results = await repository
       .createQueryBuilder("template")
+      .leftJoinAndSelect("template.tags", "tag") // join with tags
       .addSelect(
-        "ts_rank(template.search_vector, to_tsquery('english', :query))", // because different search vectors have different weights
+        "ts_rank(template.search_vector, to_tsquery('english', :query))",
         "rank"
       )
-      .where("template.search_vector @@ to_tsquery('english', :query)", {
-        query: processedSearchTerm,
-      })
+      .where(
+        "template.search_vector @@ to_tsquery('english', :query) OR tag.name @@ to_tsquery('english', :query)", // Search tags too
+        { query: processedSearchTerm }
+      )
       .orderBy("rank", "DESC")
       .getMany();
 

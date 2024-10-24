@@ -64,6 +64,8 @@ const CreateTemplatePage: React.FC = () => {
             navigate("/");
           }
 
+          console.log("templateData",templateData);
+
           setTemplate(templateData);
           setQuestionsCount(templateData.questions.length);
           setDescription(templateData.description || ""); // Set description to the new state
@@ -110,7 +112,7 @@ const CreateTemplatePage: React.FC = () => {
       const updatedTemplate = { ...template, description, image: imageUrl }; // use separate description state
       const payload = mapTemplateToPayload(updatedTemplate);
 
-      console.log(payload);
+      console.log("payload", payload);
 
       if (templateId) {
         await updateTemplate(templateId, payload);
@@ -239,6 +241,16 @@ const CreateTemplatePage: React.FC = () => {
     setExclusiveEmails((prevEmails) => prevEmails.filter((e) => e !== email));
   };
 
+  const handleTagChange = (tags: string[]) => {
+    const normalizedTags = tags.map((tag) =>
+      tag.toLowerCase().replace(/\b(a|an|the)\b/g, "").trim() // normalize tags
+    );
+    setTemplate((prev) => ({
+      ...prev,
+      tags: Array.isArray(normalizedTags) ? normalizedTags : [],
+    }));
+  };
+
   return (
     <>
       <AppNavBar />
@@ -302,7 +314,7 @@ const CreateTemplatePage: React.FC = () => {
           tags={template.tags || []}
           imagePreviewUrl={imagePreviewUrl}
           onTopicChange={(value) => setTemplate({ ...template, topic: value })}
-          onTagChange={(tags) => setTemplate({ ...template, tags })}
+          onTagChange={handleTagChange}
           onImageUpload={handleImageSelection}
           onSave={handleSaveTemplate}
           isSaving={isSaving}

@@ -5,11 +5,14 @@ import {
   ManyToOne,
   OneToMany,
   Index,
+  ManyToMany,
+  JoinTable,
 } from "typeorm";
 import { User } from "./user";
 import { Question } from "./question";
 import { Comment } from "./comment";
 import { Response } from "./response";
+import { Tag } from "./tag";
 
 @Entity("templates")
 export class Template {
@@ -43,8 +46,9 @@ export class Template {
   @Column({ type: "text", nullable: true })
   topic!: string;
 
-  @Column({ type: "text", array: true, nullable: true })
-  tags!: string[];
+  @ManyToMany(() => Tag, (tag) => tag.templates, { cascade: true })
+  @JoinTable()
+  tags!: Tag[];
 
   @OneToMany(() => Response, (response) => response.template, { eager: true })
   responses!: Response[];

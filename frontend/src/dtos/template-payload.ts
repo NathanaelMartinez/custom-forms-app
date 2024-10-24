@@ -26,7 +26,7 @@ export const mapTemplateToPayload = (template: Template): TemplatePayload => ({
     templateId: template.id,
   })),
   createdAt: template.createdAt || new Date(),
-  tags: template.tags,
+  tags: template.tags || [],
   image: template.image,
 });
 
@@ -45,6 +45,6 @@ export const mapPayloadToTemplate = (payload: TemplatePayload): Template => ({
     template: { id: q.templateId }, // map back to full Template entity
   })),
   createdAt: new Date(),
-  tags: payload.tags,
+  tags: payload.tags || [],
   image: payload.image,
 });
