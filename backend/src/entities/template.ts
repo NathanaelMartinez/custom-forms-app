@@ -4,6 +4,7 @@ import {
   Column,
   ManyToOne,
   OneToMany,
+  Index,
 } from "typeorm";
 import { User } from "./user";
 import { Question } from "./question";
@@ -47,4 +48,8 @@ export class Template {
 
   @OneToMany(() => Response, (response) => response.template, { eager: true })
   responses!: Response[];
+
+  @Column({ type: "tsvector", nullable: true }) // this stores search vector
+  @Index({ fulltext: true }) // full-text search index
+  search_vector!: string;
 }

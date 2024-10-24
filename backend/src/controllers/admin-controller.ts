@@ -18,6 +18,7 @@ export const getUsers = async (req: Request, res: Response) => {
     const users = await userRepository
       .createQueryBuilder("user")
       .addSelect("user.email") // admins can see emails in dashboard
+      .cache(true)
       .getMany();
 
     res.status(200).json(users);
