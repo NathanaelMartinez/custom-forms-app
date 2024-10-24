@@ -4,9 +4,11 @@ import { Question } from "../entities/question";
 import { User } from "../entities/user";
 import { Comment } from "../entities/comment";
 import {
+  getTemplateById,
   getTemplateRepository,
   searchTemplatesRepository,
 } from "../repositories/template-repository";
+import { getQuestionRepository } from "../repositories/question-repository";
 
 export const createTemplateService = async (data: any, user: User) => {
   const { title, description, questions, topic, tags, image } = data;
@@ -54,13 +56,7 @@ export const viewTemplatesService = async () => {
 
 // service: get a specific template
 export const getTemplateService = async (templateId: string) => {
-  const templateRepository = AppDataSource.getRepository(Template);
-  const template = await templateRepository.findOne({
-    where: { id: templateId },
-    relations: ["questions"],
-    order: { questions: { order_index: "ASC" } },
-  });
-  return template;
+  return await getTemplateById(templateId);
 };
 
 // service: edit template
@@ -71,8 +67,8 @@ export const editTemplateService = async (
 ) => {
   const { title, description, topic, tags, image, questions } = data;
 
-  const templateRepository = AppDataSource.getRepository(Template);
-  const questionRepository = AppDataSource.getRepository(Question);
+  const templateRepository = getTemplateRepository();
+  const questionRepository = getQuestionRepository();
 
   const template = await templateRepository.findOne({
     where: { id: templateId },
@@ -94,38 +90,38 @@ export const editTemplateService = async (
   template.tags = tags || template.tags;
   template.image = image || template.image;
 
-  const existingQuestions = template.questions.reduce((acc, question) => {
+  const existingQuestionsMap = template.questions.reduce((acc, question) => {
     acc[question.id] = question;
     return acc;
   }, {} as Record<string, Question>);
 
   const updatedQuestionIds = questions.map((q: Question) => q.id);
 
-  // remove old questions
-  for (const questionId in existingQuestions) {
+  // Remove old questions that were not included in the update
+  for (const questionId in existingQuestionsMap) {
     if (!updatedQuestionIds.includes(questionId)) {
-      await questionRepository.remove(existingQuestions[questionId]);
+      await questionRepository.remove(existingQuestionsMap[questionId]);
     }
   }
 
-  const newQuestionsToReturn = [];
+  // Update existing and add new questions
+  const updatedQuestions = [];
   for (const questionData of questions) {
     const questionIndex =
       questions.findIndex((q: Question) => q.id === questionData.id) + 1;
-    if (
-      questionData.id &&
-      !questionData.id.startsWith("temp-") &&
-      existingQuestions[questionData.id]
-    ) {
-      const questionToUpdate = existingQuestions[questionData.id];
+
+    if (questionData.id && existingQuestionsMap[questionData.id]) {
+      // Update existing question
+      const questionToUpdate = existingQuestionsMap[questionData.id];
       questionToUpdate.questionText =
         questionData.questionText || questionToUpdate.questionText;
       questionToUpdate.type = questionData.type || questionToUpdate.type;
       questionToUpdate.displayInTable =
         questionData.displayInTable ?? questionToUpdate.displayInTable;
       questionToUpdate.order_index = questionIndex;
-      await questionRepository.save(questionToUpdate);
-    } else if (template) {
+      updatedQuestions.push(await questionRepository.save(questionToUpdate));
+    } else {
+      // Add new question
       const newQuestion = questionRepository.create({
         questionText: questionData.questionText,
         type: questionData.type,
@@ -134,13 +130,12 @@ export const editTemplateService = async (
         options: questionData.options || [],
         order_index: questionIndex,
       });
-      const savedQuestion = await questionRepository.save(newQuestion);
-      newQuestionsToReturn.push(savedQuestion);
+      updatedQuestions.push(await questionRepository.save(newQuestion));
     }
   }
 
-  template.questions = [...template.questions, ...newQuestionsToReturn];
-  return templateRepository.save(template);
+  template.questions = updatedQuestions; // Set updated questions
+  return templateRepository.save(template); // Save the updated template
 };
 
 // service: delete template

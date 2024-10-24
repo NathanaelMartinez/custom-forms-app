@@ -105,7 +105,6 @@ const TemplateOverview: React.FC<TemplateOverviewProps> = ({
         )}
       </Form.Group>
 
-      {/* tag input TODO: search for library?*/}
       <Form.Group className="mb-3">
         <Form.Label>Tags</Form.Label>
         <TagInput tags={tags} onTagChange={onTagChange} />

@@ -43,8 +43,8 @@ export class Template {
   @Column({ type: "text", nullable: true })
   topic!: string;
 
-  @Column("simple-array", { nullable: true })
-  tags!: string[]; // TODO: make tags into entity
+  @Column({ type: "text", array: true, nullable: true })
+  tags!: string[];
 
   @OneToMany(() => Response, (response) => response.template, { eager: true })
   responses!: Response[];

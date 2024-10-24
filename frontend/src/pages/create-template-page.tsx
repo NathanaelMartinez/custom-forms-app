@@ -19,12 +19,27 @@ import { uploadImageToCloudinary } from "../services/cloudinary-service";
 
 const CreateTemplatePage: React.FC = () => {
   const [isSaving, setIsSaving] = useState<boolean>(false);
-  const [questionsCount, setQuestionsCount] = useState<number>(0); // track number of questions for validation
+  const [questionsCount, setQuestionsCount] = useState<number>(0); 
   const { isLoggedIn, user } = useAuth();
-  const { templateId } = useParams<{ templateId?: string }>(); // fetch templateId from URL if exists
-  const [selectedImage, setSelectedImage] = useState<File | null>(null); // store selected image file
-  const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(null); // preview URL for the image
-  const [exclusiveEmails, setExclusiveEmails] = useState<string[]>([]); // for making a template exclusive to selected emails
+  const { templateId } = useParams<{ templateId?: string }>(); 
+  const [selectedImage, setSelectedImage] = useState<File | null>(null); 
+  const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(null); 
+  const [exclusiveEmails, setExclusiveEmails] = useState<string[]>([]); 
+  const [description, setDescription] = useState<string>(""); // Separate description state
+  const [template, setTemplate] = useState<Template>({
+    id: "",
+    title: "Untitled Form",
+    description: "",
+    author: user || { id: "" },
+    questions: [],
+    filledForms: 0,
+    likes: 0,
+    comments: [],
+    topic: "",
+    tags: [],
+    image: null,
+    createdAt: new Date(),
+  });
   const navigate = useNavigate();
 
   // redirect to login on component mount if user is not defined (just in case)
@@ -51,6 +66,7 @@ const CreateTemplatePage: React.FC = () => {
 
           setTemplate(templateData);
           setQuestionsCount(templateData.questions.length);
+          setDescription(templateData.description || ""); // Set description to the new state
           setImagePreviewUrl(templateData.image!);
         } catch (error) {
           console.error("Failed to fetch template:", error);
@@ -61,41 +77,23 @@ const CreateTemplatePage: React.FC = () => {
   }, [templateId]);
 
   useEffect(() => {
-    window.scrollTo(0, 0); // make sure scrolled up
+    window.scrollTo(0, 0);
   }, []);
 
-  // get template from storage if redirected from login
   useEffect(() => {
     const savedTemplate = localStorage.getItem("savedTemplate");
     if (savedTemplate) {
-      setTemplate(JSON.parse(savedTemplate));
-      setQuestionsCount(JSON.parse(savedTemplate).questions.length);
-      localStorage.removeItem("savedTemplate"); // clear it after restoring
+      const parsedTemplate = JSON.parse(savedTemplate);
+      setTemplate(parsedTemplate);
+      setQuestionsCount(parsedTemplate.questions.length);
+      setDescription(parsedTemplate.description || ""); // Initialize description state
+      localStorage.removeItem("savedTemplate");
     }
   }, []);
 
-  const [template, setTemplate] = useState<Template>({
-    id: "",
-    title: "Untitled Form",
-    description: "",
-    author: user || { id: "" }, // ensure author is not null
-    questions: [],
-    filledForms: 0,
-    likes: 0,
-    comments: [],
-    topic: "",
-    tags: [],
-    image: null,
-    createdAt: new Date(),
-  });
-
   const handleSaveTemplate = async () => {
-    // check if still logged in (tokens can expire)
     if (!isLoggedIn) {
-      // save current state in localStorage
       localStorage.setItem("savedTemplate", JSON.stringify(template));
-
-      // redirect to login page and include a return URL to bring the user back
       navigate("/login", { state: { returnUrl: location.pathname } });
       return;
     }
@@ -103,20 +101,21 @@ const CreateTemplatePage: React.FC = () => {
     try {
       setIsSaving(true);
 
-      // upload image before saving template
-      const imageUrl = await handleImageUpload();
-      const updatedTemplate = { ...template, image: imageUrl };
+      if (template.questions.length === 0) {
+        setIsSaving(false);
+        return;
+      }
 
+      const imageUrl = await handleImageUpload();
+      const updatedTemplate = { ...template, description, image: imageUrl }; // use separate description state
       const payload = mapTemplateToPayload(updatedTemplate);
 
-      console.log("Payload questions to be saved:", payload.questions);
+      console.log(payload);
 
       if (templateId) {
-        // if templateId exists update existing template
         await updateTemplate(templateId, payload);
         navigate(`/forms/${templateId}`);
       } else {
-        // create new template
         const response = await createTemplate(payload);
         navigate(`/forms/${response.data.template.id}`);
       }
@@ -141,7 +140,7 @@ const CreateTemplatePage: React.FC = () => {
       ...prev,
       questions: [...prev.questions, newQuestion],
     }));
-    setQuestionsCount((prevCount) => prevCount + 1); // increment questions count
+    setQuestionsCount((prevCount) => prevCount + 1); 
   };
 
   const handleQuestionTextChange = (id: string, text: string) => {
@@ -154,7 +153,7 @@ const CreateTemplatePage: React.FC = () => {
   const handleDeleteQuestion = (id: string) => {
     const updatedQuestions = template.questions.filter((q) => q.id !== id);
     setTemplate({ ...template, questions: updatedQuestions });
-    setQuestionsCount(updatedQuestions.length); // update questions count
+    setQuestionsCount(updatedQuestions.length); 
   };
 
   const handleDuplicateQuestion = (question: Question) => {
@@ -163,7 +162,7 @@ const CreateTemplatePage: React.FC = () => {
       ...prev,
       questions: [...prev.questions, duplicatedQuestion],
     }));
-    setQuestionsCount(template.questions.length + 1); // update the question count
+    setQuestionsCount(template.questions.length + 1); 
   };
 
   const handleOptionChange = (id: string, index: number, value: string) => {
@@ -200,20 +199,17 @@ const CreateTemplatePage: React.FC = () => {
     setTemplate({ ...template, questions: updatedQuestions });
   };
 
-  // handle image selection for preview (before uploading)
   const handleImageSelection = (file: File | null) => {
     if (file) {
       setSelectedImage(file);
-      const previewUrl = URL.createObjectURL(file); // create a preview URL for the selected image
-      setImagePreviewUrl(previewUrl); // set the image preview URL
+      const previewUrl = URL.createObjectURL(file); 
+      setImagePreviewUrl(previewUrl); 
     } else {
-      // Clear the image if file is null
       setSelectedImage(null);
-      setImagePreviewUrl(null); // clear the preview if no file is selected
+      setImagePreviewUrl(null);
     }
   };
 
-  // handle image upload to Cloudinary when "Publish" button is clicked
   const handleImageUpload = async () => {
     if (selectedImage) {
       try {
@@ -228,31 +224,27 @@ const CreateTemplatePage: React.FC = () => {
   };
 
   const handleReorderQuestions = (newQuestions: Question[]) => {
-    const newOrder = [...newQuestions]; // always ensure new array
+    const newOrder = [...newQuestions];
     setTemplate((prev) => ({
       ...prev,
-      questions: newOrder, // trigger proper state change
+      questions: newOrder,
     }));
   };
 
   const handleAddEmail = (emails: string[]) => {
-    setExclusiveEmails(emails); // replace full list with new array
+    setExclusiveEmails(emails);
   };
 
   const handleRemoveEmail = (email: string) => {
-    setExclusiveEmails((prevEmails) =>
-      prevEmails.filter((e) => e !== email)
-    ); // remove email if not in new list
+    setExclusiveEmails((prevEmails) => prevEmails.filter((e) => e !== email));
   };
 
   return (
     <>
       <AppNavBar />
       <div className="d-flex justify-content-center min-vh-100 bg-light">
-        {/* TODO: find a way to get rid of this div */}
         <div className="flex-grow-1"></div>
         <div className="flex-grow-1 p-5">
-          {/* image Preview */}
           {imagePreviewUrl && (
             <div className="mb-4 w-100" style={{ maxWidth: "800px" }}>
               <img
@@ -271,7 +263,6 @@ const CreateTemplatePage: React.FC = () => {
             className="shadow-lg p-4 bg-white rounded-3"
             style={{ width: "100%", maxWidth: "800px" }}
           >
-            {/* title input */}
             <Form.Control
               type="text"
               value={template.title}
@@ -282,19 +273,15 @@ const CreateTemplatePage: React.FC = () => {
               placeholder="Untitled Form"
             />
 
-            {/* description input */}
             <Form.Group className="mb-3">
               <ReactQuill
-                value={template.description}
-                onChange={(value) =>
-                  setTemplate({ ...template, description: value })
-                }
+                value={description} // Use the separate description state
+                onChange={setDescription} // Update the description state
                 placeholder="Describe your form..."
                 className="input-focus-muted"
               />
             </Form.Group>
 
-            {/* question list */}
             <QuestionList
               containerId={template.id}
               questions={template.questions}
@@ -310,7 +297,7 @@ const CreateTemplatePage: React.FC = () => {
           </Card>
         </div>
         <TemplateOverview
-          description={template.description || ""}
+          description={description || ""}
           topic={template.topic || ""}
           tags={template.tags || []}
           imagePreviewUrl={imagePreviewUrl}

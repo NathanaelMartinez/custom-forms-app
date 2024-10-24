@@ -10,18 +10,19 @@ export function getTemplateRepository() {
 export async function searchTemplatesRepository(searchTerm: string) {
   const repository = getTemplateRepository();
 
-  // process search term for to_tsquery (replace spaces with '&')
   const processedSearchTerm = searchTerm.trim().split(/\s+/).join(" & ");
 
-  console.log("Processed Search Term: ", processedSearchTerm);
-
   try {
-    // construct full-text search query
     const results = await repository
       .createQueryBuilder("template")
+      .addSelect(
+        "ts_rank(template.search_vector, to_tsquery('english', :query))", // because different search vectors have different weights
+        "rank"
+      )
       .where("template.search_vector @@ to_tsquery('english', :query)", {
         query: processedSearchTerm,
       })
+      .orderBy("rank", "DESC")
       .getMany();
 
     return results;
@@ -45,7 +46,7 @@ export async function getTemplateById(templateId: string) {
   const repository = getTemplateRepository();
   return await repository.findOne({
     where: { id: templateId },
-    relations: ["questions"],
+    relations: ["questions", "comments", "author"],
     order: { questions: { order_index: "ASC" } },
   });
 }

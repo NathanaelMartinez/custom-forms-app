@@ -25,6 +25,7 @@ export class Question {
     onDelete: "CASCADE",
     eager: false, // prevent automatic loading of template in all queries
   })
+  @JoinColumn({ name: "templateId" })
   template!: Template;
 
   @Column({ default: true })
