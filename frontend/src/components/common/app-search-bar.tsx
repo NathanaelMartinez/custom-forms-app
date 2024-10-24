@@ -2,18 +2,18 @@ import React, { useState } from "react";
 import { Button, Form, Container, Row, Col } from "react-bootstrap";
 import { Search } from "react-bootstrap-icons";
 import { searchTemplates } from "../../services/template-service";
-import { Template } from "../../types";
+import { useNavigate } from "react-router-dom";
 
 const AppSearchBar = () => {
   const [searchTerm, setSearchTerm] = useState(""); // to store search input
-  const [searchResults, setSearchResults] = useState<Template[]>([]); // to store search results
+  const navigate = useNavigate()
 
   const handleSearch = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault(); // prevent page reload on form submission
     try {
       const results = await searchTemplates(searchTerm); // call search function
-      setSearchResults(results); // update state with search results
-      console.log("Search Results:", results); // TODO: create search results page
+      navigate("/view-templates", { state: { results, query: searchTerm } }); // pass search variables to results page
+      console.log("Search Results:", results);
     } catch (error) {
       console.error("Error searching templates:", error);
     }
@@ -40,21 +40,6 @@ const AppSearchBar = () => {
             </Col>
           </Row>
         </Container>
-      </div>
-
-      {/* you can display search results below */}
-      <div>
-        {searchResults.length > 0 && (
-          <div className="search-results">
-            <h3>Search Results:</h3>
-            {searchResults.map((result) => (
-              <div key={result.id}>
-                <h4>{result.title}</h4>
-                <p>{result.description}</p>
-              </div>
-            ))}
-          </div>
-        )}
       </div>
     </>
   );

@@ -84,7 +84,7 @@ const TemplateList: React.FC<TemplateListProps> = ({
               >
                 <Card.Img
                   variant="top"
-                  src="https://placehold.co/600x820/f4f4f4/FFF?text=Template"
+                  src={`https://placehold.co/600x820/f4f4f4/FFF?text=${template.id}`}
                   alt="Template placeholder"
                 />
                 <Card.ImgOverlay className="d-flex flex-column justify-content-end">
@@ -95,18 +95,25 @@ const TemplateList: React.FC<TemplateListProps> = ({
                     <Heart className="me-1" color="red" />
                     <span>{template.likes}</span>
                   </div>
-                  <Card.Title className="fw-bold">{template.title}</Card.Title>
-                  <Card.Text>
-                    Uploaded: {format(new Date(template.createdAt), "P")}
-                  </Card.Text>
-                  <div className="d-flex justify-content-between align-items-center mt-2">
-                    <div className="d-flex align-items-center">
-                      <Clipboard2Check className="me-1" />
-                      <span>{template.responses?.length}</span>
-                    </div>
-                    <div className="d-flex align-items-center">
-                      <ChatLeftDots className="me-1" />
-                      <span>{template.comments?.length}</span>
+                  <div className="card-bottom-content mt-auto">
+                    <Card.Title
+                      className="fw-bold mb-1"
+                      style={{ fontSize: "1rem" }}
+                    >
+                      {template.title}
+                    </Card.Title>
+                    <Card.Text style={{ fontSize: "0.875rem" }}>
+                      Uploaded: {format(new Date(template.createdAt), "P")}
+                    </Card.Text>
+                    <div className="d-flex justify-content-between align-items-center mt-2">
+                      <div className="d-flex align-items-center">
+                        <Clipboard2Check className="me-1" />
+                        <span>{template.responses?.length}</span>
+                      </div>
+                      <div className="d-flex align-items-center">
+                        <ChatLeftDots className="me-1" />
+                        <span>{template.comments?.length}</span>
+                      </div>
                     </div>
                   </div>
                 </Card.ImgOverlay>

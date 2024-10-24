@@ -439,24 +439,22 @@ h1.display-3 {
   transition: opacity 0.2s ease;
 }
 
-.tiptap-editor {
-  min-height: 150px;
-  max-height: 300px;
-  overflow-y: auto;
-}
-
-.tiptap-toolbar button {
-  background: none;
-  border: none;
-  padding: 5px;
-  cursor: pointer;
-}
-
-.tiptap-toolbar button.active {
+.custom-search-badge {
+  background-color: #124e66 !important;
+  border-radius: 8px; /* slightly rounded corners */
+  color: white;
   font-weight: bold;
+  display: inline-flex;
+  align-items: center;
 }
 
-.tiptap-toolbar button:hover {
-  background-color: #f0f0f0;
+.custom-search-badge button {
+  font-weight: bold;
+  color: white;
+  /* for X */
+  text-decoration: none; 
 }
 
+.custom-search-badge button:hover {
+  color: #dcdcdc; /* Change the color of the "X" on hover */
+}
