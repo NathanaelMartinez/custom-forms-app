@@ -10,8 +10,8 @@ import {
   deleteTemplateService,
   editTemplateService,
   getTemplateService,
-  likeTemplateService,
   searchTemplatesService,
+  toggleLikeTemplateService,
   viewTemplatesService,
 } from "../services/template-service";
 
@@ -108,16 +108,24 @@ export const deleteTemplate = async (req: Request, res: Response) => {
   }
 };
 
-// like a template
+// like/unlike template
 export const likeTemplate = async (req: Request, res: Response) => {
   const { templateId } = req.params;
+  const user = req.user as User;
 
   try {
-    const likedTemplate = await likeTemplateService(templateId);
-    res.json({ message: "template liked", likes: likedTemplate.likes });
+    const { hasLiked, likesCount } = await toggleLikeTemplateService(
+      templateId,
+      user.id
+    );
+
+    res.json({
+      message: hasLiked ? "Template liked" : "Template unliked",
+      likes: likesCount,
+    });
   } catch (error) {
-    console.error("Error liking template:", error);
-    res.status(500).json({ message: "server error" });
+    console.error("Error toggling like for template:", error);
+    res.status(500).json({ message: "Server error" });
   }
 };
 

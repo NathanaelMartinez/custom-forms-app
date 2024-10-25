@@ -14,6 +14,7 @@ interface FormButtonsProps {
   isCommentSectionVisible: boolean;
   setIsDataTableVisible: (visible: boolean) => void;
   isDataTableVisible: boolean;
+  likesCount: number;
 }
 
 const FormButtons: React.FC<FormButtonsProps> = ({
@@ -26,8 +27,11 @@ const FormButtons: React.FC<FormButtonsProps> = ({
   isCommentSectionVisible,
   setIsDataTableVisible,
   isDataTableVisible,
+  likesCount,
 }) => {
   const navigate = useNavigate();
+
+  console.log(likesCount);
 
   return (
     <div className="d-flex align-items-center gap-2">

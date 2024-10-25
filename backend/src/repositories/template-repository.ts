@@ -42,7 +42,7 @@ export async function searchTemplatesRepository(searchTerm: string) {
 export async function getAllTemplates() {
   const repository = getTemplateRepository();
   return await repository.find({
-    relations: ["author", "questions", "comments"],
+    relations: ["author", "tags"],
     cache: 60000,
   });
 }
@@ -52,7 +52,7 @@ export async function getTemplateById(templateId: string) {
   const repository = getTemplateRepository();
   return await repository.findOne({
     where: { id: templateId },
-    relations: ["questions", "comments", "author"],
+    relations: ["questions", "comments", "author", "tags", "likedBy"],
     order: { questions: { order_index: "ASC" } },
   });
 }

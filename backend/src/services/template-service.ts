@@ -173,16 +173,41 @@ export const deleteTemplateService = async (templateId: string, user: User) => {
 };
 
 // service: like template
-export const likeTemplateService = async (templateId: string) => {
+export const toggleLikeTemplateService = async (
+  templateId: string,
+  userId: string
+) => {
   const templateRepository = AppDataSource.getRepository(Template);
-  const template = await templateRepository.findOneBy({ id: templateId });
+  const userRepository = AppDataSource.getRepository(User);
 
-  if (!template) {
-    throw new Error("Template not found.");
+  const template = await templateRepository.findOne({
+    where: { id: templateId },
+    relations: ["likedBy"],
+  });
+
+  const user = await userRepository.findOne({ where: { id: userId } });
+
+  if (!template || !user) {
+    throw new Error("Template or User not found.");
   }
 
-  template.likes += 1;
-  return templateRepository.save(template);
+  // check if user has already liked
+  const hasLiked = template.likedBy.some((u) => u.id === userId);
+
+  if (!hasLiked) {
+    template.likedBy.push(user);
+    template.likesCount += 1; // increment likes count
+    await templateRepository.save(template);
+  } else {
+    template.likedBy = template.likedBy.filter((u) => u.id !== userId);
+    template.likesCount -= 1; // decrement likes count
+    await templateRepository.save(template);
+  }
+
+  return {
+    hasLiked: !hasLiked,
+    likesCount: template.likesCount,
+  };
 };
 
 // service: add comment to template

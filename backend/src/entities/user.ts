@@ -1,4 +1,10 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from "typeorm";
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  OneToMany,
+  ManyToMany,
+} from "typeorm";
 import { Template } from "./template";
 import { Comment } from "./comment";
 import { Response } from "./response";
@@ -34,4 +40,7 @@ export class User {
 
   @OneToMany(() => Response, (response) => response.user)
   responses!: Response[];
+
+  @ManyToMany(() => Template, (template) => template.likedBy)
+  likedTemplates!: Template[]; // templates user has liked
 }

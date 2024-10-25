@@ -6,8 +6,9 @@ import {
   fetchAggregateResponses,
   fetchTemplateById,
   submitForm,
+  toggleLikeTemplate,
 } from "../services/template-service";
-import { Template } from "../types";
+import { Template, User } from "../types";
 import { Form, Button, Card, Spinner, Alert } from "react-bootstrap";
 import AppNavBar from "../components/common/app-nav-bar";
 import { useAuth } from "../context/auth-context";
@@ -36,7 +37,8 @@ const FormPage: React.FC = () => {
   const [isCommentSectionVisible, setIsCommentSectionVisible] =
     useState<boolean>(false);
   const [isDataTableVisible, setIsDataTableVisible] = useState<boolean>(false);
-  const [liked, setLiked] = useState<boolean>(false);
+  const [isLiked, setLiked] = useState<boolean>(false);
+  const [likesCount, setLikesCount] = useState(0);
   const [aggregatedData, setAggregatedData] = useState<AggregatedData>({
     responseCount: 0,
     numericData: {},
@@ -56,6 +58,8 @@ const FormPage: React.FC = () => {
       try {
         const data = await fetchTemplateById(id as string);
         setTemplate(data);
+        setLikesCount(data.likesCount); // set initial likes count
+        setLiked(data.likedBy.some((u: User) => u.id === user?.id)); // set initial liked status
       } catch (err) {
         console.log(err);
         setError("Failed to fetch template");
@@ -108,15 +112,39 @@ const FormPage: React.FC = () => {
     }));
   };
 
-  const handleLikeToggle = () => {
+  const handleToggleLike = async () => {
+    if (!template || !user) {
+      console.error("Template or User not found.");
+      return;
+    }
+  
+    // optimistically toggle like
+    const newLikedState = !isLiked;
+    const newLikesCount = newLikedState ? likesCount + 1 : likesCount - 1;
+  
+    setLiked(newLikedState);
+    setLikesCount(newLikesCount);
+  
     try {
-      setLiked(!liked);
-      // await toggleLike(template?.id); TODO: add call to backend to increment like
+      const response = await toggleLikeTemplate(template.id);
+  
+      // validate likes count and liked state w/ response
+      const actualLikedState = response.hasLiked ?? newLikedState;
+      const actualLikesCount = response.likesCount ?? newLikesCount;
+  
+      // update based on server response
+      setLiked(actualLikedState);
+      setLikesCount(actualLikesCount);
+  
     } catch (error) {
       console.error("Failed to toggle like:", error);
+  
+      // rollback optimistic changes if request fails
+      setLiked((prevLiked) => !prevLiked);
+      setLikesCount((prevCount) => (newLikedState ? prevCount - 1 : prevCount + 1));
     }
   };
-
+  
   const handleFormSubmit = async () => {
     if (!user) {
       setError("Please log in to submit the form.");
@@ -226,12 +254,13 @@ const FormPage: React.FC = () => {
                     templateId={template?.id || ""}
                     user={user}
                     templateAuthorId={template?.author.id || ""}
-                    liked={liked}
-                    handleLikeToggle={handleLikeToggle}
+                    liked={isLiked}
+                    handleLikeToggle={handleToggleLike}
                     setIsCommentSectionVisible={setIsCommentSectionVisible}
                     isCommentSectionVisible={isCommentSectionVisible}
                     setIsDataTableVisible={setIsDataTableVisible}
                     isDataTableVisible={isDataTableVisible}
+                    likesCount={likesCount}
                   />
                 </div>
 

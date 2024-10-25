@@ -34,8 +34,12 @@ export class Template {
   @Column({ type: "timestamp", default: () => "CURRENT_TIMESTAMP" })
   createdAt!: Date;
 
+  @ManyToMany(() => User, (user) => user.likedTemplates)
+  @JoinTable()
+  likedBy!: User[]; // users that have like template
+
   @Column({ default: 0 })
-  likes!: number;
+  likesCount!: number; // this is more performant than likedBy.length
 
   @OneToMany(() => Comment, (comment) => comment.template, { cascade: true })
   comments!: Comment[];

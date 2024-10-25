@@ -179,3 +179,29 @@ export async function searchTemplates(searchTerm: string) {
     throw error;
   }
 }
+
+// toggle like for template
+export const toggleLikeTemplate = async (templateId: string) => {
+  // retrieve the token from local storage
+  const token = localStorage.getItem("authToken");
+
+  if (!token) {
+    throw new Error("No token found, please login again.");
+  }
+  try {
+    const response = await axios.post(
+      `${SERVER_URL}/api/templates/${templateId}/like`,
+      {}, // empty request body to enable send header
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    console.log(response.data);
+    return response.data;
+  } catch (error) {
+    console.error("Error toggling like:", error);
+    throw error;
+  }
+};

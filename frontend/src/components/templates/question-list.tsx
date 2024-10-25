@@ -81,8 +81,6 @@ const QuestionList: React.FC<QuestionListProps> = ({
     const containerEl = containerRef.current;
     invariant(containerEl);
 
-    console.log("Setting up dropTargetForElements");
-
     return dropTargetForElements({
       element: containerEl,
       onDragEnter: () => console.log("onDragEnter on list"),

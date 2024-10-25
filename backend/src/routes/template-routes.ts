@@ -6,6 +6,7 @@ import {
   deleteTemplate,
   getTemplate,
   searchTemplatesController,
+  likeTemplate,
 } from "../controllers/template-controller";
 import {
   authenticateJWT,
@@ -51,5 +52,7 @@ router.get("/:templateId/aggregate", authenticateJWT, getResponsesAggregate);
 
 router.get("/:templateId/comments", getCommentsForTemplate);
 router.post("/:templateId/comments", authenticateJWT, addCommentToTemplate);
+
+router.post("/:templateId/like", authenticateJWT, likeTemplate);
 
 export default router;
