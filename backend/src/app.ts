@@ -23,10 +23,8 @@ cloudinary.config({
 });
 
 // allow local development
-const allowedOrigins = [
-  "http://localhost:5173",
-  process.env.FRONTEND_URL || "http://localhost:5173",
-];
+const allowedOrigins = ["http://localhost:5173", process.env.FRONTEND_URL];
+console.log("Allowed Origins:", allowedOrigins);
 
 // cors config
 const corsOptions: cors.CorsOptions = {
