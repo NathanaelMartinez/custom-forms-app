@@ -247,7 +247,7 @@ const CreateTemplatePage: React.FC = () => {
     );
     setTemplate((prev) => ({
       ...prev,
-      tags: Array.isArray(normalizedTags) ? normalizedTags : [],
+      tags: normalizedTags,
     }));
   };
 

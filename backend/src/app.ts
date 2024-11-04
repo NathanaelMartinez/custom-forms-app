@@ -8,6 +8,7 @@ import { initializeAuth } from "./services/auth-service";
 import templateRouter from "./routes/template-routes";
 import adminRouter from "./routes/admin-routes";
 import userRouter from "./routes/user-routes";
+import ticketRoutes from "./routes/ticket-routes";
 import uploadSignatureRouter from "./routes/cloudinary-routes";
 import passport from "passport";
 
@@ -56,10 +57,11 @@ app.use("/api/templates", templateRouter); // template and question routes (may 
 app.use("/api/admin", adminRouter); // admin user management routes
 app.use("/api/users", userRouter); // for getting signature for cloudinary
 app.use("/api", uploadSignatureRouter); // for getting signature for cloudinary
+app.use("/api/tickets", ticketRoutes); // for Jira integration
 
 // error handling
 app.use((req, res, next) => {
-  res.status(404).send("Page not found");
+  res.status(404).send({ error: "Page not found" });
 });
 
 export default app;

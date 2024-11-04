@@ -19,7 +19,7 @@ const LoginPage: React.FC = () => {
   const location = useLocation();
 
   // extract returnUrl if exists
-  const returnUrl = location.state?.returnUrl || "/";
+  const returnUrl = location.state?.returnUrl || "/"; // need to whitelist this
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });

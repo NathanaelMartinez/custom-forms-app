@@ -11,7 +11,7 @@ const ProductPitch: React.FC<ProductPitchProps> = ({ imageSrc, title, descriptio
   return (
     <Col md={7} className="d-flex justify-content-center align-items-center">
       <div className="product-info position-relative bg-secondary p-4 rounded text-center">
-        <img src={imageSrc} alt={title} className="img-fluid rounded" />
+        <img src={imageSrc} alt={title} className="img-fluid rounded" loading="lazy" />
         <div className="overlay-text position-absolute bottom-0 start-0 p-4">
           <h2 className="fw-bold">{title}</h2>
           <p>{description}</p>

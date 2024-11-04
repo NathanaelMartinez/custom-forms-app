@@ -133,7 +133,7 @@ const AdminPage: React.FC = () => {
     }
   };
 
-  // handle unblocking selected users
+  // handle promoting selected users
   const handlePromoteSelectedUsers = async () => {
     const usersToPromote = users
       .filter((_, index) => selectedUsers[index])
@@ -154,7 +154,7 @@ const AdminPage: React.FC = () => {
     }
   };
 
-  // handle unblocking selected users
+  // handle demoting selected users
   const handleDemoteSelectedUsers = async () => {
     if (!user) return;
     const usersToDemote = users
