@@ -1,12 +1,22 @@
 import axios from "axios";
 
-export const createJiraTicket = async (summary: string, priority: string) => {
+export const createJiraTicket = async (
+  summary: string,
+  priority: string,
+  user: { email: string; username: string },
+  pageLink: string,
+  templateTitle: string
+) => {
   try {
-    const forgeApiUrl =
-      "https://nathanaelmartinez.atlassian.net/rest/atlassian-connect/1/method/create-ticket";
-    // forge app url
+    const forgeApiUrl = "/api/create-ticket";
 
-    const response = await axios.post(forgeApiUrl, { summary, priority });
+    const response = await axios.post(forgeApiUrl, {
+      summary,
+      priority,
+      user,
+      pageLink,
+      templateTitle,
+    });
     return response.data.ticketLink;
   } catch (error) {
     console.error("Failed to create ticket in Jira:", error);

@@ -1,35 +1,43 @@
-import Resolver from '@forge/resolver';
-import api, { route, variables } from '@forge/api';
+import Resolver from "@forge/resolver";
+import api, { route, variables } from "@forge/api";
 
 const resolver = new Resolver();
 
 // define createTicket function to handle ticket creation requests
-resolver.define('createTicket', async (req) => {
+resolver.define("createTicket", async (req) => {
   const { summary, priority } = req.payload;
 
   try {
     // retrieve environment variables securely
-    const jiraProjectKey = await variables.get('JIRA_PROJECT_KEY');
-    const jiraApiToken = await variables.get('JIRA_API_TOKEN');
-    const jiraEmail = await variables.get('JIRA_EMAIL');
-    const jiraDomain = await variables.get('JIRA_DOMAIN');
+    const jiraProjectKey = await variables.get("JIRA_PROJECT_KEY");
+    const jiraApiToken = await variables.get("JIRA_API_TOKEN");
+    const jiraEmail = await variables.get("JIRA_EMAIL");
+    const jiraDomain = await variables.get("JIRA_DOMAIN");
 
     // make request to Jira API to create new issue
     const response = await api.asApp().requestJira(route`/rest/api/3/issue`, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Authorization': `Basic ${Buffer.from(`${jiraEmail}:${jiraApiToken}`).toString('base64')}`,
-        'Content-Type': 'application/json'
+        Authorization: `Basic ${Buffer.from(
+          `${jiraEmail}:${jiraApiToken}`
+        ).toString("base64")}`,
+        "Content-Type": "application/json",
       },
       body: JSON.stringify({
         fields: {
           project: { key: jiraProjectKey },
           summary,
           priority: { name: priority },
-          description: 'Support issue created via QuickFormr',
-          issuetype: { name: 'Task' }
-        }
-      })
+          description: `
+            **Reported by:** ${user.email} (${user.name})
+            **Template Title:** ${templateTitle || "N/A"}
+            **Page Link:** ${pageLink || "N/A"}
+            
+            ${summary} - Support issue created via QuickFormr
+          `,
+          issuetype: { name: "Task" },
+        },
+      }),
     });
 
     // handle Jira API response
@@ -43,8 +51,8 @@ resolver.define('createTicket', async (req) => {
 
     return { ticketLink }; // return link to created Jira ticket
   } catch (error) {
-    console.error('Error in createTicket:', error);
-    return { error: 'Failed to create Jira ticket' };
+    console.error("Error in createTicket:", error);
+    return { error: "Failed to create Jira ticket" };
   }
 });
 

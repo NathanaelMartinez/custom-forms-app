@@ -1,10 +1,13 @@
 import React, { createContext, useContext, useState } from "react";
 import { createJiraTicket } from "../services/ticket-service";
+import { useAuth } from "./auth-context";
 
 interface SupportModalContextProps {
   showSupportModal: boolean;
   summary: string;
   priority: string;
+  templateTitle: string;
+  setTemplateTitle: (title: string) => void;
   setShowSupportModal: (show: boolean) => void;
   setSummary: (summary: string) => void;
   setPriority: (priority: string) => void;
@@ -21,13 +24,27 @@ export const SupportModalProvider: React.FC<{ children: React.ReactNode }> = ({
   const [showSupportModal, setShowSupportModal] = useState(false);
   const [summary, setSummary] = useState("");
   const [priority, setPriority] = useState("Medium");
+  const [templateTitle, setTemplateTitle] = useState<string>(""); // dynamic template title
+  const { user } = useAuth();
 
   const handleSupportSubmit = async () => {
     try {
-      await createJiraTicket(summary, priority);
-      alert("Ticket created successfully!"); // TODO: remove debug alert
+      const pageLink = window.location.href; // capture current page URL
+
+      await createJiraTicket(
+        summary,
+        priority,
+        {
+          email: user?.email || "no-email@domain.com", // provide fallback value
+          username: user?.username || "Unknown User",
+        },
+        pageLink,
+        templateTitle
+      ); 
+
+      alert("Ticket created successfully!");
+      // reset values
       setSummary("");
-      // return to defaults
       setPriority("Medium");
       setShowSupportModal(false);
     } catch (error) {
@@ -44,6 +61,8 @@ export const SupportModalProvider: React.FC<{ children: React.ReactNode }> = ({
         setSummary,
         priority,
         setPriority,
+        templateTitle,
+        setTemplateTitle,
         handleSupportSubmit,
       }}
     >
