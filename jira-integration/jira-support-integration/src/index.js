@@ -1,26 +1,22 @@
 import Resolver from "@forge/resolver";
-import api, { route, variables } from "@forge/api";
+import api, { route } from "@forge/api";
 
 const resolver = new Resolver();
 
-// define createTicket function to handle ticket creation requests
 resolver.define("createTicket", async (req) => {
-  const { summary, priority } = req.payload;
+  const { summary, priority, user, pageLink, templateTitle } = req.payload;
+
+  console.log("Payload received:", req.payload);
 
   try {
     // retrieve environment variables securely
-    const jiraProjectKey = await variables.get("JIRA_PROJECT_KEY");
-    const jiraApiToken = await variables.get("JIRA_API_TOKEN");
-    const jiraEmail = await variables.get("JIRA_EMAIL");
-    const jiraDomain = await variables.get("JIRA_DOMAIN");
+    const jiraProjectKey = process.env.JIRA_PROJECT_KEY;
+    const jiraDomain = process.env.JIRA_DOMAIN;
 
     // make request to Jira API to create new issue
     const response = await api.asApp().requestJira(route`/rest/api/3/issue`, {
       method: "POST",
       headers: {
-        Authorization: `Basic ${Buffer.from(
-          `${jiraEmail}:${jiraApiToken}`
-        ).toString("base64")}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
@@ -29,7 +25,7 @@ resolver.define("createTicket", async (req) => {
           summary,
           priority: { name: priority },
           description: `
-            **Reported by:** ${user.email} (${user.name})
+            **Reported by:** ${user.email} (${user.username})
             **Template Title:** ${templateTitle || "N/A"}
             **Page Link:** ${pageLink || "N/A"}
             
@@ -43,6 +39,7 @@ resolver.define("createTicket", async (req) => {
     // handle Jira API response
     if (!response.ok) {
       const errorText = await response.text();
+      console.error("Error creating Jira ticket:", errorText);
       return { error: `Error creating Jira ticket: ${errorText}` };
     }
 

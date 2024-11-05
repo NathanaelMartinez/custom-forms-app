@@ -8,6 +8,11 @@ modules:
   function:
     - key: resolver
       handler: index.handler
+    - key: createTicketFunction
+      handler: index.handler
+  webtrigger:
+    - key: create-ticket-trigger
+      function: createTicketFunction
 resources:
   - key: main
     path: static/hello-world/build

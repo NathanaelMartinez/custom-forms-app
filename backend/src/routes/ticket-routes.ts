@@ -21,12 +21,12 @@ router.post("/create-ticket", async (req, res) => {
 
   try {
     // endpoint of forge app
-    const forgeApiUrl = process.env.JIRA_API_URL;
+    const forgeApiUrl = process.env.JIRA_API_WEBTRIGGER;
 
     console.log("forge api url:", forgeApiUrl);
 
     // send request to forge app
-    const response = await axios.post(`${forgeApiUrl}/createTicket`, {
+    const response = await axios.post(`${forgeApiUrl}/`, {
       summary,
       priority,
       user,
