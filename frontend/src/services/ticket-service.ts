@@ -1,5 +1,7 @@
 import axios from "axios";
 
+const SERVER_URL = import.meta.env.VITE_SERVER_URL;
+
 export const createJiraTicket = async (
   summary: string,
   priority: string,
@@ -8,7 +10,7 @@ export const createJiraTicket = async (
   templateTitle: string
 ) => {
   try {
-    const forgeApiUrl = "/api/tickets/create-ticket";
+    const forgeApiUrl = `${SERVER_URL}/api/tickets/create-ticket`;
 
     const response = await axios.post(forgeApiUrl, {
       summary,
