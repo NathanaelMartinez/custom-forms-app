@@ -47,15 +47,21 @@ const AppNavBar: React.FC = () => {
                   variant="link"
                   className="p-0 me-2 custom-icon-btn"
                   id="help-dropdown"
+                  // hide toggle arrow
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    padding: 0,
+                    border: "none",
+                    background: "none",
+                  }}
                 >
-                  <QuestionCircle size={36} className="text-light" />
+                  <QuestionCircle size={36} className="custom-icon-btn" />
                 </Dropdown.Toggle>
 
                 <Dropdown.Menu>
                   <Dropdown.Item href="/faq">FAQs</Dropdown.Item>
-                  <Dropdown.Item href="/documentation">
-                    Documentation
-                  </Dropdown.Item>
                   <Dropdown.Item href="/support-resources">
                     Support Resources
                   </Dropdown.Item>
