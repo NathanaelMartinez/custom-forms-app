@@ -26,22 +26,13 @@ router.post("/create-ticket", async (req, res) => {
     console.log("forge api url:", forgeApiUrl);
 
     // send request to forge app
-    const response = await axios.post(
-      `${forgeApiUrl}/createTicket`,
-      {
-        summary,
-        priority,
-        user,
-        pageLink,
-        templateTitle,
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${process.env.JIRA_API_TOKEN}`,
-          "Content-Type": "application/json",
-        },
-      }
-    );
+    const response = await axios.post(`${forgeApiUrl}/createTicket`, {
+      summary,
+      priority,
+      user,
+      pageLink,
+      templateTitle,
+    });
 
     console.log("forge app response:", response.data);
 
