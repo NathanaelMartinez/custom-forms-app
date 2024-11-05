@@ -1,28 +1,25 @@
 // <reference types="vite-plugin-svgr/client" />
 
 import React from "react";
-import {
-  Navbar,
-  Nav,
-  Button,
-  Dropdown,
-  Container,
-} from "react-bootstrap";
+import { Navbar, Nav, Button, Dropdown, Container } from "react-bootstrap";
 import {
   ShieldFill,
   PersonLock,
   CardList,
   BoxArrowRight,
+  QuestionCircle,
 } from "react-bootstrap-icons";
 import { useNavigate, useLocation } from "react-router-dom";
-import FormNewIcon from '../../assets/icons/form-new.svg?react';
+import FormNewIcon from "../../assets/icons/form-new.svg?react";
 import { useAuth } from "../../context/auth-context";
 import AppSearchBar from "./app-search-bar";
+import { useSupportModal } from "../../context/support-modal-context";
 
 const AppNavBar: React.FC = () => {
   const { isLoggedIn, user, logout } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+  const { setShowSupportModal } = useSupportModal();
 
   const handleLogInClick = () => {
     navigate("/login", { state: { returnUrl: location.pathname } });
@@ -44,22 +41,42 @@ const AppNavBar: React.FC = () => {
           <Navbar.Toggle aria-controls="basic-navbar-nav" />
           <Navbar.Collapse id="basic-navbar-nav">
             <Nav className="ms-auto align-items-center">
+              <Dropdown align="end">
+                <Dropdown.Toggle
+                  as={Button}
+                  variant="link"
+                  className="p-0 me-2 custom-icon-btn"
+                  id="help-dropdown"
+                >
+                  <QuestionCircle size={36} className="text-light" />
+                </Dropdown.Toggle>
+
+                <Dropdown.Menu>
+                  <Dropdown.Item href="/faq">FAQs</Dropdown.Item>
+                  <Dropdown.Item href="/documentation">
+                    Documentation
+                  </Dropdown.Item>
+                  <Dropdown.Item href="/support-resources">
+                    Support Resources
+                  </Dropdown.Item>
+                  <Dropdown.Divider />
+                  <Dropdown.Item onClick={() => setShowSupportModal(true)}>
+                    Still need help? Contact Support
+                  </Dropdown.Item>
+                </Dropdown.Menu>
+              </Dropdown>
               {isLoggedIn ? (
                 <>
-                  {/* <Button
-                    variant="link"
-                    className="p-0 me-2 custom-icon-btn"
-                    onClick={() => navigate("/saved-templates")}
-                  >
-                    <BookmarkFill size={36} className="text-light" />
-                  </Button> */}
-
                   <Button
                     variant="link"
                     className="p-0 custom-icon-btn"
                     onClick={() => navigate("/templates")}
                   >
-                    <FormNewIcon width={36} height={36} style={{ fill: 'white' }}/>
+                    <FormNewIcon
+                      width={36}
+                      height={36}
+                      style={{ fill: "white" }}
+                    />
                   </Button>
 
                   {user?.role === "admin" && (
@@ -81,11 +98,11 @@ const AppNavBar: React.FC = () => {
                       {user?.status === "active" ? (
                         // TODO: allow adding of profile pictures
                         <img
-                        src={`https://i.pravatar.cc/300?u=${user.username}`}
-                        alt="Profile"
-                        className="rounded-circle"
-                        width="42"
-                      />
+                          src={`https://i.pravatar.cc/300?u=${user.username}`}
+                          alt="Profile"
+                          className="rounded-circle"
+                          width="42"
+                        />
                       ) : (
                         <PersonLock size={36} />
                       )}
@@ -96,7 +113,9 @@ const AppNavBar: React.FC = () => {
                       {/* <Dropdown.Item onClick={() => navigate("/saved-templates")}>
                         Saved Templates
                       </Dropdown.Item> */}
-                      <Dropdown.Item onClick={() => navigate(`/profile/${user?.id}`)}>
+                      <Dropdown.Item
+                        onClick={() => navigate(`/profile/${user?.id}`)}
+                      >
                         <CardList /> My Dashboard
                       </Dropdown.Item>
                       {user?.role === "admin" && (
