@@ -42,7 +42,7 @@ const AppFooter: React.FC = () => {
                   className="text-light text-decoration-none"
                   onClick={() => setShowSupportModal(true)}
                 >
-                  Support
+                  Report a bug
                 </a>
               </li>
               <li>

@@ -43,18 +43,14 @@ const AppNavBar: React.FC = () => {
             <Nav className="ms-auto align-items-center">
               <Dropdown align="end">
                 <Dropdown.Toggle
-                  as={Button}
-                  variant="link"
-                  className="p-0 me-2 custom-icon-btn"
+                  as="div" // get rid of arrow
+                  className="custom-icon-toggle p-0 me-2"
                   id="help-dropdown"
-                  // hide toggle arrow
                   style={{
                     display: "inline-flex",
                     alignItems: "center",
                     justifyContent: "center",
-                    padding: 0,
-                    border: "none",
-                    background: "none",
+                    cursor: "pointer", // keep it clickable
                   }}
                 >
                   <QuestionCircle size={36} className="custom-icon-btn" />
