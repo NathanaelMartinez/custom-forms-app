@@ -8,7 +8,7 @@ export const createJiraTicket = async (
   templateTitle: string
 ) => {
   try {
-    const forgeApiUrl = "/api/create-ticket";
+    const forgeApiUrl = "/api/tickets/create-ticket";
 
     const response = await axios.post(forgeApiUrl, {
       summary,
