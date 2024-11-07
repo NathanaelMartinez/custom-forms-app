@@ -35,6 +35,7 @@ const PersonalDashboardPage: React.FC = () => {
   const [loadingBugReports, setLoadingBugReports] = useState<boolean>(true);
   const [bugReportsError, setBugReportsError] = useState<string | null>(null);
   const [currentBugPage, setCurrentBugPage] = useState(1);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [bugReportSubmitted, setBugReportSubmitted] = useState(false); // refresh after samepage report submission
   const resultsPerPage = 10;
   const navigate = useNavigate();
@@ -366,7 +367,7 @@ const PersonalDashboardPage: React.FC = () => {
                           <tr>
                             <th>Summary</th>
                             <th>Template</th>
-                            <th>Link</th>
+                            <th>Issue Link</th>
                             <th>Priority</th>
                             <th>Status</th>
                           </tr>
