@@ -31,7 +31,12 @@ export async function fetchUserJiraTickets(
   userEmail: string,
   startAt: number = 0,
   maxResults: number = 10
-): Promise<JiraTicket[]> {
+): Promise<{
+  issues: JiraTicket[];
+  total: number;
+  startAt: number;
+  maxResults: number;
+}> {
   try {
     const response = await axios.get(`${SERVER_URL}/api/tickets/user`, {
       params: {
@@ -41,14 +46,19 @@ export async function fetchUserJiraTickets(
       },
     });
 
-    return response.data.issues.map((issue: JiraTicket) => ({
-      id: issue.id,
-      summary: issue.summary,
-      template: issue.template || "N/A",
-      link: issue.link,
-      priority: issue.priority,
-      status: issue.status,
-    }));
+    return {
+      issues: response.data.issues.map((issue: JiraTicket) => ({
+        id: issue.id,
+        summary: issue.summary,
+        template: issue.template || "N/A",
+        link: issue.link,
+        priority: issue.priority,
+        status: issue.status,
+      })),
+      total: response.data.total,
+      startAt: response.data.startAt,
+      maxResults: response.data.maxResults,
+    };
   } catch (error) {
     console.error("Failed to fetch Jira tickets:", error);
     throw new Error("Failed to fetch Jira tickets");

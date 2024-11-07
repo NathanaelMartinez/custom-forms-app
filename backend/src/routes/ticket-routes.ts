@@ -69,7 +69,15 @@ router.get("/user", async (req, res) => {
       }
     );
 
-    res.status(200).json(response.data); // send data back to frontend
+    const { issues, total } = response.data;
+    res
+      .status(200)
+      .json({
+        issues,
+        startAt: Number(startAt),
+        maxResults: Number(maxResults),
+        total,
+      }); // send data back to frontend
   } catch (error) {
     console.error("Failed to fetch Jira tickets:", error);
     res

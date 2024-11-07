@@ -35,6 +35,7 @@ const PersonalDashboardPage: React.FC = () => {
   const [loadingBugReports, setLoadingBugReports] = useState<boolean>(true);
   const [bugReportsError, setBugReportsError] = useState<string | null>(null);
   const [currentBugPage, setCurrentBugPage] = useState(1);
+  const [totalBugReports, setTotalBugReports] = useState(0);
   const resultsPerPage = 10;
   const navigate = useNavigate();
 
@@ -95,18 +96,13 @@ const PersonalDashboardPage: React.FC = () => {
       try {
         setBugReportsError(null);
         setLoadingBugReports(true);
+
         const startAt = (page - 1) * resultsPerPage;
+        const response = await fetchUserJiraTickets(user!.email, startAt, resultsPerPage);
 
-        const reports = await fetchUserJiraTickets(
-          user!.email,
-          startAt,
-          resultsPerPage
-        );
-
-        console.log("Fetched bug reports for page", page, ":", reports);
-
-        // replace current bugReports with new results
-        setBugReports(reports);
+        // Set reports and pagination metadata
+        setBugReports(response.issues);
+        setTotalBugReports(response.total);
       } catch (err) {
         console.error("Failed to fetch bug reports:", err);
         setBugReportsError("Failed to load bug reports.");
@@ -121,8 +117,7 @@ const PersonalDashboardPage: React.FC = () => {
   }, [user, currentBugPage]);
 
   const handlePageChange = (page: number) => {
-    if (page < 1) return;
-
+    if (page < 1 || (page - 1) * resultsPerPage >= totalBugReports) return;
     setCurrentBugPage(page);
   };
 
