@@ -105,10 +105,8 @@ const PersonalDashboardPage: React.FC = () => {
 
         console.log("Fetched bug reports for page", page, ":", reports);
 
-        // append reports to the existing bugReports array, except on page 1
-        setBugReports((prevReports) =>
-          page === 1 ? reports : [...prevReports, ...reports]
-        );
+        // replace current bugReports with new results
+        setBugReports(reports);
       } catch (err) {
         console.error("Failed to fetch bug reports:", err);
         setBugReportsError("Failed to load bug reports.");
@@ -123,11 +121,11 @@ const PersonalDashboardPage: React.FC = () => {
   }, [user, currentBugPage]);
 
   const handlePageChange = (page: number) => {
-    setCurrentBugPage(page);
+    if (page < 1) return;
 
-    // clear bug reports only when navigating back to first page
-    if (page === 1) setBugReports([]);
+    setCurrentBugPage(page);
   };
+
   const handleDeleteTemplate = async (templateId: string) => {
     try {
       await deleteTemplate(templateId);
