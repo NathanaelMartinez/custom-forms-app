@@ -48,7 +48,7 @@ export const SupportModalProvider: React.FC<{ children: React.ReactNode }> = ({
 
       console.log("response:", response);
 
-      setToastMessage(response.ticketLink);
+      setToastMessage(response);
       setIsError(false);
 
       // reset values
@@ -104,7 +104,7 @@ export const SupportModalProvider: React.FC<{ children: React.ReactNode }> = ({
                     View Ticket
                   </Button>
                 ) : (
-                  <span>Failed to submit report. Please try again.</span>
+                  <span>{toastMessage}</span>
                 )}
               </>
             ) : (
