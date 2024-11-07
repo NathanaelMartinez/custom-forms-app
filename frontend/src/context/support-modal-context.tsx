@@ -57,7 +57,6 @@ export const SupportModalProvider: React.FC<{ children: React.ReactNode }> = ({
       setShowSupportModal(false);
     } catch (error) {
       console.error("Error submitting report:", error);
-      setToastMessage("Failed to submit report. Please try again.");
       setIsError(true);
     } finally {
       setShowToast(true);
@@ -95,7 +94,7 @@ export const SupportModalProvider: React.FC<{ children: React.ReactNode }> = ({
             {!isError ? (
               <>
                 <div>Report submitted successfully!</div>
-                {toastMessage && isError === false ? (
+                {toastMessage && !isError ? (
                   <Button
                     variant="link"
                     href={toastMessage}
@@ -105,7 +104,7 @@ export const SupportModalProvider: React.FC<{ children: React.ReactNode }> = ({
                     View Ticket
                   </Button>
                 ) : (
-                  <span>{toastMessage}</span>
+                  <span>Failed to submit report. Please try again.</span>
                 )}
               </>
             ) : (
