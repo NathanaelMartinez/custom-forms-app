@@ -66,7 +66,7 @@ const AppNavBar: React.FC = () => {
                       </Dropdown.Item>
                       <Dropdown.Divider />
                       <Dropdown.Item onClick={() => setShowSupportModal(true)}>
-                        Still need help? Contact Support
+                        Report a bug
                       </Dropdown.Item>
                     </Dropdown.Menu>
                   </Dropdown>

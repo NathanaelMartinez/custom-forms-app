@@ -15,7 +15,7 @@ import { format } from "date-fns";
 import { useAuth } from "../context/auth-context";
 import AppNavBar from "../components/common/app-nav-bar";
 import AppFooter from "../components/common/app-footer";
-import { BugReport, Template, Response as formResponse } from "../types";
+import { JiraTicket, Template, Response as formResponse } from "../types";
 import { fetchTemplates, deleteTemplate } from "../services/template-service";
 import { Pencil, Trash, SortUp, SortDown } from "react-bootstrap-icons";
 import { fetchUserResponses } from "../services/user-service";
@@ -30,7 +30,7 @@ const PersonalDashboardPage: React.FC = () => {
   const [sortColumn, setSortColumn] = useState<string>("title");
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
   const [responses, setResponses] = useState<formResponse[]>([]);
-  const [bugReports, setBugReports] = useState<BugReport[]>([]);
+  const [bugReports, setBugReports] = useState<JiraTicket[]>([]);
   const [loadingBugReports, setLoadingBugReports] = useState<boolean>(true);
   const [bugReportsError, setBugReportsError] = useState<string | null>(null);
   const navigate = useNavigate();

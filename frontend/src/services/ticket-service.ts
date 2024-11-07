@@ -1,5 +1,5 @@
 import axios from "axios";
-import { BugReport, JiraTicket } from "../types";
+import { JiraTicket } from "../types";
 
 const SERVER_URL = import.meta.env.VITE_SERVER_URL;
 
@@ -29,7 +29,7 @@ export const createJiraTicket = async (
 
 export async function fetchUserJiraTickets(
   userEmail: string
-): Promise<BugReport[]> {
+): Promise<JiraTicket[]> {
   try {
     const response = await axios.get(`${SERVER_URL}/api/tickets/user`, {
       params: { email: userEmail },

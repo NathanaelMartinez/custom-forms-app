@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState } from "react";
+import { Button, Toast, ToastContainer } from "react-bootstrap";
 import { createJiraTicket } from "../services/ticket-service";
 import { useAuth } from "./auth-context";
 
@@ -25,13 +26,15 @@ export const SupportModalProvider: React.FC<{ children: React.ReactNode }> = ({
   const [summary, setSummary] = useState("");
   const [priority, setPriority] = useState("Medium");
   const [templateTitle, setTemplateTitle] = useState<string>(""); // dynamic template title
+  const [showToast, setShowToast] = useState(false);
+  const [toastMessage, setToastMessage] = useState("");
   const { user } = useAuth();
 
   const handleSupportSubmit = async () => {
     try {
       const pageLink = window.location.href; // capture current page URL
 
-      await createJiraTicket(
+      const response = await createJiraTicket(
         summary,
         priority,
         {
@@ -40,15 +43,19 @@ export const SupportModalProvider: React.FC<{ children: React.ReactNode }> = ({
         },
         pageLink,
         templateTitle
-      ); 
+      );
 
-      alert("Ticket created successfully!");
+      setToastMessage(`Thanks for the report, we'll get on it as soon as possible!\n${response.ticketLink}`);
+      setShowToast(true);
+
       // reset values
       setSummary("");
       setPriority("Medium");
       setShowSupportModal(false);
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
-      alert(`Failed to create ticket: ${error}`);
+      setToastMessage("Failed to submit report. Please try again.");
+      setShowToast(true);
     }
   };
 
@@ -67,6 +74,37 @@ export const SupportModalProvider: React.FC<{ children: React.ReactNode }> = ({
       }}
     >
       {children}
+
+      {/* Toast for showing success/failure messages */}
+      <ToastContainer position="top-end" className="p-3">
+        <Toast
+          show={showToast}
+          onClose={() => setShowToast(false)}
+          delay={3000}
+          autohide
+        >
+          <Toast.Header>
+            <strong className="me-auto">Notification</strong>
+          </Toast.Header>
+          <Toast.Body>
+            {toastMessage ? (
+              <>
+                <div>Report submitted successfully!</div>
+                <Button
+                  variant="link"
+                  href={toastMessage}
+                  target="_blank"
+                  className="p-0"
+                >
+                  View Ticket
+                </Button>
+              </>
+            ) : (
+              "Failed to submit report. Please try again."
+            )}
+          </Toast.Body>
+        </Toast>
+      </ToastContainer>
     </SupportModalContext.Provider>
   );
 };
