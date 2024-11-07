@@ -45,7 +45,7 @@ export const SupportModalProvider: React.FC<{ children: React.ReactNode }> = ({
         templateTitle
       );
 
-      setToastMessage(`Thanks for the report, we'll get on it as soon as possible!\n${response.ticketLink}`);
+      setToastMessage(response.ticketLink);
       setShowToast(true);
 
       // reset values
