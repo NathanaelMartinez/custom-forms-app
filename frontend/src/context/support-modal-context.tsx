@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
+import { useLocation } from "react-router-dom";
 import { Button, Toast, ToastContainer } from "react-bootstrap";
 import { createJiraTicket } from "../services/ticket-service";
 import { useAuth } from "./auth-context";
@@ -30,6 +31,7 @@ export const SupportModalProvider: React.FC<{ children: React.ReactNode }> = ({
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
   const [isError, setIsError] = useState(false);
+  const location = useLocation();
   const { user } = useAuth();
 
   useEffect(() => {
@@ -71,9 +73,10 @@ export const SupportModalProvider: React.FC<{ children: React.ReactNode }> = ({
 
       if (response?.ticketLink) {
         setToastMessage(response.ticketLink);
-        setIsError(false); // Ensure it's a success state
+        setIsError(false);
       } else {
-        throw new Error("Ticket link missing in response.");
+        setToastMessage("No ticket link available, but report was submitted.");
+        setIsError(false);
       }
 
       // reset values
