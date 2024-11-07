@@ -15,9 +15,13 @@ interface SupportModalContextProps {
   handleSupportSubmit: () => Promise<void>;
 }
 
-const SupportModalContext = createContext<SupportModalContextProps | undefined>(undefined);
+const SupportModalContext = createContext<SupportModalContextProps | undefined>(
+  undefined
+);
 
-export const SupportModalProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const SupportModalProvider: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
   const [showSupportModal, setShowSupportModal] = useState(false);
   const [summary, setSummary] = useState("");
   const [priority, setPriority] = useState("Medium");
@@ -29,33 +33,36 @@ export const SupportModalProvider: React.FC<{ children: React.ReactNode }> = ({ 
 
   const handleSupportSubmit = async () => {
     try {
-      const pageLink = window.location.href; // get current page URL
+      const pageLink = window.location.href;
 
       const response = await createJiraTicket(
         summary,
         priority,
-        { email: user?.email || "no-email@domain.com", username: user?.username || "Unknown User" },
+        {
+          email: user?.email || "no-email@domain.com",
+          username: user?.username || "Unknown User",
+        },
         pageLink,
         templateTitle
       );
 
+      // log response to ensure ticketLink is received
+      console.log("Response from createJiraTicket:", response);
+
       if (response?.ticketLink) {
-        // Success state: ticket link is available
         setToastMessage(response.ticketLink);
         setIsError(false);
       } else {
-        // Success without ticket link
         setToastMessage("Report submitted, but no ticket link available.");
         setIsError(false);
       }
 
-      // reset values
+      // Reset values
       setSummary("");
       setPriority("Medium");
       setShowSupportModal(false);
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
-      // Error state
       setToastMessage("Failed to submit report. Please try again.");
       setIsError(true);
     } finally {
@@ -81,7 +88,12 @@ export const SupportModalProvider: React.FC<{ children: React.ReactNode }> = ({ 
 
       {/* Toast notification for success/failure */}
       <ToastContainer position="top-end" className="p-3">
-        <Toast show={showToast} onClose={() => setShowToast(false)} delay={3000} autohide>
+        <Toast
+          show={showToast}
+          onClose={() => setShowToast(false)}
+          delay={3000}
+          autohide
+        >
           <Toast.Header>
             <strong className="me-auto">Notification</strong>
           </Toast.Header>
@@ -89,12 +101,21 @@ export const SupportModalProvider: React.FC<{ children: React.ReactNode }> = ({ 
             {!isError ? (
               <>
                 <div>Report submitted successfully!</div>
-                {toastMessage.startsWith("http") ? (
-                  <Button variant="link" href={toastMessage} target="_blank" className="p-0">
-                    View Ticket
-                  </Button>
+                {toastMessage ? (
+                  toastMessage.startsWith("http") ? (
+                    <Button
+                      variant="link"
+                      href={toastMessage}
+                      target="_blank"
+                      className="p-0"
+                    >
+                      View Ticket
+                    </Button>
+                  ) : (
+                    <span>{toastMessage}</span>
+                  )
                 ) : (
-                  <span>{toastMessage}</span>
+                  "Ticket link not available."
                 )}
               </>
             ) : (
@@ -110,7 +131,9 @@ export const SupportModalProvider: React.FC<{ children: React.ReactNode }> = ({ 
 export const useSupportModal = (): SupportModalContextProps => {
   const context = useContext(SupportModalContext);
   if (!context) {
-    throw new Error("useSupportModal must be used within a SupportModalProvider");
+    throw new Error(
+      "useSupportModal must be used within a SupportModalProvider"
+    );
   }
   return context;
 };
