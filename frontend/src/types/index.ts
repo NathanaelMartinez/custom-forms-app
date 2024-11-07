@@ -7,3 +7,4 @@ export * from "./comment";
 export * from "./aggregated-data";
 export * from "./response";
 export * from "./tag";
+export * from "./jira";

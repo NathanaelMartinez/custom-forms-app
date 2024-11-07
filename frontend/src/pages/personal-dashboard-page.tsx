@@ -15,10 +15,11 @@ import { format } from "date-fns";
 import { useAuth } from "../context/auth-context";
 import AppNavBar from "../components/common/app-nav-bar";
 import AppFooter from "../components/common/app-footer";
-import { Template, Response as formResponse } from "../types";
+import { BugReport, Template, Response as formResponse } from "../types";
 import { fetchTemplates, deleteTemplate } from "../services/template-service";
 import { Pencil, Trash, SortUp, SortDown } from "react-bootstrap-icons";
 import { fetchUserResponses } from "../services/user-service";
+import { fetchUserJiraTickets } from "../services/ticket-service";
 
 const PersonalDashboardPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -29,6 +30,8 @@ const PersonalDashboardPage: React.FC = () => {
   const [sortColumn, setSortColumn] = useState<string>("title");
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
   const [responses, setResponses] = useState<formResponse[]>([]);
+  const [bugReports, setBugReports] = useState<BugReport[]>([]);
+  const [loadingBugReports, setLoadingBugReports] = useState<boolean>(true);
   const navigate = useNavigate();
 
   // fetch templates on component mount
@@ -82,6 +85,24 @@ const PersonalDashboardPage: React.FC = () => {
 
     loadUserResponses();
   }, [id]);
+
+  useEffect(() => {
+    const loadBugReports = async () => {
+      try {
+        const reports = await fetchUserJiraTickets(user!.email);
+        setBugReports(reports);
+      } catch (err) {
+        console.error("Failed to fetch bug reports:", err);
+        setError("Failed to load bug reports.");
+      } finally {
+        setLoadingBugReports(false);
+      }
+    };
+
+    if (user?.email) {
+      loadBugReports();
+    }
+  }, [user]);
 
   const handleDeleteTemplate = async (templateId: string) => {
     try {
@@ -138,7 +159,7 @@ const PersonalDashboardPage: React.FC = () => {
             className="rounded-circle img-thumbnail"
             width="120"
           />
-          {user && (user.id === id) ? (
+          {user && user.id === id ? (
             // TODO: username should be displayed in all cases when viewing user page
             <h5 className="ms-3 fw-bold fs-1 text-light">{user?.username}</h5>
           ) : (
@@ -146,7 +167,7 @@ const PersonalDashboardPage: React.FC = () => {
           )}
         </div>
 
-        {user && (user.id === id) && (
+        {user && user.id === id && (
           <Button
             variant="outline-secondary"
             className="mb-4 custom-success-btn"
@@ -221,10 +242,7 @@ const PersonalDashboardPage: React.FC = () => {
                                 </a>
                               </td>
                               <td>
-                                {format(
-                                  new Date(template.createdAt),
-                                  "P"
-                                )}
+                                {format(new Date(template.createdAt), "P")}
                               </td>
                               {user &&
                                 (user.id === id || user.role === "admin") && (
@@ -233,9 +251,7 @@ const PersonalDashboardPage: React.FC = () => {
                                       variant="warning"
                                       className="me-2 mb-1 custom-outline-contrast-btn btn-sm"
                                       onClick={() =>
-                                        navigate(
-                                          `/templates/${template.id}`
-                                        )
+                                        navigate(`/templates/${template.id}`)
                                       }
                                     >
                                       <Pencil /> Edit
@@ -270,24 +286,24 @@ const PersonalDashboardPage: React.FC = () => {
                     <Table striped bordered hover responsive>
                       <thead>
                         <tr>
-                        <th onClick={() => handleSort("title")}>
-                              Template Title{" "}
-                              {sortColumn === "title" &&
-                                (sortDirection === "asc" ? (
-                                  <SortUp />
-                                ) : (
-                                  <SortDown />
-                                ))}
-                            </th>
-                            <th onClick={() => handleSort("createdAt")}>
-                              Date Submitted{" "}
-                              {sortColumn === "createdAt" &&
-                                (sortDirection === "asc" ? (
-                                  <SortUp />
-                                ) : (
-                                  <SortDown />
-                                ))}
-                            </th>
+                          <th onClick={() => handleSort("title")}>
+                            Template Title{" "}
+                            {sortColumn === "title" &&
+                              (sortDirection === "asc" ? (
+                                <SortUp />
+                              ) : (
+                                <SortDown />
+                              ))}
+                          </th>
+                          <th onClick={() => handleSort("createdAt")}>
+                            Date Submitted{" "}
+                            {sortColumn === "createdAt" &&
+                              (sortDirection === "asc" ? (
+                                <SortUp />
+                              ) : (
+                                <SortDown />
+                              ))}
+                          </th>
                         </tr>
                       </thead>
                       <tbody>
@@ -295,7 +311,12 @@ const PersonalDashboardPage: React.FC = () => {
                           responses.map((response) => (
                             <tr key={response.id}>
                               <td>{response.template.title}</td>
-                              <td>{format(new Date(response.submittedAt), "MM-dd-yyyy")}</td>
+                              <td>
+                                {format(
+                                  new Date(response.submittedAt),
+                                  "MM-dd-yyyy"
+                                )}
+                              </td>
                             </tr>
                           ))
                         ) : (
@@ -306,6 +327,50 @@ const PersonalDashboardPage: React.FC = () => {
                       </tbody>
                     </Table>
                   </div>
+                </Tab>
+              )}
+              {/* user bug reports */}
+              {user && (user.id === id || user.role === "admin") && (
+                <Tab
+                  eventKey="bugReports"
+                  title={<span className="fw-bold fs-3">Bug Reports</span>}
+                >
+                  {loadingBugReports ? (
+                    <Spinner animation="border" />
+                  ) : bugReports.length === 0 ? (
+                    <Alert variant="info">No bug reports found.</Alert>
+                  ) : (
+                    <Table striped bordered hover responsive>
+                      <thead>
+                        <tr>
+                          <th>Summary</th>
+                          <th>Template</th>
+                          <th>Link</th>
+                          <th>Priority</th>
+                          <th>Status</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {bugReports.map((report) => (
+                          <tr key={report.id}>
+                            <td>{report.summary}</td>
+                            <td>{report.template}</td>
+                            <td>
+                              <a
+                                href={report.link}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                              >
+                                {report.link}
+                              </a>
+                            </td>
+                            <td>{report.priority}</td>
+                            <td>{report.status}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </Table>
+                  )}
                 </Tab>
               )}
             </Tabs>

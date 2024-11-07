@@ -9,11 +9,15 @@ modules:
   webtrigger:
     - key: create-ticket-trigger
       function: createTicketFunction
+    - key: fetch-tickets-trigger
+      function: fetchTicketsFunction
 
   # function module where backend function `createTicketFunction` is defined
   function:
     - key: createTicketFunction
-      handler: index.createTicketFunction
+      handler: index.createTicketFunction   
+    - key: fetchTicketsFunction                         
+      handler: index.fetchTicketsFunction
 
 resources:
   # reference for static files served to jira

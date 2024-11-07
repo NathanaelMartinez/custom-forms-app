@@ -6,9 +6,7 @@ dotenv.config();
 
 const router = express.Router();
 
-router.post("/create-ticket", async (req, res) => {
-  console.log("received request at /create-ticket");
-
+router.post("/", async (req, res) => {
   const { summary, priority, user, pageLink, templateTitle } = req.body;
 
   console.log("request payload:", {
@@ -47,6 +45,34 @@ router.post("/create-ticket", async (req, res) => {
     res
       .status(500)
       .json({ error: "ticket creation failed. please try again later." });
+  }
+});
+
+// fetch tickets for a user
+router.get("/tickets", async (req, res) => {
+  const { email } = req.query; // get email from params
+
+  try {
+    const forgeApiUrl = process.env.JIRA_API_FETCH_TICKETS_WEBTRIGGER!;
+
+    const response = await axios.post(
+      forgeApiUrl,
+      {
+        userEmail: email,
+      },
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+    res.status(200).json(response.data); // send data back to frontend
+  } catch (error) {
+    console.error("Failed to fetch Jira tickets:", error);
+    res
+      .status(500)
+      .json({ error: "Failed to retrieve tickets. Try again later." });
   }
 });
 
