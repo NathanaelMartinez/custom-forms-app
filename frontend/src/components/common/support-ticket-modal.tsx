@@ -45,10 +45,10 @@ const SupportTicketModal: React.FC = () => {
         </Form>
       </Modal.Body>
       <Modal.Footer>
-        <Button variant="secondary" className="custom-secondary-btn" onClick={() => setShowSupportModal(false)}>
+        <Button variant="secondary" onClick={() => setShowSupportModal(false)}>
           Cancel
         </Button>
-        <Button variant="primary" onClick={handleSupportSubmit}>
+        <Button variant="primary" className="custom-primary-btn" onClick={handleSupportSubmit}>
           Submit
         </Button>
       </Modal.Footer>

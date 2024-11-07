@@ -19,7 +19,7 @@ router.post("/", async (req, res) => {
 
   try {
     // endpoint of forge app
-    const forgeApiUrl = process.env.JIRA_API_WEBTRIGGER!;
+    const forgeApiUrl = process.env.JIRA_API_CREATE_TICKET_WEBTRIGGER!;
 
     console.log("forge api url:", forgeApiUrl);
 
