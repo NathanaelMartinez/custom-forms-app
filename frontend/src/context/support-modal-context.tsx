@@ -11,7 +11,7 @@ interface SupportModalContextProps {
   setShowSupportModal: (show: boolean) => void;
   setSummary: (summary: string) => void;
   setPriority: (priority: string) => void;
-  setTemplateTitle: (title: string) => void; // Expose this function to set template title
+  setTemplateTitle: (title: string) => void; // expose this function to set template title
   handleSupportSubmit: () => Promise<void>;
 }
 
@@ -40,9 +40,11 @@ export const SupportModalProvider: React.FC<{ children: React.ReactNode }> = ({ 
       );
 
       if (response?.ticketLink) {
+        // Success state: ticket link is available
         setToastMessage(response.ticketLink);
-        setIsError(false); // success state
+        setIsError(false);
       } else {
+        // Success without ticket link
         setToastMessage("Report submitted, but no ticket link available.");
         setIsError(false);
       }
@@ -53,8 +55,9 @@ export const SupportModalProvider: React.FC<{ children: React.ReactNode }> = ({ 
       setShowSupportModal(false);
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
+      // Error state
       setToastMessage("Failed to submit report. Please try again.");
-      setIsError(true); // set error state
+      setIsError(true);
     } finally {
       setShowToast(true);
     }
@@ -86,9 +89,13 @@ export const SupportModalProvider: React.FC<{ children: React.ReactNode }> = ({ 
             {!isError ? (
               <>
                 <div>Report submitted successfully!</div>
-                <Button variant="link" href={toastMessage} target="_blank" className="p-0">
-                  View Ticket
-                </Button>
+                {toastMessage.startsWith("http") ? (
+                  <Button variant="link" href={toastMessage} target="_blank" className="p-0">
+                    View Ticket
+                  </Button>
+                ) : (
+                  <span>{toastMessage}</span>
+                )}
               </>
             ) : (
               toastMessage
