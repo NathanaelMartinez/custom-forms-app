@@ -37,11 +37,11 @@ export async function fetchUserJiraTickets(
 
     return response.data.issues.map((issue: JiraTicket) => ({
       id: issue.id,
-      summary: issue.fields.summary,
-      template: issue.fields.customfield_10042 || "N/A",
-      link: issue.fields.customfield_10043,
-      priority: issue.fields.priority.name,
-      status: issue.fields.status.name,
+      summary: issue.summary,
+      template: issue.template || "N/A",
+      link: issue.link,
+      priority: issue.priority,
+      status: issue.status,
     }));
   } catch (error) {
     console.error("Failed to fetch Jira tickets:", error);
