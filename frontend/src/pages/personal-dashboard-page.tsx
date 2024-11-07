@@ -35,6 +35,7 @@ const PersonalDashboardPage: React.FC = () => {
   const [loadingBugReports, setLoadingBugReports] = useState<boolean>(true);
   const [bugReportsError, setBugReportsError] = useState<string | null>(null);
   const [currentBugPage, setCurrentBugPage] = useState(1);
+  const [bugReportSubmitted, setBugReportSubmitted] = useState(false); // refresh after samepage report submission
   const resultsPerPage = 10;
   const navigate = useNavigate();
 
@@ -90,32 +91,32 @@ const PersonalDashboardPage: React.FC = () => {
     loadUserResponses();
   }, [id]);
 
-  const loadBugReports = async (page: number) => {
-    try {
-      setBugReportsError(null); // reset bug reports error state
-      setLoadingBugReports(true);
-      const startAt = (page - 1) * resultsPerPage;
-
-      const reports = await fetchUserJiraTickets(
-        user!.email,
-        startAt,
-        resultsPerPage
-      );
-      console.log("Fetched bug reports:", reports);
-      setBugReports(reports);
-    } catch (err) {
-      console.error("Failed to fetch bug reports:", err);
-      setBugReportsError("Failed to load bug reports."); // set error
-    } finally {
-      setLoadingBugReports(false);
-    }
-  };
-
   useEffect(() => {
+    const loadBugReports = async (page: number) => {
+      try {
+        setBugReportsError(null);
+        setLoadingBugReports(true);
+        const startAt = (page - 1) * resultsPerPage;
+
+        const reports = await fetchUserJiraTickets(
+          user!.email,
+          startAt,
+          resultsPerPage
+        );
+        console.log("Fetched bug reports:", reports);
+        setBugReports(reports);
+      } catch (err) {
+        console.error("Failed to fetch bug reports:", err);
+        setBugReportsError("Failed to load bug reports.");
+      } finally {
+        setLoadingBugReports(false);
+      }
+    };
+
     if (user?.email) {
       loadBugReports(currentBugPage);
     }
-  }, [user, currentBugPage]);
+  }, [user, currentBugPage, bugReportSubmitted]);
 
   const handlePageChange = (page: number) => {
     setCurrentBugPage(page);
@@ -392,26 +393,23 @@ const PersonalDashboardPage: React.FC = () => {
                       </Table>
 
                       {/* pagination Controls */}
-                      {bugReports.length === resultsPerPage && (
-                        <Pagination className="mt-3">
-                          <Pagination.First
-                            onClick={() => handlePageChange(1)}
-                          />
-                          <Pagination.Prev
-                            onClick={() => handlePageChange(currentBugPage - 1)}
-                            disabled={currentBugPage === 1}
-                          />
-                          <Pagination.Item active>
-                            {currentBugPage}
-                          </Pagination.Item>
-                          <Pagination.Next
-                            onClick={() => handlePageChange(currentBugPage + 1)}
-                          />
-                          <Pagination.Last
-                            onClick={() => handlePageChange(currentBugPage + 1)}
-                          />
-                        </Pagination>
-                      )}
+                      <Pagination className="mt-3">
+                        <Pagination.First
+                          onClick={() => handlePageChange(1)}
+                          disabled={currentBugPage === 1}
+                        />
+                        <Pagination.Prev
+                          onClick={() => handlePageChange(currentBugPage - 1)}
+                          disabled={currentBugPage === 1}
+                        />
+                        <Pagination.Item active>
+                          {currentBugPage}
+                        </Pagination.Item>
+                        <Pagination.Next
+                          onClick={() => handlePageChange(currentBugPage + 1)}
+                          disabled={bugReports.length < resultsPerPage}
+                        />
+                      </Pagination>
                     </>
                   )}
                 </Tab>
