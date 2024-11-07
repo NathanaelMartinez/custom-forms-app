@@ -48,8 +48,7 @@ export const SupportModalProvider: React.FC<{ children: React.ReactNode }> = ({
 
       console.log("response:", response);
   
-      // Check for ticketLink directly in the response
-      if (response?.ticketLink) {
+      if (response.ticketLink) {
         setToastMessage(response.ticketLink);
         setIsError(false);
       } else {
@@ -113,7 +112,7 @@ export const SupportModalProvider: React.FC<{ children: React.ReactNode }> = ({
                     View Ticket
                   </Button>
                 ) : (
-                  <span>{toastMessage || "Ticket link not available."}</span>
+                  <span>{"Ticket link not available."}</span>
                 )}
               </>
             ) : (
