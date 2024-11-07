@@ -45,6 +45,8 @@ export const SupportModalProvider: React.FC<{ children: React.ReactNode }> = ({
         pageLink,
         templateTitle
       );
+
+      console.log("response:", response);
   
       // Check for ticketLink directly in the response
       if (response?.ticketLink) {
@@ -61,6 +63,7 @@ export const SupportModalProvider: React.FC<{ children: React.ReactNode }> = ({
       setShowSupportModal(false);
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
+      console.log(error);
       setToastMessage("Failed to submit report. Please try again.");
       setIsError(true);
     } finally {
