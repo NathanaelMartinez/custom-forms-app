@@ -29,11 +29,7 @@ router.post("/create-ticket", async (req, res) => {
     const response = await axios.post(
       forgeApiUrl,
       {
-        summary,
-        priority,
-        user,
-        pageLink,
-        templateTitle,
+        payload: { summary, priority, user, pageLink, templateTitle },
       },
       {
         headers: {
