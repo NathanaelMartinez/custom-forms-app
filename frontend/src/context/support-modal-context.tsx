@@ -6,6 +6,7 @@ import { useAuth } from "./auth-context";
 import { Template } from "../types";
 import { fetchTemplateById } from "../services/template-service";
 
+// define context properties
 interface SupportModalContextProps {
   showSupportModal: boolean;
   summary: string;
@@ -17,17 +18,19 @@ interface SupportModalContextProps {
   handleSupportSubmit: () => Promise<void>;
 }
 
+// create support modal context
 const SupportModalContext = createContext<SupportModalContextProps | undefined>(
   undefined
 );
 
+// provider component for support modal context
 export const SupportModalProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
   const [showSupportModal, setShowSupportModal] = useState(false);
   const [summary, setSummary] = useState("");
   const [priority, setPriority] = useState("Medium");
-  const [templateTitle, setTemplateTitle] = useState<string>("");
+  const [templateTitle, setTemplateTitle] = useState("");
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
   const [isError, setIsError] = useState(false);
@@ -37,28 +40,22 @@ export const SupportModalProvider: React.FC<{ children: React.ReactNode }> = ({
   useEffect(() => {
     const path = location.pathname;
 
-    // regex for appropriate templateTitle
+    // match url to set appropriate title
     const matchForm = path.match(/^\/forms\/([^/]+)$/);
     const matchTemplate = path.match(/^\/templates\/([^/]+)$/);
 
     if (matchForm) {
-      const formId = matchForm[1];
-      fetchTemplateById(formId)
-        .then((form: Template) => {
-          setTemplateTitle(form.title); // set form title
-        })
-        .catch((error) => {
-          console.error("Failed to fetch form:", error);
-        });
+      fetchTemplateById(matchForm[1])
+        .then((form: Template) => setTemplateTitle(form.title))
+        .catch(() => console.error("failed to fetch form"));
     } else if (matchTemplate) {
-      const templateId = matchTemplate[1];
-      setTemplateTitle(templateId); // just set template ID
+      setTemplateTitle(matchTemplate[1]);
     }
   }, [location]);
 
   const handleSupportSubmit = async () => {
     try {
-      const pageLink = window.location.href; // capture current page URL
+      const pageLink = window.location.href;
 
       const response = await createJiraTicket(
         summary,
@@ -71,22 +68,16 @@ export const SupportModalProvider: React.FC<{ children: React.ReactNode }> = ({
         templateTitle
       );
 
-      if (response?.ticketLink) {
-        setToastMessage(response.ticketLink);
-        setIsError(false);
-      } else {
-        setToastMessage("No ticket link available, but report was submitted.");
-        setIsError(false);
-      }
-
-      // reset values
+      setToastMessage(
+        response?.ticketLink || "report submitted without ticket link"
+      );
+      setIsError(!response?.ticketLink);
       setSummary("");
       setPriority("Medium");
       setShowSupportModal(false);
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    } catch (error) {
-      setToastMessage("Failed to submit report. Please try again.");
-      setIsError(true); // Set as error state
+    } catch {
+      setToastMessage("failed to submit report. please try again.");
+      setIsError(true);
     } finally {
       setShowToast(true);
     }
@@ -107,7 +98,7 @@ export const SupportModalProvider: React.FC<{ children: React.ReactNode }> = ({
     >
       {children}
 
-      {/* Toast for showing success/failure messages */}
+      {/* toast for showing success/failure messages */}
       <ToastContainer position="top-end" className="p-3">
         <Toast
           show={showToast}
@@ -128,7 +119,7 @@ export const SupportModalProvider: React.FC<{ children: React.ReactNode }> = ({
                   target="_blank"
                   className="p-0"
                 >
-                  View Ticket
+                  View ticket
                 </Button>
               </>
             ) : (
@@ -141,12 +132,10 @@ export const SupportModalProvider: React.FC<{ children: React.ReactNode }> = ({
   );
 };
 
+// hook to use support modal context
 export const useSupportModal = (): SupportModalContextProps => {
   const context = useContext(SupportModalContext);
-  if (context === undefined) {
-    throw new Error(
-      "useSupportModal must be used within a SupportModalProvider"
-    );
-  }
+  if (!context)
+    throw new Error("useSupportModal must be used within SupportModalProvider");
   return context;
 };
