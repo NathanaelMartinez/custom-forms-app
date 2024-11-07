@@ -1,7 +1,7 @@
 import api, { route } from "@forge/api";
 
 // function to get jira account by QuickFormr email
-async function getAccountIdByEmail(email) {
+async function getAccountIdByEmail(email, username) {
   try {
     const response = await api
       .asApp()
@@ -15,13 +15,37 @@ async function getAccountIdByEmail(email) {
         return users[0].accountId; // return accountId of first matched user
       }
     }
-    console.log("User not found with email:", email);
+    console.log(
+      "User not found, attempting to create new Jira user for email:",
+      email
+    );
+
+    const createResponse = await api
+      .asApp()
+      .requestJira(route`/rest/api/3/user`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          emailAddress: email,
+          displayName: username,
+          notification: false,
+        }),
+      });
+
+    if (createResponse.ok) {
+      const newUser = await createResponse.json();
+      console.log("Successfully created Jira user:", newUser);
+      return newUser.accountId;
+    } else {
+      const errorText = await createResponse.text();
+      console.error("Failed to create Jira user:", errorText);
+    }
   } catch (error) {
     console.error("Error fetching user by email:", error);
   }
-
-  // TODO: account creation logic (get permissions???)
-  return "defaultAccountId"; // use placeholder if acct not found
+  return "defaultAccountId"; // use placeholder if acct not found and can't be created
 }
 
 // creates new issue in jira with ticket type
@@ -50,7 +74,7 @@ export async function createTicketFunction(request) {
   } = payload;
 
   // Retrieve accountId using email
-  const accountId = await getAccountIdByEmail(user.email);
+  const accountId = await getAccountIdByEmail(user.email, user.username);
 
   try {
     const response = await api.asApp().requestJira(route`/rest/api/3/issue`, {
@@ -122,7 +146,7 @@ export async function createTicketFunction(request) {
 export async function fetchTicketsFunction(request) {
   let payload;
   try {
-    payload = JSON.parse(request.body); // Explicitly parse body as JSON
+    payload = JSON.parse(request.body);
     console.log("Parsed payload:", payload);
   } catch (err) {
     console.error("Error parsing request body:", err);
@@ -132,7 +156,7 @@ export async function fetchTicketsFunction(request) {
     };
   }
 
-  // Validate that userEmail exists in payload
+  // validate that userEmail exists in payload
   const userEmail = payload?.userEmail;
   if (!userEmail) {
     console.error("userEmail is missing in the request payload.");
@@ -141,6 +165,10 @@ export async function fetchTicketsFunction(request) {
       body: JSON.stringify({ error: "userEmail is required." }),
     };
   }
+
+  // set up pagination
+  const startAt = payload.startAt || 0;
+  const maxResults = payload.maxResults || 10;
 
   try {
     const response = await api.asApp().requestJira(route`/rest/api/3/search`, {
@@ -157,6 +185,8 @@ export async function fetchTicketsFunction(request) {
           "priority",
           "status",
         ],
+        startAt,
+        maxResults,
       },
     });
 
@@ -173,6 +203,9 @@ export async function fetchTicketsFunction(request) {
             priority: issue.fields.priority?.name || "N/A",
             status: issue.fields.status?.name || "N/A",
           })),
+          startAt: data.startAt,
+          maxResults: data.maxResults,
+          total: data.total,
         }),
       };
     } else {

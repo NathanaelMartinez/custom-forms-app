@@ -28,11 +28,17 @@ export const createJiraTicket = async (
 };
 
 export async function fetchUserJiraTickets(
-  userEmail: string
+  userEmail: string,
+  startAt: number = 0,
+  maxResults: number = 10
 ): Promise<JiraTicket[]> {
   try {
     const response = await axios.get(`${SERVER_URL}/api/tickets/user`, {
-      params: { email: userEmail },
+      params: {
+        email: userEmail,
+        startAt,
+        maxResults,
+      },
     });
 
     return response.data.issues.map((issue: JiraTicket) => ({

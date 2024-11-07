@@ -50,7 +50,7 @@ router.post("/", async (req, res) => {
 
 // fetch tickets for a user
 router.get("/user", async (req, res) => {
-  const { email } = req.query; // get email from params
+  const { email, startAt = 0, maxResults = 10 } = req.query; // get email from params
 
   try {
     const forgeApiUrl = process.env.JIRA_API_FETCH_TICKETS_WEBTRIGGER!;
@@ -59,6 +59,8 @@ router.get("/user", async (req, res) => {
       forgeApiUrl,
       {
         userEmail: email,
+        startAt: Number(startAt),
+        maxResults: Number(maxResults),
       },
       {
         headers: {

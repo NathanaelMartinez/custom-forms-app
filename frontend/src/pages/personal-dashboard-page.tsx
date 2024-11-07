@@ -33,6 +33,8 @@ const PersonalDashboardPage: React.FC = () => {
   const [bugReports, setBugReports] = useState<JiraTicket[]>([]);
   const [loadingBugReports, setLoadingBugReports] = useState<boolean>(true);
   const [bugReportsError, setBugReportsError] = useState<string | null>(null);
+  const [bugPage, setBugPage] = useState(0);
+  const resultsPerPage = 10;
   const navigate = useNavigate();
 
   // fetch templates on component mount
@@ -91,9 +93,15 @@ const PersonalDashboardPage: React.FC = () => {
     const loadBugReports = async () => {
       try {
         setBugReportsError(null); // reset bug reports error state
-        const reports = await fetchUserJiraTickets(user!.email);
+        const startAt = bugPage * resultsPerPage;
+
+        const reports = await fetchUserJiraTickets(
+          user!.email,
+          startAt,
+          resultsPerPage
+        );
         console.log("Fetched bug reports:", reports);
-        setBugReports(reports);
+        setBugReports((prevReports) => [...prevReports, ...reports]);
       } catch (err) {
         console.error("Failed to fetch bug reports:", err);
         setBugReportsError("Failed to load bug reports."); // set error
@@ -105,7 +113,9 @@ const PersonalDashboardPage: React.FC = () => {
     if (user?.email) {
       loadBugReports();
     }
-  }, [user]);
+  }, [user, bugPage]);
+
+  const loadMore = () => setBugPage((prevPage) => prevPage + 1);
 
   const handleDeleteTemplate = async (templateId: string) => {
     try {
@@ -374,6 +384,15 @@ const PersonalDashboardPage: React.FC = () => {
                           </tr>
                         ))}
                       </tbody>
+                      {bugReports.length > 0 && (
+                        <Button
+                          onClick={loadMore}
+                          variant="secondary"
+                          className="mt-3"
+                        >
+                          Load More
+                        </Button>
+                      )}
                     </Table>
                   )}
                 </Tab>
