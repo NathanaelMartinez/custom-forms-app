@@ -38,7 +38,7 @@ const AppFooter: React.FC = () => {
               </li>
               <li>
                 <a
-                  // href="#"
+                  href="#"
                   className="text-light text-decoration-none"
                   onClick={() => setShowSupportModal(true)}
                 >

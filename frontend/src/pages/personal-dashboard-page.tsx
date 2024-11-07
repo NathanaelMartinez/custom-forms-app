@@ -102,7 +102,8 @@ const PersonalDashboardPage: React.FC = () => {
           startAt,
           resultsPerPage
         );
-        console.log("Fetched bug reports:", reports);
+        console.log("Fetched bug reports for page", page, ":", reports);
+
         setBugReports(reports);
       } catch (err) {
         console.error("Failed to fetch bug reports:", err);
@@ -393,10 +394,7 @@ const PersonalDashboardPage: React.FC = () => {
 
                       {/* pagination Controls */}
                       <Pagination className="mt-3">
-                        <Pagination.First
-                          onClick={() => handlePageChange(1)}
-                          disabled={currentBugPage === 1}
-                        />
+                        <Pagination.First onClick={() => handlePageChange(1)} />
                         <Pagination.Prev
                           onClick={() => handlePageChange(currentBugPage - 1)}
                           disabled={currentBugPage === 1}

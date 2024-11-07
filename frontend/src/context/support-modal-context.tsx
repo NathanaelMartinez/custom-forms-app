@@ -1,14 +1,15 @@
-import React, { createContext, useContext, useState } from "react";
+import React, { createContext, useContext, useEffect, useState } from "react";
 import { Button, Toast, ToastContainer } from "react-bootstrap";
 import { createJiraTicket } from "../services/ticket-service";
 import { useAuth } from "./auth-context";
+import { Template } from "../types";
+import { fetchTemplateById } from "../services/template-service";
 
 interface SupportModalContextProps {
   showSupportModal: boolean;
   summary: string;
   priority: string;
   templateTitle: string;
-  setTemplateTitle: (title: string) => void;
   setShowSupportModal: (show: boolean) => void;
   setSummary: (summary: string) => void;
   setPriority: (priority: string) => void;
@@ -25,11 +26,33 @@ export const SupportModalProvider: React.FC<{ children: React.ReactNode }> = ({
   const [showSupportModal, setShowSupportModal] = useState(false);
   const [summary, setSummary] = useState("");
   const [priority, setPriority] = useState("Medium");
-  const [templateTitle, setTemplateTitle] = useState<string>(""); // dynamic template title
+  const [templateTitle, setTemplateTitle] = useState<string>("");
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
   const [isError, setIsError] = useState(false);
   const { user } = useAuth();
+
+  useEffect(() => {
+    const path = location.pathname;
+
+    // regex for appropriate templateTitle
+    const matchForm = path.match(/^\/forms\/([^/]+)$/);
+    const matchTemplate = path.match(/^\/templates\/([^/]+)$/);
+
+    if (matchForm) {
+      const formId = matchForm[1];
+      fetchTemplateById(formId)
+        .then((form: Template) => {
+          setTemplateTitle(form.title); // set form title
+        })
+        .catch((error) => {
+          console.error("Failed to fetch form:", error);
+        });
+    } else if (matchTemplate) {
+      const templateId = matchTemplate[1];
+      setTemplateTitle(templateId); // just set template ID
+    }
+  }, [location]);
 
   const handleSupportSubmit = async () => {
     try {
@@ -76,7 +99,6 @@ export const SupportModalProvider: React.FC<{ children: React.ReactNode }> = ({
         priority,
         setPriority,
         templateTitle,
-        setTemplateTitle,
         handleSupportSubmit,
       }}
     >

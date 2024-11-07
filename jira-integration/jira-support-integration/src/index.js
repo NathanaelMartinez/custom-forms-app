@@ -192,7 +192,6 @@ export async function fetchTicketsFunction(request) {
 
     if (response.ok) {
       const data = await response.json();
-      const ticketLink = `https://${process.env.JIRA_DOMAIN}/browse/${data.key}`;
       return {
         statusCode: 200,
         body: JSON.stringify({
@@ -200,7 +199,7 @@ export async function fetchTicketsFunction(request) {
             id: issue.id,
             summary: issue.fields.summary,
             template: issue.fields.customfield_10042 || "N/A",
-            link: ticketLink || "N/A",
+            link: `https://${process.env.JIRA_DOMAIN}/browse/${issue.key}`,
             priority: issue.fields.priority?.name || "N/A",
             status: issue.fields.status?.name || "N/A",
           })),
