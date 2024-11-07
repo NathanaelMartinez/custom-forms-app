@@ -31,7 +31,7 @@ export async function fetchUserJiraTickets(
   userEmail: string
 ): Promise<BugReport[]> {
   try {
-    const response = await axios.get(`${SERVER_URL}/api/tickets`, {
+    const response = await axios.get(`${SERVER_URL}/api/tickets/user`, {
       params: { email: userEmail },
     });
 
