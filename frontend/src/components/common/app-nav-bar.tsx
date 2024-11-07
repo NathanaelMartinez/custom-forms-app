@@ -14,12 +14,13 @@ import FormNewIcon from "../../assets/icons/form-new.svg?react";
 import { useAuth } from "../../context/auth-context";
 import AppSearchBar from "./app-search-bar";
 import { useSupportModal } from "../../context/support-modal-context";
+import { fetchTemplateById } from "../../services/template-service";
 
 const AppNavBar: React.FC = () => {
   const { isLoggedIn, user, logout } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-  const { setShowSupportModal } = useSupportModal();
+  const { setShowSupportModal, setTemplateTitle } = useSupportModal();
 
   const handleLogInClick = () => {
     navigate("/login", { state: { returnUrl: location.pathname } });
@@ -27,6 +28,25 @@ const AppNavBar: React.FC = () => {
 
   const handleSignUpClick = () => {
     navigate("/sign-up");
+  };
+
+  const handleReportBugClick = async () => {
+    const path = location.pathname;
+    const matchForm = path.match(/^\/forms\/([^/]+)$/);
+
+    if (matchForm) {
+      const formId = matchForm[1];
+      try {
+        const form = await fetchTemplateById(formId);
+        setTemplateTitle(form.title);
+      } catch (error) {
+        console.error("Failed to fetch form title:", error);
+        setTemplateTitle(""); // clear title if fetch fails
+      }
+    } else {
+      setTemplateTitle(""); // clear title if not on form page
+    }
+    setShowSupportModal(true); // show modal after setting the title
   };
 
   const isHomePage = location.pathname === "/"; // for extra features on homepage
@@ -65,7 +85,7 @@ const AppNavBar: React.FC = () => {
                         Support Resources
                       </Dropdown.Item>
                       <Dropdown.Divider />
-                      <Dropdown.Item onClick={() => setShowSupportModal(true)}>
+                      <Dropdown.Item onClick={handleReportBugClick}>
                         Report a bug
                       </Dropdown.Item>
                     </Dropdown.Menu>

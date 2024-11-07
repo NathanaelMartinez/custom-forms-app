@@ -9,9 +9,29 @@ import {
 } from "react-bootstrap-icons";
 import { useSupportModal } from "../../context/support-modal-context";
 import SupportTicketModal from "./support-ticket-modal";
+import { fetchTemplateById } from "../../services/template-service";
 
 const AppFooter: React.FC = () => {
-  const { setShowSupportModal } = useSupportModal();
+  const { setShowSupportModal, setTemplateTitle } = useSupportModal();
+
+  const handleReportBugClick = async () => {
+    const path = location.pathname;
+    const matchForm = path.match(/^\/forms\/([^/]+)$/);
+
+    if (matchForm) {
+      const formId = matchForm[1];
+      try {
+        const form = await fetchTemplateById(formId);
+        setTemplateTitle(form.title);
+      } catch (error) {
+        console.error("Failed to fetch form title:", error);
+        setTemplateTitle(""); // clear title if fetch fails
+      }
+    } else {
+      setTemplateTitle(""); // clear title if not on form page
+    }
+    setShowSupportModal(true); // show modal after setting the title
+  };
 
   return (
     <footer className="bg-dark text-light py-5">
@@ -40,7 +60,7 @@ const AppFooter: React.FC = () => {
                 <a
                   href="#"
                   className="text-light text-decoration-none"
-                  onClick={() => setShowSupportModal(true)}
+                  onClick={handleReportBugClick}
                 >
                   Report a bug
                 </a>
