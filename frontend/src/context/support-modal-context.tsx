@@ -48,9 +48,7 @@ export const SupportModalProvider: React.FC<{ children: React.ReactNode }> = ({
 
       console.log("response:", response);
 
-      setToastMessage(
-        response.ticketLink || "Report submitted, but no ticket link available."
-      );
+      setToastMessage(response.ticketLink);
       setIsError(false);
 
       // reset values
