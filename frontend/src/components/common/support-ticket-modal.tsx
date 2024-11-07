@@ -27,12 +27,14 @@ const SupportTicketModal: React.FC = () => {
               value={summary}
               onChange={(e) => setSummary(e.target.value)}
               placeholder="Briefly describe your issue"
+              className="input-focus-muted"
             />
           </Form.Group>
           <Form.Group>
             <Form.Label>Priority</Form.Label>
             <Form.Select
               value={priority}
+              className="input-focus-muted"
               onChange={(e) => setPriority(e.target.value)}
             >
               <option value="High">High</option>
@@ -43,10 +45,10 @@ const SupportTicketModal: React.FC = () => {
         </Form>
       </Modal.Body>
       <Modal.Footer>
-        <Button variant="secondary" onClick={() => setShowSupportModal(false)}>
+        <Button variant="secondary" className="custom-secondary-btn" onClick={() => setShowSupportModal(false)}>
           Cancel
         </Button>
-        <Button variant="primary" onClick={handleSupportSubmit}>
+        <Button variant="primary" className="custom-success-btn" onClick={handleSupportSubmit}>
           Submit
         </Button>
       </Modal.Footer>

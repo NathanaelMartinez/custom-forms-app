@@ -35,7 +35,7 @@ export const SupportModalProvider: React.FC<{ children: React.ReactNode }> = ({
         summary,
         priority,
         {
-          email: user?.email || "no-email@domain.com", // provide fallback value
+          email: user?.email || "no-email@domain.com",
           username: user?.username || "Unknown User",
         },
         pageLink,

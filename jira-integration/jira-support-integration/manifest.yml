@@ -1,25 +1,31 @@
 modules:
+  # global page to display in jira ui, accessible under app's page title
   jira:globalPage:
-    - key: jira-support-integration-hello-world-page
+    - key: jira-support-integration-page
       resource: main
-      resolver:
-        function: resolver
       title: jira-support-integration
-  function:
-    - key: resolver
-      handler: index.handler
-    - key: createTicketFunction
-      handler: index.handler
+      
+  # web trigger makes `createTicketFunction` available as an endpoint outside of forge
   webtrigger:
     - key: create-ticket-trigger
       function: createTicketFunction
+
+  # function module where backend function `createTicketFunction` is defined
+  function:
+    - key: createTicketFunction
+      handler: index.createTicketFunction
+
 resources:
+  # reference for static files served to jira
   - key: main
     path: static/hello-world/build
+
 app:
+  # runtime environment used for backend functions
   runtime:
     name: nodejs20.x
   id: ari:cloud:ecosystem::app/2fe269c1-bdd8-45ce-adda-f2f233b2744a
+
 permissions:
   scopes:
     - read:jira-work

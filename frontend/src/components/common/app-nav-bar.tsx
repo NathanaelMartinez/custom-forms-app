@@ -41,34 +41,36 @@ const AppNavBar: React.FC = () => {
           <Navbar.Toggle aria-controls="basic-navbar-nav" />
           <Navbar.Collapse id="basic-navbar-nav">
             <Nav className="ms-auto align-items-center">
-              <Dropdown align="end">
-                <Dropdown.Toggle
-                  as="div" // get rid of arrow
-                  className="custom-icon-toggle p-0 me-2"
-                  id="help-dropdown"
-                  style={{
-                    display: "inline-flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    cursor: "pointer", // keep it clickable
-                  }}
-                >
-                  <QuestionCircle size={36} className="custom-icon-btn" />
-                </Dropdown.Toggle>
-
-                <Dropdown.Menu>
-                  <Dropdown.Item href="/faq">FAQs</Dropdown.Item>
-                  <Dropdown.Item href="/support-resources">
-                    Support Resources
-                  </Dropdown.Item>
-                  <Dropdown.Divider />
-                  <Dropdown.Item onClick={() => setShowSupportModal(true)}>
-                    Still need help? Contact Support
-                  </Dropdown.Item>
-                </Dropdown.Menu>
-              </Dropdown>
               {isLoggedIn ? (
                 <>
+                  {/* Help button */}
+                  <Dropdown align="end">
+                    <Dropdown.Toggle
+                      as="div" // get rid of arrow
+                      className="custom-icon-toggle p-0 me-2"
+                      id="help-dropdown"
+                      style={{
+                        display: "inline-flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        cursor: "pointer", // keep it clickable
+                      }}
+                    >
+                      <QuestionCircle size={36} className="custom-icon-btn" />
+                    </Dropdown.Toggle>
+
+                    <Dropdown.Menu>
+                      <Dropdown.Item href="/faq">FAQs</Dropdown.Item>
+                      <Dropdown.Item href="/support-resources">
+                        Support Resources
+                      </Dropdown.Item>
+                      <Dropdown.Divider />
+                      <Dropdown.Item onClick={() => setShowSupportModal(true)}>
+                        Still need help? Contact Support
+                      </Dropdown.Item>
+                    </Dropdown.Menu>
+                  </Dropdown>
+
                   <Button
                     variant="link"
                     className="p-0 custom-icon-btn"
