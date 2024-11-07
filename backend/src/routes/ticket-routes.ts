@@ -49,7 +49,7 @@ router.post("/", async (req, res) => {
 });
 
 // fetch tickets for a user
-router.get("/tickets", async (req, res) => {
+router.get("/", async (req, res) => {
   const { email } = req.query; // get email from params
 
   try {

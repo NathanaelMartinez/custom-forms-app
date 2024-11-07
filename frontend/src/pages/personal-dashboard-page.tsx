@@ -32,6 +32,7 @@ const PersonalDashboardPage: React.FC = () => {
   const [responses, setResponses] = useState<formResponse[]>([]);
   const [bugReports, setBugReports] = useState<BugReport[]>([]);
   const [loadingBugReports, setLoadingBugReports] = useState<boolean>(true);
+  const [bugReportsError, setBugReportsError] = useState<string | null>(null);
   const navigate = useNavigate();
 
   // fetch templates on component mount
@@ -89,11 +90,13 @@ const PersonalDashboardPage: React.FC = () => {
   useEffect(() => {
     const loadBugReports = async () => {
       try {
+        setBugReportsError(null); // reset bug reports error state
         const reports = await fetchUserJiraTickets(user!.email);
+        console.log("Fetched bug reports:", reports);
         setBugReports(reports);
       } catch (err) {
         console.error("Failed to fetch bug reports:", err);
-        setError("Failed to load bug reports.");
+        setBugReportsError("Failed to load bug reports."); // set error
       } finally {
         setLoadingBugReports(false);
       }
@@ -337,6 +340,8 @@ const PersonalDashboardPage: React.FC = () => {
                 >
                   {loadingBugReports ? (
                     <Spinner animation="border" />
+                  ) : bugReportsError ? (
+                    <Alert variant="danger">{bugReportsError}</Alert>
                   ) : bugReports.length === 0 ? (
                     <Alert variant="info">No bug reports found.</Alert>
                   ) : (
