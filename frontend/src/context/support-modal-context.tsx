@@ -34,7 +34,7 @@ export const SupportModalProvider: React.FC<{ children: React.ReactNode }> = ({
   const handleSupportSubmit = async () => {
     try {
       const pageLink = window.location.href;
-  
+
       const response = await createJiraTicket(
         summary,
         priority,
@@ -47,29 +47,24 @@ export const SupportModalProvider: React.FC<{ children: React.ReactNode }> = ({
       );
 
       console.log("response:", response);
-  
-      if (response.ticketLink) {
-        setToastMessage(response.ticketLink);
-        setIsError(false);
-      } else {
-        setToastMessage("Report submitted, but no ticket link available.");
-        setIsError(false);
-      }
-  
-      // Reset values
+
+      setToastMessage(
+        response.ticketLink || "Report submitted, but no ticket link available."
+      );
+      setIsError(false);
+
+      // reset values
       setSummary("");
       setPriority("Medium");
       setShowSupportModal(false);
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
-      console.log(error);
+      console.error("Error submitting report:", error);
       setToastMessage("Failed to submit report. Please try again.");
       setIsError(true);
     } finally {
       setShowToast(true);
     }
   };
-  
 
   return (
     <SupportModalContext.Provider
@@ -92,7 +87,7 @@ export const SupportModalProvider: React.FC<{ children: React.ReactNode }> = ({
         <Toast
           show={showToast}
           onClose={() => setShowToast(false)}
-          delay={3000}
+          delay={10000}
           autohide
         >
           <Toast.Header>
@@ -102,7 +97,7 @@ export const SupportModalProvider: React.FC<{ children: React.ReactNode }> = ({
             {!isError ? (
               <>
                 <div>Report submitted successfully!</div>
-                {toastMessage && toastMessage.startsWith("http") ? (
+                {toastMessage && isError === false ? (
                   <Button
                     variant="link"
                     href={toastMessage}
@@ -112,7 +107,7 @@ export const SupportModalProvider: React.FC<{ children: React.ReactNode }> = ({
                     View Ticket
                   </Button>
                 ) : (
-                  <span>{"Ticket link not available."}</span>
+                  <span>{toastMessage}</span>
                 )}
               </>
             ) : (
