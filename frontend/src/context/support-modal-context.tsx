@@ -8,10 +8,10 @@ interface SupportModalContextProps {
   summary: string;
   priority: string;
   templateTitle: string;
+  setTemplateTitle: (title: string) => void;
   setShowSupportModal: (show: boolean) => void;
   setSummary: (summary: string) => void;
   setPriority: (priority: string) => void;
-  setTemplateTitle: (title: string) => void; // expose this function to set template title
   handleSupportSubmit: () => Promise<void>;
 }
 
@@ -25,15 +25,14 @@ export const SupportModalProvider: React.FC<{ children: React.ReactNode }> = ({
   const [showSupportModal, setShowSupportModal] = useState(false);
   const [summary, setSummary] = useState("");
   const [priority, setPriority] = useState("Medium");
-  const [templateTitle, setTemplateTitle] = useState<string>(""); // set dynamically as needed
+  const [templateTitle, setTemplateTitle] = useState<string>(""); // dynamic template title
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
-  const [isError, setIsError] = useState(false);
   const { user } = useAuth();
 
   const handleSupportSubmit = async () => {
     try {
-      const pageLink = window.location.href;
+      const pageLink = window.location.href; // capture current page URL
 
       const response = await createJiraTicket(
         summary,
@@ -46,26 +45,16 @@ export const SupportModalProvider: React.FC<{ children: React.ReactNode }> = ({
         templateTitle
       );
 
-      // log response to ensure ticketLink is received
-      console.log("Response from createJiraTicket:", response);
+      setToastMessage(response.ticketLink);
+      setShowToast(true);
 
-      if (response?.ticketLink) {
-        setToastMessage(response.ticketLink);
-        setIsError(false);
-      } else {
-        setToastMessage("Report submitted, but no ticket link available.");
-        setIsError(false);
-      }
-
-      // Reset values
+      // reset values
       setSummary("");
       setPriority("Medium");
       setShowSupportModal(false);
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
       setToastMessage("Failed to submit report. Please try again.");
-      setIsError(true);
-    } finally {
       setShowToast(true);
     }
   };
@@ -80,13 +69,13 @@ export const SupportModalProvider: React.FC<{ children: React.ReactNode }> = ({
         priority,
         setPriority,
         templateTitle,
-        setTemplateTitle, // expose setter to manage templateTitle externally
+        setTemplateTitle,
         handleSupportSubmit,
       }}
     >
       {children}
 
-      {/* Toast notification for success/failure */}
+      {/* Toast for showing success/failure messages */}
       <ToastContainer position="top-end" className="p-3">
         <Toast
           show={showToast}
@@ -98,24 +87,20 @@ export const SupportModalProvider: React.FC<{ children: React.ReactNode }> = ({
             <strong className="me-auto">Notification</strong>
           </Toast.Header>
           <Toast.Body>
-            {!isError ? (
+            {toastMessage ? (
               <>
                 <div>Report submitted successfully!</div>
-                {toastMessage && toastMessage.startsWith("http") ? (
-                  <Button
-                    variant="link"
-                    href={toastMessage}
-                    target="_blank"
-                    className="p-0"
-                  >
-                    View Ticket
-                  </Button>
-                ) : (
-                  <span>{toastMessage || "Ticket link not available."}</span>
-                )}
+                <Button
+                  variant="link"
+                  href={toastMessage}
+                  target="_blank"
+                  className="p-0"
+                >
+                  View Ticket
+                </Button>
               </>
             ) : (
-              <span>{toastMessage}</span>
+              "Failed to submit report. Please try again."
             )}
           </Toast.Body>
         </Toast>
@@ -126,7 +111,7 @@ export const SupportModalProvider: React.FC<{ children: React.ReactNode }> = ({
 
 export const useSupportModal = (): SupportModalContextProps => {
   const context = useContext(SupportModalContext);
-  if (!context) {
+  if (context === undefined) {
     throw new Error(
       "useSupportModal must be used within a SupportModalProvider"
     );
