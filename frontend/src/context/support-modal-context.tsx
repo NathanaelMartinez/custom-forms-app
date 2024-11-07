@@ -28,6 +28,7 @@ export const SupportModalProvider: React.FC<{ children: React.ReactNode }> = ({
   const [templateTitle, setTemplateTitle] = useState<string>(""); // dynamic template title
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
+  const [isError, setIsError] = useState(false);
   const { user } = useAuth();
 
   const handleSupportSubmit = async () => {
@@ -45,8 +46,12 @@ export const SupportModalProvider: React.FC<{ children: React.ReactNode }> = ({
         templateTitle
       );
 
-      setToastMessage(response.ticketLink);
-      setShowToast(true);
+      if (response?.ticketLink) {
+        setToastMessage(response.ticketLink);
+        setIsError(false); // Ensure it's a success state
+      } else {
+        throw new Error("Ticket link missing in response.");
+      }
 
       // reset values
       setSummary("");
@@ -55,6 +60,8 @@ export const SupportModalProvider: React.FC<{ children: React.ReactNode }> = ({
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
       setToastMessage("Failed to submit report. Please try again.");
+      setIsError(true); // Set as error state
+    } finally {
       setShowToast(true);
     }
   };
@@ -87,7 +94,7 @@ export const SupportModalProvider: React.FC<{ children: React.ReactNode }> = ({
             <strong className="me-auto">Notification</strong>
           </Toast.Header>
           <Toast.Body>
-            {toastMessage ? (
+            {!isError ? (
               <>
                 <div>Report submitted successfully!</div>
                 <Button
@@ -100,7 +107,7 @@ export const SupportModalProvider: React.FC<{ children: React.ReactNode }> = ({
                 </Button>
               </>
             ) : (
-              "Failed to submit report. Please try again."
+              toastMessage
             )}
           </Toast.Body>
         </Toast>
