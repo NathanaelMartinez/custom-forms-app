@@ -9,6 +9,7 @@ import {
   Button,
   Row,
   Col,
+  Pagination,
 } from "react-bootstrap";
 import { useNavigate, useParams } from "react-router-dom";
 import { format } from "date-fns";
@@ -33,7 +34,7 @@ const PersonalDashboardPage: React.FC = () => {
   const [bugReports, setBugReports] = useState<JiraTicket[]>([]);
   const [loadingBugReports, setLoadingBugReports] = useState<boolean>(true);
   const [bugReportsError, setBugReportsError] = useState<string | null>(null);
-  const [bugPage, setBugPage] = useState(0);
+  const [currentBugPage, setCurrentBugPage] = useState(1);
   const resultsPerPage = 10;
   const navigate = useNavigate();
 
@@ -89,33 +90,36 @@ const PersonalDashboardPage: React.FC = () => {
     loadUserResponses();
   }, [id]);
 
-  useEffect(() => {
-    const loadBugReports = async () => {
-      try {
-        setBugReportsError(null); // reset bug reports error state
-        const startAt = bugPage * resultsPerPage;
+  const loadBugReports = async (page: number) => {
+    try {
+      setBugReportsError(null); // reset bug reports error state
+      setLoadingBugReports(true);
+      const startAt = (page - 1) * resultsPerPage;
 
-        const reports = await fetchUserJiraTickets(
-          user!.email,
-          startAt,
-          resultsPerPage
-        );
-        console.log("Fetched bug reports:", reports);
-        setBugReports((prevReports) => [...prevReports, ...reports]);
-      } catch (err) {
-        console.error("Failed to fetch bug reports:", err);
-        setBugReportsError("Failed to load bug reports."); // set error
-      } finally {
-        setLoadingBugReports(false);
-      }
-    };
-
-    if (user?.email) {
-      loadBugReports();
+      const reports = await fetchUserJiraTickets(
+        user!.email,
+        startAt,
+        resultsPerPage
+      );
+      console.log("Fetched bug reports:", reports);
+      setBugReports(reports);
+    } catch (err) {
+      console.error("Failed to fetch bug reports:", err);
+      setBugReportsError("Failed to load bug reports."); // set error
+    } finally {
+      setLoadingBugReports(false);
     }
-  }, [user, bugPage]);
+  };
 
-  const loadMore = () => setBugPage((prevPage) => prevPage + 1);
+  useEffect(() => {
+    if (user?.email) {
+      loadBugReports(currentBugPage);
+    }
+  }, [user, currentBugPage]);
+
+  const handlePageChange = (page: number) => {
+    setCurrentBugPage(page);
+  };
 
   const handleDeleteTemplate = async (templateId: string) => {
     try {
@@ -355,45 +359,60 @@ const PersonalDashboardPage: React.FC = () => {
                   ) : bugReports.length === 0 ? (
                     <Alert variant="info">No bug reports found.</Alert>
                   ) : (
-                    <Table striped bordered hover responsive>
-                      <thead>
-                        <tr>
-                          <th>Summary</th>
-                          <th>Template</th>
-                          <th>Link</th>
-                          <th>Priority</th>
-                          <th>Status</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {bugReports.map((report) => (
-                          <tr key={report.id}>
-                            <td>{report.summary}</td>
-                            <td>{report.template}</td>
-                            <td>
-                              <a
-                                href={report.link}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                              >
-                                {report.link}
-                              </a>
-                            </td>
-                            <td>{report.priority}</td>
-                            <td>{report.status}</td>
+                    <>
+                      <Table striped bordered hover responsive>
+                        <thead>
+                          <tr>
+                            <th>Summary</th>
+                            <th>Template</th>
+                            <th>Link</th>
+                            <th>Priority</th>
+                            <th>Status</th>
                           </tr>
-                        ))}
-                      </tbody>
-                      {bugReports.length > 0 && (
-                        <Button
-                          onClick={loadMore}
-                          variant="secondary"
-                          className="mt-3"
-                        >
-                          Load More
-                        </Button>
+                        </thead>
+                        <tbody>
+                          {bugReports.map((report) => (
+                            <tr key={report.id}>
+                              <td>{report.summary}</td>
+                              <td>{report.template}</td>
+                              <td>
+                                <a
+                                  href={report.link}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                >
+                                  {report.link}
+                                </a>
+                              </td>
+                              <td>{report.priority}</td>
+                              <td>{report.status}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </Table>
+
+                      {/* pagination Controls */}
+                      {bugReports.length === resultsPerPage && (
+                        <Pagination className="mt-3">
+                          <Pagination.First
+                            onClick={() => handlePageChange(1)}
+                          />
+                          <Pagination.Prev
+                            onClick={() => handlePageChange(currentBugPage - 1)}
+                            disabled={currentBugPage === 1}
+                          />
+                          <Pagination.Item active>
+                            {currentBugPage}
+                          </Pagination.Item>
+                          <Pagination.Next
+                            onClick={() => handlePageChange(currentBugPage + 1)}
+                          />
+                          <Pagination.Last
+                            onClick={() => handlePageChange(currentBugPage + 1)}
+                          />
+                        </Pagination>
                       )}
-                    </Table>
+                    </>
                   )}
                 </Tab>
               )}
