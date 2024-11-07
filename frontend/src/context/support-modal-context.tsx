@@ -101,25 +101,21 @@ export const SupportModalProvider: React.FC<{ children: React.ReactNode }> = ({
             {!isError ? (
               <>
                 <div>Report submitted successfully!</div>
-                {toastMessage ? (
-                  toastMessage.startsWith("http") ? (
-                    <Button
-                      variant="link"
-                      href={toastMessage}
-                      target="_blank"
-                      className="p-0"
-                    >
-                      View Ticket
-                    </Button>
-                  ) : (
-                    <span>{toastMessage}</span>
-                  )
+                {toastMessage && toastMessage.startsWith("http") ? (
+                  <Button
+                    variant="link"
+                    href={toastMessage}
+                    target="_blank"
+                    className="p-0"
+                  >
+                    View Ticket
+                  </Button>
                 ) : (
-                  "Ticket link not available."
+                  <span>{toastMessage || "Ticket link not available."}</span>
                 )}
               </>
             ) : (
-              toastMessage
+              <span>{toastMessage}</span>
             )}
           </Toast.Body>
         </Toast>
